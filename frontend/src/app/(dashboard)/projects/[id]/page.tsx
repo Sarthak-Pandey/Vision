@@ -2,73 +2,60 @@
 
 import React, { useEffect, useState, use } from 'react';
 import Link from 'next/link';
-import { ArrowLeft, MapPin, Calendar, Images, Activity, Navigation, FileText, Clock, ShieldAlert } from 'lucide-react';
+import { ArrowLeft, MapPin, Calendar, Images, Activity, Navigation, FileText, Clock, ShieldAlert, UploadCloud } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { StatCard } from '@/components/ui/StatCard';
 import { Tabs } from '@/components/ui/Tabs';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card';
 import { EmptyState } from '@/components/ui/EmptyState';
-import { getProject } from '@/lib/api/client';
-import { Project } from '@/types';
+import { MediaCard } from '@/components/ui/MediaCard';
+import { UploadMediaModal } from '@/components/media/UploadMediaModal';
+import { getProject, getAssets } from '@/lib/api/client';
+import { Project, MediaAsset } from '@/types';
 
 export default function ProjectDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const resolvedParams = use(params);
   const projectId = resolvedParams.id;
 
   const [project, setProject] = useState<Project | null>(null);
+  const [projectAssets, setProjectAssets] = useState<MediaAsset[]>([]);
   const [activeTab, setActiveTab] = useState('overview');
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
+
+  const loadData = async () => {
+    try {
+      setIsLoading(true);
+      const [projectData, assetsData] = await Promise.all([
+        getProject(projectId),
+        getAssets(projectId),
+      ]);
+      setProject(projectData);
+      setProjectAssets(assetsData);
+    } catch (err: any) {
+      setError(err.message || 'Failed to fetch project details');
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   useEffect(() => {
-    async function loadProject() {
-      try {
-        setIsLoading(true);
-        const data = await getProject(projectId);
-        setProject(data);
-      } catch (err: any) {
-        setError(err.message || 'Failed to fetch project details');
-      } finally {
-        setIsLoading(false);
-      }
-    }
-    loadProject();
+    loadData();
   }, [projectId]);
 
   const tabs = [
     { id: 'overview', label: 'Overview' },
-    { id: 'media', label: 'Media', count: 37 },
+    { id: 'media', label: 'Media', count: projectAssets.length },
     { id: 'timeline', label: 'Timeline' },
-    { id: 'evidence', label: 'Evidence', count: 18 },
-    { id: 'reports', label: 'Reports', count: 2 },
+    { id: 'evidence', label: 'Evidence' },
+    { id: 'reports', label: 'Reports' },
   ];
 
-  const sampleRecentMedia = [
-    {
-      id: 'p-m1',
-      url: 'https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?w=600&auto=format&fit=crop&q=60',
-      title: 'Zone A Bio-filter Installation',
-      date: 'Feb 10, 2025',
-    },
-    {
-      id: 'p-m2',
-      url: 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=600&auto=format&fit=crop&q=60',
-      title: 'Turbidity Sampling Site #4',
-      date: 'Feb 12, 2025',
-    },
-    {
-      id: 'p-m3',
-      url: 'https://images.unsplash.com/photo-1509391365360-2e959784a276?w=600&auto=format&fit=crop&q=60',
-      title: 'Solar Water Aerator',
-      date: 'Feb 18, 2025',
-    },
-    {
-      id: 'p-m4',
-      url: 'https://images.unsplash.com/photo-1532996122724-e3c354a0b15b?w=600&auto=format&fit=crop&q=60',
-      title: 'Trash Skimmer Deployment',
-      date: 'Feb 22, 2025',
-    },
-  ];
+  const handleAssetUploaded = (newAsset: MediaAsset) => {
+    if (newAsset.project_id !== projectId) return;
+    setProjectAssets((prev) => [newAsset, ...prev]);
+  };
 
   if (isLoading) {
     return (
@@ -106,7 +93,7 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
       {/* Top Back Navigation */}
       <Link
         href="/projects"
-        className="inline-flex items-center gap-1.5 text-xs font-semibold text-secondary-text hover:text-brand-dark-orange transition-colors"
+        className="inline-flex items-center gap-1.5 text-xs font-semibold text-secondary-text hover:text-brand-primary transition-colors"
       >
         <ArrowLeft className="w-4 h-4" />
         <span>Back to Projects</span>
@@ -131,6 +118,14 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
             </span>
           </div>
         </div>
+
+        <Button
+          onClick={() => setIsUploadModalOpen(true)}
+          className="gap-2 shrink-0 self-start md:self-auto"
+        >
+          <UploadCloud className="w-4 h-4" />
+          <span>Upload Evidence</span>
+        </Button>
       </div>
 
       {/* Navigation Tabs */}
@@ -142,19 +137,19 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
           {/* Top 3 Stat Cards */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <StatCard
-              title="Media"
-              value={37}
-              icon={<Images className="w-4 h-4 text-brand-orange" />}
+              title="Media Assets"
+              value={projectAssets.length}
+              icon={<Images className="w-4 h-4 text-brand-primary" />}
             />
             <StatCard
               title="Activities"
               value={4}
-              icon={<Activity className="w-4 h-4 text-brand-orange" />}
+              icon={<Activity className="w-4 h-4 text-brand-primary" />}
             />
             <StatCard
               title="Locations"
-              value={2}
-              icon={<Navigation className="w-4 h-4 text-brand-orange" />}
+              value={project.location ? 1 : 0}
+              icon={<Navigation className="w-4 h-4 text-brand-primary" />}
             />
           </div>
 
@@ -173,42 +168,85 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
 
           {/* Recent Media Section */}
           <div className="space-y-3">
-            <h3 className="text-base font-semibold text-primary-text">Recent Media</h3>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              {sampleRecentMedia.map((m) => (
-                <div key={m.id} className="bg-white border border-border rounded-xl overflow-hidden group">
-                  <div className="aspect-4/3 bg-secondary-bg overflow-hidden relative">
-                    <img
-                      src={m.url}
-                      alt={m.title}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                    />
-                  </div>
-                  <div className="p-3">
-                    <p className="text-xs font-semibold text-primary-text truncate">{m.title}</p>
-                    <p className="text-[11px] text-muted-text mt-0.5">{m.date}</p>
-                  </div>
-                </div>
-              ))}
+            <div className="flex items-center justify-between">
+              <h3 className="text-base font-semibold text-primary-text">Recent Media Evidence</h3>
+              {projectAssets.length > 0 && (
+                <button
+                  onClick={() => setActiveTab('media')}
+                  className="text-xs text-brand-primary font-medium hover:underline"
+                >
+                  View all ({projectAssets.length})
+                </button>
+              )}
             </div>
+
+            {projectAssets.length === 0 ? (
+              <div className="p-8 text-center bg-white border border-border border-dashed rounded-xl">
+                <p className="text-xs text-secondary-text">No visual evidence uploaded for this project yet.</p>
+                <Button
+                  size="sm"
+                  onClick={() => setIsUploadModalOpen(true)}
+                  className="mt-3 gap-1.5"
+                >
+                  <UploadCloud className="w-3.5 h-3.5" />
+                  <span>Upload Media</span>
+                </Button>
+              </div>
+            ) : (
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                {projectAssets.slice(0, 4).map((asset) => (
+                  <MediaCard key={asset.id} asset={asset} projectName={project.name} />
+                ))}
+              </div>
+            )}
           </div>
         </div>
       )}
 
-      {/* Placeholders for non-overview tabs */}
+      {/* Media tab with full grid */}
       {activeTab === 'media' && (
-        <EmptyState
-          icon={<Images className="w-8 h-8 text-muted-text" />}
-          title="Project Media Gallery"
-          description="Cloudinary field media assets for this project will appear here."
-        />
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <p className="text-sm text-secondary-text">
+              Showing {projectAssets.length} visual evidence records for {project.name}.
+            </p>
+            <Button
+              size="sm"
+              onClick={() => setIsUploadModalOpen(true)}
+              className="gap-1.5"
+            >
+              <UploadCloud className="w-3.5 h-3.5" />
+              <span>Add Media</span>
+            </Button>
+          </div>
+
+          {projectAssets.length === 0 ? (
+            <EmptyState
+              icon={<Images className="w-8 h-8 text-secondary-text" />}
+              title="No media in this project"
+              description="Upload field photos to document verified project progress."
+              action={
+                <Button onClick={() => setIsUploadModalOpen(true)} className="gap-2">
+                  <UploadCloud className="w-4 h-4" />
+                  <span>Upload Evidence</span>
+                </Button>
+              }
+            />
+          ) : (
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+              {projectAssets.map((asset) => (
+                <MediaCard key={asset.id} asset={asset} projectName={project.name} />
+              ))}
+            </div>
+          )}
+        </div>
       )}
 
       {activeTab === 'timeline' && (
         <EmptyState
           icon={<Clock className="w-8 h-8 text-muted-text" />}
           title="Project Activity Timeline"
-          description="Chronological evidence progression and field updates will be tracked in Phase 1."
+          description="Chronological evidence progression sorted by capture date."
         />
       )}
 
@@ -216,7 +254,7 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
         <EmptyState
           icon={<FileText className="w-8 h-8 text-muted-text" />}
           title="Evidence Provenance & Confidence"
-          description="AI vision analysis & verified evidence graphs will be attached in future phases."
+          description="AI vision analysis & verified evidence graphs will be attached in Phase 2."
         />
       )}
 
@@ -227,6 +265,14 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
           description="Structured PDF & web impact reports will be generated here."
         />
       )}
+
+      {/* Upload Media Modal */}
+      <UploadMediaModal
+        isOpen={isUploadModalOpen}
+        onClose={() => setIsUploadModalOpen(false)}
+        onUploaded={handleAssetUploaded}
+        defaultProjectId={project.id}
+      />
     </div>
   );
 }

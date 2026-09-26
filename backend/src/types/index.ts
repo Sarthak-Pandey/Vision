@@ -37,6 +37,17 @@ export interface Asset {
   created_at: string;
 }
 
+export interface CreateAssetInput {
+  project_id: string;
+  cloudinary_public_id?: string | null;
+  url: string;
+  type?: string | null;
+  capture_date?: string | null;
+  latitude?: number | null;
+  longitude?: number | null;
+  uploaded_by?: string | null;
+}
+
 export interface ApiResponse<T = any> {
   success: boolean;
   data?: T;

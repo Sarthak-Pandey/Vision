@@ -17,6 +17,9 @@ const config: Config = {
         "secondary-text": "#6B6B6B",
         "muted-text": "#9A9A9A",
         brand: {
+          primary: "#059669",
+          "primary-hover": "#047857",
+          "primary-light": "#ECFDF5",
           orange: "#F97316",
           "dark-orange": "#EA580C",
           "light-orange": "#FFF7ED",

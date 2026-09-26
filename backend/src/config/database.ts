@@ -5,10 +5,13 @@ const isConfigured =
   config.supabaseUrl &&
   config.supabaseUrl.startsWith('http') &&
   config.supabaseServiceRoleKey &&
-  !config.supabaseUrl.includes('mock-supabase');
+  !config.supabaseUrl.includes('mock-supabase') &&
+  !config.supabaseUrl.includes('your-supabase-project') &&
+  !config.supabaseServiceRoleKey.includes('your-supabase-service-role-key');
 
 export const supabase = isConfigured
   ? createClient(config.supabaseUrl, config.supabaseServiceRoleKey)
   : null;
 
 export const isSupabaseConfigured = (): boolean => !!supabase;
+

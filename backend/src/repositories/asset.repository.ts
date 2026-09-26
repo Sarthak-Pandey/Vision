@@ -1,10 +1,11 @@
 import { supabase, isSupabaseConfigured } from '../config/database.js';
-import { Asset } from '../types/index.js';
+import { Asset, CreateAssetInput } from '../types/index.js';
 
 const mockAssetsStore: Asset[] = [
   {
     id: 'asset-1',
     project_id: 'proj-1',
+    cloudinary_public_id: 'sample_tree_1',
     url: 'https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?w=800&auto=format&fit=crop&q=60',
     type: 'image',
     capture_date: '2025-02-10T10:00:00Z',
@@ -16,6 +17,7 @@ const mockAssetsStore: Asset[] = [
   {
     id: 'asset-2',
     project_id: 'proj-1',
+    cloudinary_public_id: 'sample_tree_2',
     url: 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=800&auto=format&fit=crop&q=60',
     type: 'image',
     capture_date: '2025-02-15T14:30:00Z',
@@ -27,6 +29,7 @@ const mockAssetsStore: Asset[] = [
   {
     id: 'asset-3',
     project_id: 'proj-2',
+    cloudinary_public_id: 'sample_solar_1',
     url: 'https://images.unsplash.com/photo-1509391365360-2e959784a276?w=800&auto=format&fit=crop&q=60',
     type: 'image',
     capture_date: '2025-01-20T09:15:00Z',
@@ -66,4 +69,45 @@ export class AssetRepository {
 
     return mockAssetsStore;
   }
+
+  async create(data: CreateAssetInput): Promise<Asset> {
+    if (isSupabaseConfigured() && supabase) {
+      const { data: created, error } = await supabase
+        .from('assets')
+        .insert([
+          {
+            project_id: data.project_id,
+            cloudinary_public_id: data.cloudinary_public_id || null,
+            url: data.url,
+            type: data.type || 'image',
+            capture_date: data.capture_date || new Date().toISOString(),
+            latitude: data.latitude ?? null,
+            longitude: data.longitude ?? null,
+            uploaded_by: data.uploaded_by || 'Anonymous Field Worker',
+          },
+        ])
+        .select('*')
+        .single();
+
+      if (error) throw new Error(error.message);
+      return created as Asset;
+    }
+
+    const newAsset: Asset = {
+      id: `ast-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`,
+      project_id: data.project_id,
+      cloudinary_public_id: data.cloudinary_public_id || null,
+      url: data.url,
+      type: data.type || 'image',
+      capture_date: data.capture_date || new Date().toISOString(),
+      latitude: data.latitude ?? null,
+      longitude: data.longitude ?? null,
+      uploaded_by: data.uploaded_by || 'Sarthak Pandey',
+      created_at: new Date().toISOString(),
+    };
+
+    mockAssetsStore.unshift(newAsset);
+    return newAsset;
+  }
 }
+

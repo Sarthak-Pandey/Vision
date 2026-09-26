@@ -10,4 +10,20 @@ if (config.cloudinaryCloudName && config.cloudinaryCloudName !== 'mock-cloud-nam
   });
 }
 
+export const isCloudinaryConfigured = (): boolean => {
+  return !!(
+    config.cloudinaryCloudName &&
+    config.cloudinaryCloudName !== 'mock-cloud' &&
+    config.cloudinaryCloudName !== 'mock-cloud-name' &&
+    !config.cloudinaryCloudName.includes('your-cloudinary') &&
+    config.cloudinaryApiKey &&
+    config.cloudinaryApiKey !== 'mock-key' &&
+    !config.cloudinaryApiKey.includes('your-cloudinary') &&
+    config.cloudinaryApiSecret &&
+    config.cloudinaryApiSecret !== 'mock-secret' &&
+    !config.cloudinaryApiSecret.includes('your-cloudinary')
+  );
+};
+
 export { cloudinary };
+
