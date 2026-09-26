@@ -27,6 +27,7 @@ export interface UpdateProjectPayload {
 export interface MediaAsset {
   id: string;
   project_id: string;
+  cloudinary_public_id?: string | null;
   url: string;
   type?: string | null;
   capture_date?: string | null;
@@ -35,6 +36,23 @@ export interface MediaAsset {
   uploaded_by?: string | null;
   created_at: string;
 }
+
+export interface CreateAssetPayload {
+  project_id: string;
+  cloudinary_public_id?: string | null;
+  url: string;
+  type?: string | null;
+  capture_date?: string | null;
+  latitude?: number | null;
+  longitude?: number | null;
+  uploaded_by?: string | null;
+}
+
+export interface UploadMediaResponse {
+  url: string;
+  public_id: string;
+}
+
 
 export interface User {
   id: string;

@@ -1,0 +1,13 @@
+{
+  "name": "vision-platform",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "start": "npm run dev --prefix backend",
+    "dev": "node dev.mjs",
+    "dev:backend": "npm run dev --prefix backend",
+    "dev:frontend": "npm run dev --prefix frontend",
+    "install:all": "npm install --prefix backend && npm install --prefix frontend",
+    "typecheck": "npm run typecheck --prefix backend && npm run typecheck --prefix frontend"
+  }
+}

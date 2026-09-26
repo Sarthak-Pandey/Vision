@@ -1,5 +1,5 @@
 import { AssetRepository } from '../repositories/asset.repository.js';
-import { Asset } from '../types/index.js';
+import { Asset, CreateAssetInput } from '../types/index.js';
 
 export class AssetService {
   private assetRepository: AssetRepository;
@@ -15,4 +15,9 @@ export class AssetService {
   async getAllAssets(): Promise<Asset[]> {
     return this.assetRepository.findAll();
   }
+
+  async createAsset(data: CreateAssetInput): Promise<Asset> {
+    return this.assetRepository.create(data);
+  }
 }
+
