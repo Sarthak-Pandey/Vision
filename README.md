@@ -138,6 +138,5 @@ NEXT_PUBLIC_DEMO_USER_EMAIL=sarthak@example.com
 
 ---
 
-## 📄 License
+© 2026 Sarthak Pandey. All Rights Reserved.
 
-MIT License © 2026 Sarthak Pandey. All Rights Reserved.
