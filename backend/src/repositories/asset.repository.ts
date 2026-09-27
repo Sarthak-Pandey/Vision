@@ -56,6 +56,21 @@ export class AssetRepository {
     return mockAssetsStore.filter((a) => a.project_id === projectId);
   }
 
+  async findById(id: string): Promise<Asset | null> {
+    if (isSupabaseConfigured() && supabase) {
+      const { data, error } = await supabase
+        .from('assets')
+        .select('*')
+        .eq('id', id)
+        .maybeSingle();
+
+      if (error) throw new Error(error.message);
+      return (data as Asset) || null;
+    }
+
+    return mockAssetsStore.find((a) => a.id === id) || null;
+  }
+
   async findAll(): Promise<Asset[]> {
     if (isSupabaseConfigured() && supabase) {
       const { data, error } = await supabase

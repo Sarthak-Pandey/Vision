@@ -62,3 +62,27 @@ export interface UserSession {
   email: string;
   name?: string;
 }
+
+export interface AiAnalysis {
+  id: string;
+  asset_id: string;
+  description: string;
+  objects: string[];
+  activities: string[];
+  scene: string;
+  visible_condition: string;
+  confidence: number;
+  source?: 'gemini' | 'simulated';
+  created_at: string;
+}
+
+export interface CreateAiAnalysisInput {
+  asset_id: string;
+  description: string;
+  objects: string[];
+  activities: string[];
+  scene: string;
+  visible_condition: string;
+  confidence: number;
+  source?: 'gemini' | 'simulated';
+}

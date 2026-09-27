@@ -16,6 +16,10 @@ export class AssetService {
     return this.assetRepository.findAll();
   }
 
+  async getAssetById(id: string): Promise<Asset | null> {
+    return this.assetRepository.findById(id);
+  }
+
   async createAsset(data: CreateAssetInput): Promise<Asset> {
     return this.assetRepository.create(data);
   }
