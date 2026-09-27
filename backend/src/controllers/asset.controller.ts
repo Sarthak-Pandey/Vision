@@ -4,7 +4,7 @@ import { CloudinaryService } from '../services/cloudinary.service.js';
 import { VisionService } from '../services/vision.service.js';
 import { ProjectService } from '../services/project.service.js';
 import { BadRequestError, NotFoundError } from '../utils/errors.js';
-import { AiAnalysis } from '../types/index.js';
+import { Asset, AiAnalysis } from '../types/index.js';
 
 export class AssetController {
   private assetService: AssetService;
@@ -21,12 +21,19 @@ export class AssetController {
 
   getAssets = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
+      const userId = (req as any).user?.id;
       const { projectId } = req.query;
-      let assets;
+      let assets: Asset[] = [];
+
       if (projectId && typeof projectId === 'string') {
+        // Enforce user ownership of target project
+        await this.projectService.getProjectById(projectId, userId);
         assets = await this.assetService.getAssetsByProject(projectId);
       } else {
-        assets = await this.assetService.getAllAssets();
+        // Fetch only assets belonging to user's authorized projects
+        const userProjects = await this.projectService.getAllProjects(userId);
+        const userProjectIds = userProjects.map((p) => p.id);
+        assets = await this.assetService.getAssetsByProjectIds(userProjectIds);
       }
 
       // Efficiently fetch only the latest AI analysis for the requested asset IDs
@@ -49,17 +56,23 @@ export class AssetController {
 
   createAsset = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
-      const asset = await this.assetService.createAsset(req.body);
+      const userId = (req as any).user?.id;
+      const userName = (req as any).user?.name || (req as any).user?.email || 'Field Worker';
+
+      // Verify user owns target project before associating asset
+      const project = await this.projectService.getProjectById(req.body.project_id, userId);
+
+      const assetPayload = {
+        ...req.body,
+        uploaded_by: userName,
+      };
+
+      const asset = await this.assetService.createAsset(assetPayload);
 
       // Trigger automated vision analysis in background upon asset registration
       (async () => {
         try {
-          let projectName: string | undefined;
-          if (asset.project_id) {
-            const project = await this.projectService.getProjectById(asset.project_id);
-            if (project) projectName = project.name;
-          }
-          await this.visionService.analyzeAsset(asset, projectName);
+          await this.visionService.analyzeAsset(asset, project.name);
           console.log(`[AssetController] Automated AI Vision analysis completed for asset: ${asset.id}`);
         } catch (visionErr: any) {
           console.warn(`[AssetController] Background vision analysis failed for asset ${asset.id}:`, visionErr.message);
@@ -77,23 +90,18 @@ export class AssetController {
 
   analyzeAsset = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
+      const userId = (req as any).user?.id;
       const { id } = req.params;
+
       const asset = await this.assetService.getAssetById(id);
       if (!asset) {
         throw new NotFoundError(`Asset with ID ${id} not found`);
       }
 
-      let projectName: string | undefined;
-      if (asset.project_id) {
-        try {
-          const project = await this.projectService.getProjectById(asset.project_id);
-          if (project) projectName = project.name;
-        } catch {
-          // ignore
-        }
-      }
+      // Verify user owns the project containing this asset
+      const project = await this.projectService.getProjectById(asset.project_id, userId);
 
-      const analysis = await this.visionService.analyzeAsset(asset, projectName);
+      const analysis = await this.visionService.analyzeAsset(asset, project.name);
       res.status(200).json({
         success: true,
         data: analysis,
@@ -105,7 +113,17 @@ export class AssetController {
 
   getAssetAnalysis = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
+      const userId = (req as any).user?.id;
       const { id } = req.params;
+
+      const asset = await this.assetService.getAssetById(id);
+      if (!asset) {
+        throw new NotFoundError(`Asset with ID ${id} not found`);
+      }
+
+      // Verify user owns the project containing this asset
+      await this.projectService.getProjectById(asset.project_id, userId);
+
       const analysis = await this.visionService.getAnalysisByAssetId(id);
       res.status(200).json({
         success: true,

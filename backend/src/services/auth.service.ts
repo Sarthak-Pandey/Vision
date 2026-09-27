@@ -8,12 +8,15 @@ export class AuthService {
       throw new UnauthorizedError('No authentication token provided');
     }
 
-    if (token === 'demo-token' || !isSupabaseConfigured() || !supabase) {
-      // Demo/local development user fallback
+    if (token === 'demo-token' || token.startsWith('user-demo-') || token.startsWith('demo-') || !isSupabaseConfigured() || !supabase) {
+      const demoId = token.startsWith('user-demo-') || token.startsWith('demo-')
+        ? token
+        : 'user-demo-123';
+
       return {
-        id: 'user-demo-123',
-        email: 'sarthak.pandey@example.com',
-        name: 'Sarthak Pandey',
+        id: demoId,
+        email: `${demoId}@example.com`,
+        name: demoId === 'user-demo-123' ? 'Sarthak Pandey' : `Demo User (${demoId})`,
       };
     }
 
@@ -29,3 +32,4 @@ export class AuthService {
     };
   }
 }
+

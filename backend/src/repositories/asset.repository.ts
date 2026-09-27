@@ -71,6 +71,23 @@ export class AssetRepository {
     return mockAssetsStore.find((a) => a.id === id) || null;
   }
 
+  async findByProjectIds(projectIds: string[]): Promise<Asset[]> {
+    if (!projectIds || projectIds.length === 0) return [];
+
+    if (isSupabaseConfigured() && supabase) {
+      const { data, error } = await supabase
+        .from('assets')
+        .select('*')
+        .in('project_id', projectIds)
+        .order('created_at', { ascending: false });
+
+      if (error) throw new Error(error.message);
+      return data as Asset[];
+    }
+
+    return mockAssetsStore.filter((a) => projectIds.includes(a.project_id));
+  }
+
   async findAll(): Promise<Asset[]> {
     if (isSupabaseConfigured() && supabase) {
       const { data, error } = await supabase

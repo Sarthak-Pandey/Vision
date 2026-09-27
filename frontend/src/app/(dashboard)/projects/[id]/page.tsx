@@ -1,34 +1,59 @@
 'use client';
 
-import React, { useEffect, useState, use } from 'react';
+import React, { useEffect, useState, use, useMemo } from 'react';
 import Link from 'next/link';
-import { ArrowLeft, MapPin, Calendar, Images, Activity, Navigation, FileText, Clock, ShieldAlert, UploadCloud } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import {
+  ArrowLeft,
+  MapPin,
+  Calendar,
+  Images,
+  Activity as ActivityIcon,
+  Clock,
+  ShieldAlert,
+  UploadCloud,
+  Edit,
+  Trash2,
+} from 'lucide-react';
 import { Button } from '@/components/ui/Button';
-import { StatCard } from '@/components/ui/StatCard';
 import { Tabs } from '@/components/ui/Tabs';
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { MediaCard } from '@/components/ui/MediaCard';
 import { UploadMediaModal } from '@/components/media/UploadMediaModal';
 import { MediaDetailModal } from '@/components/media/MediaDetailModal';
+import { EditProjectModal } from '@/components/projects/EditProjectModal';
+import { DeleteProjectModal } from '@/components/projects/DeleteProjectModal';
+import { ProjectStats } from '@/components/projects/ProjectStats';
+import { ProjectOverviewCard } from '@/components/projects/ProjectOverviewCard';
+import { ActivitySummary } from '@/components/projects/ActivitySummary';
+import { LocationSummary } from '@/components/projects/LocationSummary';
+import { RecentMedia } from '@/components/projects/RecentMedia';
+import { ProjectTimeline } from '@/components/projects/ProjectTimeline';
 import { getProject, getAssets } from '@/lib/api/client';
-import { Project, MediaAsset, MediaAssetWithAnalysis, AiAnalysis } from '@/types';
+import { Project, MediaAsset, MediaAssetWithAnalysis } from '@/types';
+import { calculateProjectStats } from '@/lib/utils/projectStats';
 
 export default function ProjectDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const resolvedParams = use(params);
   const projectId = resolvedParams.id;
+  const router = useRouter();
 
   const [project, setProject] = useState<Project | null>(null);
   const [projectAssets, setProjectAssets] = useState<MediaAssetWithAnalysis[]>([]);
   const [activeTab, setActiveTab] = useState('overview');
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  // Modals state
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [selectedAssetForInspection, setSelectedAssetForInspection] = useState<MediaAssetWithAnalysis | null>(null);
 
   const loadData = async () => {
     try {
       setIsLoading(true);
+      setError(null);
       const [projectData, assetsData] = await Promise.all([
         getProject(projectId),
         getAssets(projectId),
@@ -46,17 +71,50 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
     loadData();
   }, [projectId]);
 
+  // Compute stats deterministically from assets and AI analysis
+  const stats = useMemo(() => {
+    return calculateProjectStats(projectAssets);
+  }, [projectAssets]);
+
   const tabs = [
     { id: 'overview', label: 'Overview' },
-    { id: 'media', label: 'Media', count: projectAssets.length },
+    { id: 'media', label: 'Media', count: stats.mediaCount },
+    { id: 'activities', label: 'Activities', count: stats.activityCount },
+    { id: 'locations', label: 'Locations', count: stats.locationCount },
     { id: 'timeline', label: 'Timeline' },
-    { id: 'evidence', label: 'Evidence' },
-    { id: 'reports', label: 'Reports' },
   ];
 
-  const handleAssetUploaded = (newAsset: MediaAsset) => {
-    if (newAsset.project_id !== projectId) return;
-    setProjectAssets((prev) => [newAsset, ...prev]);
+  const formatDateRange = (start?: string | null, end?: string | null) => {
+    const formatSingle = (str?: string | null) => {
+      if (!str) return null;
+      try {
+        const d = new Date(str);
+        if (isNaN(d.getTime())) return null;
+        return d.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+      } catch {
+        return null;
+      }
+    };
+    const s = formatSingle(start);
+    const e = formatSingle(end);
+
+    if (s && e) return `${s} → ${e}`;
+    if (s) return `From ${s}`;
+    if (e) return `Until ${e}`;
+    return 'Date range unspecified';
+  };
+
+  const handleAssetUploaded = (_newAsset: MediaAsset) => {
+    loadData();
+  };
+
+  const handleProjectUpdated = (updatedProject: Project) => {
+    setProject(updatedProject);
+    loadData();
+  };
+
+  const handleProjectDeleted = () => {
+    router.push('/projects');
   };
 
   if (isLoading) {
@@ -72,14 +130,17 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
   if (error || !project) {
     return (
       <div className="py-12">
-        <Link href="/projects" className="inline-flex items-center gap-1.5 text-xs text-secondary-text hover:text-primary-text mb-6">
+        <Link
+          href="/projects"
+          className="inline-flex items-center gap-1.5 text-xs text-secondary-text hover:text-primary-text mb-6 font-medium"
+        >
           <ArrowLeft className="w-4 h-4" />
           <span>Back to Projects</span>
         </Link>
         <EmptyState
           icon={<ShieldAlert className="w-8 h-8 text-status-error" />}
           title="Project not found"
-          description={error || 'The requested project could not be loaded.'}
+          description={error || 'The requested project could not be found or you do not have permission.'}
           action={
             <Link href="/projects">
               <Button variant="outline">View All Projects</Button>
@@ -92,7 +153,7 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
 
   return (
     <div className="space-y-6">
-      {/* Top Back Navigation */}
+      {/* Navigation & Header */}
       <Link
         href="/projects"
         className="inline-flex items-center gap-1.5 text-xs font-semibold text-secondary-text hover:text-brand-primary transition-colors"
@@ -101,13 +162,12 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
         <span>Back to Projects</span>
       </Link>
 
-      {/* Project Header Title */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-border pb-6">
         <div>
           <h1 className="text-2xl md:text-3xl font-bold text-primary-text tracking-tight">
-            {project.name}
+            🌊 {project.name}
           </h1>
-          <div className="flex items-center gap-4 text-xs text-secondary-text mt-1.5">
+          <div className="flex flex-wrap items-center gap-4 text-xs text-secondary-text mt-1.5 font-medium">
             {project.location && (
               <span className="flex items-center gap-1">
                 <MapPin className="w-3.5 h-3.5 text-muted-text" />
@@ -116,106 +176,71 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
             )}
             <span className="flex items-center gap-1">
               <Calendar className="w-3.5 h-3.5 text-muted-text" />
-              {project.start_date || 'Jan 2025'} – {project.end_date || 'Sep 2026'}
+              {formatDateRange(project.start_date, project.end_date)}
             </span>
           </div>
         </div>
 
-        <Button
-          onClick={() => setIsUploadModalOpen(true)}
-          className="gap-2 shrink-0 self-start md:self-auto"
-        >
-          <UploadCloud className="w-4 h-4" />
-          <span>Upload Evidence</span>
-        </Button>
+        <div className="flex items-center gap-2 flex-wrap shrink-0 self-start md:self-auto">
+          <Button
+            variant="outline"
+            onClick={() => setIsEditModalOpen(true)}
+            className="gap-1.5 text-xs"
+          >
+            <Edit className="w-3.5 h-3.5" />
+            <span>Edit Project</span>
+          </Button>
+
+          <Button
+            variant="outline"
+            onClick={() => setIsDeleteModalOpen(true)}
+            className="gap-1.5 text-xs text-status-error border-red-200 hover:bg-red-50"
+          >
+            <Trash2 className="w-3.5 h-3.5" />
+            <span>Delete</span>
+          </Button>
+
+          <Button
+            onClick={() => setIsUploadModalOpen(true)}
+            className="gap-2 shrink-0 text-xs"
+          >
+            <UploadCloud className="w-4 h-4" />
+            <span>Upload Media</span>
+          </Button>
+        </div>
       </div>
 
       {/* Navigation Tabs */}
       <Tabs tabs={tabs} activeTab={activeTab} onChange={setActiveTab} />
 
-      {/* Tab Content */}
+      {/* Tab 1: Overview */}
       {activeTab === 'overview' && (
         <div className="space-y-6 animate-in fade-in duration-200">
-          {/* Top 3 Stat Cards */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <StatCard
-              title="Media Assets"
-              value={projectAssets.length}
-              icon={<Images className="w-4 h-4 text-brand-primary" />}
-            />
-            <StatCard
-              title="Activities"
-              value={4}
-              icon={<Activity className="w-4 h-4 text-brand-primary" />}
-            />
-            <StatCard
-              title="Locations"
-              value={project.location ? 1 : 0}
-              icon={<Navigation className="w-4 h-4 text-brand-primary" />}
-            />
-          </div>
+          <ProjectStats stats={stats} />
 
-          {/* Project Overview Card */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Project Overview</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-secondary-text leading-relaxed">
-                {project.description ||
-                  'No description provided for this project. This project tracks field operations, visual media ingestion, and environmental evidence validation.'}
-              </p>
-            </CardContent>
-          </Card>
+          <ProjectOverviewCard project={project} />
 
-          {/* Recent Media Section */}
-          <div className="space-y-3">
-            <div className="flex items-center justify-between">
-              <h3 className="text-base font-semibold text-primary-text">Recent Media Evidence</h3>
-              {projectAssets.length > 0 && (
-                <button
-                  onClick={() => setActiveTab('media')}
-                  className="text-xs text-brand-primary font-medium hover:underline"
-                >
-                  View all ({projectAssets.length})
-                </button>
-              )}
-            </div>
+          <RecentMedia
+            assets={projectAssets}
+            projectName={project.name}
+            onViewAllClick={() => setActiveTab('media')}
+            onAssetClick={setSelectedAssetForInspection}
+            onUploadClick={() => setIsUploadModalOpen(true)}
+          />
 
-            {projectAssets.length === 0 ? (
-              <div className="p-8 text-center bg-white border border-border border-dashed rounded-xl">
-                <p className="text-xs text-secondary-text">No visual evidence uploaded for this project yet.</p>
-                <Button
-                  size="sm"
-                  onClick={() => setIsUploadModalOpen(true)}
-                  className="mt-3 gap-1.5"
-                >
-                  <UploadCloud className="w-3.5 h-3.5" />
-                  <span>Upload Media</span>
-                </Button>
-              </div>
-            ) : (
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                {projectAssets.slice(0, 4).map((asset) => (
-                  <MediaCard
-                    key={asset.id}
-                    asset={asset}
-                    projectName={project.name}
-                    onClick={() => setSelectedAssetForInspection(asset)}
-                  />
-                ))}
-              </div>
-            )}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <ActivitySummary activities={stats.activities} />
+            <LocationSummary locations={stats.locations} />
           </div>
         </div>
       )}
 
-      {/* Media tab with full grid */}
+      {/* Tab 2: Media */}
       {activeTab === 'media' && (
-        <div className="space-y-4">
+        <div className="space-y-4 animate-in fade-in duration-200">
           <div className="flex items-center justify-between">
             <p className="text-sm text-secondary-text">
-              Showing {projectAssets.length} visual evidence records for {project.name}.
+              Showing {projectAssets.length} visual media assets for {project.name}.
             </p>
             <Button
               size="sm"
@@ -231,11 +256,11 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
             <EmptyState
               icon={<Images className="w-8 h-8 text-secondary-text" />}
               title="No media in this project"
-              description="Upload field photos to document verified project progress."
+              description="Upload field photos or videos to start building project media intelligence."
               action={
                 <Button onClick={() => setIsUploadModalOpen(true)} className="gap-2">
                   <UploadCloud className="w-4 h-4" />
-                  <span>Upload Evidence</span>
+                  <span>Upload Media</span>
                 </Button>
               }
             />
@@ -254,28 +279,30 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
         </div>
       )}
 
+      {/* Tab 3: Activities */}
+      {activeTab === 'activities' && (
+        <div className="space-y-6 animate-in fade-in duration-200">
+          <ActivitySummary activities={stats.activities} />
+        </div>
+      )}
+
+      {/* Tab 4: Locations */}
+      {activeTab === 'locations' && (
+        <div className="space-y-6 animate-in fade-in duration-200">
+          <LocationSummary locations={stats.locations} />
+        </div>
+      )}
+
+      {/* Tab 5: Timeline */}
       {activeTab === 'timeline' && (
-        <EmptyState
-          icon={<Clock className="w-8 h-8 text-muted-text" />}
-          title="Project Activity Timeline"
-          description="Chronological evidence progression sorted by capture date."
-        />
-      )}
-
-      {activeTab === 'evidence' && (
-        <EmptyState
-          icon={<FileText className="w-8 h-8 text-muted-text" />}
-          title="Evidence Provenance & Confidence"
-          description="AI vision analysis & verified evidence graphs will be attached in Phase 2."
-        />
-      )}
-
-      {activeTab === 'reports' && (
-        <EmptyState
-          icon={<FileText className="w-8 h-8 text-muted-text" />}
-          title="Project Impact Reports"
-          description="Structured PDF & web impact reports will be generated here."
-        />
+        <div className="space-y-6 animate-in fade-in duration-200">
+          <ProjectTimeline
+            timeline={stats.timeline}
+            undatedCount={stats.undatedAssetsCount}
+            projectName={project.name}
+            onAssetClick={setSelectedAssetForInspection}
+          />
+        </div>
       )}
 
       {/* Upload Media Modal */}
@@ -286,21 +313,45 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
         defaultProjectId={project.id}
       />
 
+      {/* Edit Project Modal */}
+      {isEditModalOpen && (
+        <EditProjectModal
+          isOpen={isEditModalOpen}
+          onClose={() => setIsEditModalOpen(false)}
+          project={project}
+          onUpdated={handleProjectUpdated}
+        />
+      )}
+
+      {/* Delete Project Modal */}
+      {isDeleteModalOpen && (
+        <DeleteProjectModal
+          isOpen={isDeleteModalOpen}
+          onClose={() => setIsDeleteModalOpen(false)}
+          project={project}
+          onDeleted={handleProjectDeleted}
+        />
+      )}
+
       {/* Evidence Inspector Modal */}
-      <MediaDetailModal
-        isOpen={!!selectedAssetForInspection}
-        onClose={() => setSelectedAssetForInspection(null)}
-        asset={selectedAssetForInspection}
-        projectName={project.name}
-        onAnalysisUpdated={(assetId, analysis) => {
-          setProjectAssets((prev) =>
-            prev.map((a) => (a.id === assetId ? { ...a, ai_analysis: analysis } : a))
-          );
-          if (selectedAssetForInspection && selectedAssetForInspection.id === assetId) {
-            setSelectedAssetForInspection((prev) => (prev ? { ...prev, ai_analysis: analysis } : null));
-          }
-        }}
-      />
+      {selectedAssetForInspection && (
+        <MediaDetailModal
+          isOpen={!!selectedAssetForInspection}
+          onClose={() => setSelectedAssetForInspection(null)}
+          asset={selectedAssetForInspection}
+          projectName={project.name}
+          onAnalysisUpdated={(assetId, analysis) => {
+            setProjectAssets((prev) =>
+              prev.map((a) => (a.id === assetId ? { ...a, ai_analysis: analysis } : a))
+            );
+            if (selectedAssetForInspection && selectedAssetForInspection.id === assetId) {
+              setSelectedAssetForInspection((prev) =>
+                prev ? { ...prev, ai_analysis: analysis } : null
+              );
+            }
+          }}
+        />
+      )}
     </div>
   );
 }
