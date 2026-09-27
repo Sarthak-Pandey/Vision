@@ -1,6 +1,6 @@
 # Vision
 
-An end-to-end media intelligence and verification platform for environmental, social, and sustainability initiatives. Vision ingests field photos and videos, pairs them with tamper-resistant geographic metadata, and verifies physical ground-truth progress through multimodal AI analysis.
+An end-to-end media intelligence and verification platform for environmental, social, and sustainability initiatives. Vision ingests field photos and videos, pairs them with geographic metadata, and verifies physical ground-truth progress through multimodal AI analysis and project-centric evidence dashboards.
 
 [![Next.js 15](https://img.shields.io/badge/Next.js-15_App_Router-black?style=flat-square&logo=next.js)](https://nextjs.org/)
 [![Express](https://img.shields.io/badge/Express-4.x-000000?style=flat-square&logo=express)](https://expressjs.com/)
@@ -13,22 +13,24 @@ An end-to-end media intelligence and verification platform for environmental, so
 
 ## Architecture
 
-Vision is decoupled into an autonomous Next.js 15 frontend application, an Express TypeScript REST backend, Cloudinary asset storage, and a Supabase PostgreSQL persistence layer.
+Vision is decoupled into an autonomous Next.js 15 frontend application, an Express TypeScript REST backend with strict Zod schemas, Cloudinary asset storage, and a Supabase PostgreSQL persistence layer.
 
 ```mermaid
 graph TD
     subgraph Client ["Frontend (Next.js 15 App Router)"]
-        UI["Dashboard & Project UI"]
+        ProjectsUI["Projects List & Management Modals"]
+        DashboardUI["Project Intelligence Dashboard"]
         UploadModal["Media Ingestion Modal (GPS + Drag-n-Drop)"]
         Inspector["Evidence Inspector & AI Badges"]
     end
 
     subgraph Backend ["Backend API (Express + TypeScript)"]
+        AuthMiddleware["Authentication Middleware (Bearer Token / x-demo-user)"]
         API["REST Endpoints (/api/*)"]
-        ZodValidator["Zod Schema Validation"]
+        ZodValidator["Zod Schema Validation & Ownership Scoping"]
         UploadStream["Multer 15MB Memory Buffer"]
         CloudinaryService["Cloudinary SDK (Stream Uploader)"]
-        DBRepo["Supabase Repository Layer"]
+        DBRepo["Supabase Repository Layer (User Scoped)"]
         VisionEngine["Multimodal Vision Analysis Engine"]
     end
 
@@ -37,47 +39,18 @@ graph TD
         Supabase[("Supabase PostgreSQL\n(Projects, Assets, AI Analysis)")]
     end
 
-    UI -->|REST / JWT| API
+    ProjectsUI -->|REST / JWT| AuthMiddleware
+    DashboardUI -->|REST / JWT| AuthMiddleware
+    AuthMiddleware --> API
     UploadModal -->|multipart/form-data| UploadStream
     UploadStream --> ZodValidator
     ZodValidator --> CloudinaryService
     CloudinaryService -->|Secure Stream Upload| Cloudinary
     Cloudinary -->|URL + Public ID| CloudinaryService
     CloudinaryService --> DBRepo
-    DBRepo -->|SQL Query / RPC| Supabase
+    DBRepo -->|SQL Query / RLS| Supabase
     API --> VisionEngine
     VisionEngine -.->|Multimodal Analysis| Supabase
-```
-
----
-
-## Ingestion and Verification Flow
-
-Field teams submit on-site photo or video evidence with real-time GPS metadata. The ingestion pipeline validates the payload, streams it to Cloudinary, indexes it in Supabase, and updates the frontend gallery.
-
-```mermaid
-sequenceDiagram
-    autonumber
-    actor FieldUser as Field Officer / Auditor
-    participant Browser as Next.js 15 Client
-    participant Server as Express REST API
-    participant CDN as Cloudinary Storage
-    participant DB as Supabase PostgreSQL
-
-    FieldUser->>Browser: Selects media file & captures GPS coordinates
-    Browser->>Browser: Validates file type (image/*, video/*) & coordinate ranges
-    Browser->>Server: POST /api/assets/upload (multipart/form-data)
-    Server->>Server: Multer memory streaming & 15MB limit enforcement
-    Server->>CDN: cloudinary.uploader.upload_stream()
-    CDN-->>Server: Returns secure_url, public_id, format, dimensions
-    Server-->>Browser: 201 Created (Cloudinary URL payload)
-    
-    Browser->>Server: POST /api/assets (project_id, url, lat/lng, public_id)
-    Server->>Server: Zod schema validation (lat: -90..90, lng: -180..180)
-    Server->>DB: INSERT INTO assets (...)
-    DB-->>Server: Confirmed row insertion
-    Server-->>Browser: 201 Created (Asset record)
-    Browser->>Browser: Live updates Gallery & Project Evidence feeds
 ```
 
 ---
@@ -89,18 +62,34 @@ sequenceDiagram
 | **Phase 0** | **Core Architecture & Schemas** | Decoupled client/server, project schema, in-memory fallbacks, basic routing | Completed |
 | **Phase 1** | **Media Ingestion Pipeline** | Cloudinary integration, GPS capture, drag-and-drop modal, live gallery feeds | Completed |
 | **Phase 2** | **AI Vision Analysis** | Multimodal structured JSON extraction, resilient multi-model fallback chain, automated tagging, Visual Evidence Inspector | Completed |
-| **Phase 3** | **Vector Search & Similarity** | pgvector embeddings, duplicate detection, cross-project semantic queries | Planned |
-| **Phase 4** | **ESG Impact Reports** | Metric aggregation, PDF report generation, public verification share links | Planned |
+| **Phase 3** | **Project Management & Dashboard** | Project creation, editing, deletion, real-time statistics, chronological timeline, activity breakdown, geo-clustering, multi-tenant security controls | Completed |
+| **Phase 4** | **Vector Search & Similarity** | pgvector embeddings, duplicate detection, cross-project semantic queries | Planned |
+| **Phase 5** | **ESG Impact Reports** | Metric aggregation, PDF report generation, public verification share links | Planned |
 
 ---
 
-## Phase 2: AI Vision Analysis Capabilities
+## Key Features
+
+### Phase 3: Project Management & Intelligence Dashboard
+
+- **Project Management System**: Create, edit, and safely delete real-world impact projects with strict client and server validation (name, location, description, and date ranges).
+- **Multi-Tenant Security Controls**:
+  - **Authentication Middleware**: Requires valid `Bearer` token or explicit `x-demo-user` credentials, returning `401 Unauthorized` when credentials are missing.
+  - **Server-Side Ownership Scoping**: Enforces `created_by = userId` filtering across project, asset, and AI analysis endpoints to prevent IDOR URL tampering data leaks.
+  - **Attacker-Controlled `created_by` Protection**: Client-supplied owner fields in request payloads are safely overridden server-side with the authenticated user ID.
+- **Project Intelligence Dashboard**:
+  - **Real-Time Statistics**: Dynamic Media Count, Activity Count, and Geo-Location Count cards.
+  - **Activity Breakdown**: Case-insensitive normalization of AI vision activities (e.g. `tree plantation`, `Tree Plantation`), attributing assets across distinct categories without double-counting in total media counts.
+  - **Geo-Location Site Clustering**: Validates coordinate boundaries (-90..90 lat, -180..180 lng) and groups operational sites at 0.001 degree precision (~110m accuracy).
+  - **Chronological Evidence Timeline**: Groups project assets by Year → Month using `capture_date` (fallback `created_at`), transparently highlighting undated assets.
+  - **Recent Media Evidence**: Displays recent project thumbnails with video indicators and broken URL fallback UI.
+
+### Phase 2: AI Vision Analysis Capabilities
 
 - **Multimodal Ground-Truth Verification**: Inspects uploaded photographic and video evidence through multimodal vision intelligence, automatically detecting verifiable environmental markers, activities, and physical conditions.
 - **Resilient Fallback & Backoff**: Automatically handles upstream provider capacity spikes with bounded jittered exponential backoff and multi-model candidate failover.
 - **Fail-Safe Diagnostics**: Upstream provider credential errors (`401`/`403`) are isolated server-side and mapped to `502 Bad Gateway`, safeguarding application client authentication state.
-- **Evidence Inspector Modal**: Detailed visual drawer in the frontend with confidence scores, identified physical objects, sustainability activities, condition assessments, and interactive Google Maps GPS pins.
-- **Provenance & Auditability**: Every inspection records provenance tracking (`source: 'gemini' | 'simulated'`) and prevents N+1 query overhead via asset-batched retrieval.
+- **Evidence Inspector Modal**: Detailed visual drawer in the frontend with confidence scores, identified physical objects, sustainability activities, condition assessments, and interactive GPS coordinate details.
 
 ---
 
@@ -115,7 +104,7 @@ sequenceDiagram
 Install both backend and frontend dependencies from the root repository:
 
 ```bash
-git clone https://github.com/Swatantra-66/Vision.git
+git clone https://github.com/Sarthak-Pandey/Vision.git
 cd Vision
 npm run install:all
 ```
@@ -161,20 +150,23 @@ npm run dev
 
 - Frontend: `http://localhost:3000`
 - Backend Health Check: `http://localhost:5000/api/health`
-- Media Gallery: `http://localhost:3000/media`
+- Projects List: `http://localhost:3000/projects`
 
 ---
 
 ## REST API Reference
 
-| Method | Endpoint | Description | Payload / Parameters |
+| Method | Endpoint | Description | Headers / Payload |
 | :--- | :--- | :--- | :--- |
 | `GET` | `/api/health` | Service health status check | None |
-| `GET` | `/api/projects` | List active projects | Filter query params |
-| `GET` | `/api/projects/:id` | Get project detail and metrics | `id: UUID` |
+| `GET` | `/api/projects` | List projects owned by authenticated user | `Authorization` or `x-demo-user` |
+| `POST` | `/api/projects` | Create a new project | `{ name, description, location, start_date, end_date }` |
+| `GET` | `/api/projects/:id` | Get project details and statistics | `id: UUID` |
+| `PATCH` | `/api/projects/:id` | Update project details | `{ name, description, location, ... }` |
+| `DELETE` | `/api/projects/:id` | Delete project and cascade assets | `id: UUID` |
 | `POST` | `/api/assets/upload` | Stream image or video to Cloudinary | `multipart/form-data` (`file`) |
 | `POST` | `/api/assets` | Register uploaded asset in database | `{ project_id, url, latitude, longitude, ... }` |
-| `GET` | `/api/assets` | List ingested media assets | `?projectId=:id` |
+| `GET` | `/api/assets` | List ingested media assets for project | `?projectId=:id` |
 | `POST` | `/api/assets/:id/analyze` | Execute automated AI Vision multimodal inspection | `id: UUID` |
 | `GET` | `/api/assets/:id/analysis` | Fetch existing AI evidence analysis for an asset | `id: UUID` |
 
@@ -184,9 +176,9 @@ npm run dev
 
 The platform uses PostgreSQL via Supabase. Schema definitions are maintained in [`backend/schema.sql`](backend/schema.sql):
 
-- **`projects`**: Project titles, descriptions, sustainability categories, locations, target goals.
-- **`assets`**: Cloudinary URLs, public IDs, file types, GPS coordinates (latitude/longitude), upload timestamps.
-- **`ai_analysis`**: Structured multimodal outputs (description, detected objects, activities, scene classifications, physical conditions, confidence metrics, source provenance).
+- **`projects`**: Project names, descriptions, locations, start/end dates, `created_by` owner IDs, creation timestamps.
+- **`assets`**: Cloudinary URLs, public IDs, file types, GPS coordinates (latitude/longitude), upload timestamps, foreign key `project_id REFERENCES projects(id) ON DELETE CASCADE`.
+- **`ai_analysis`**: Multimodal outputs (description, detected objects, activities, scene classifications, physical conditions, confidence metrics, source provenance), foreign key `asset_id REFERENCES assets(id) ON DELETE CASCADE`.
 
 ---
 
