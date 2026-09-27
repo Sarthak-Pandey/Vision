@@ -53,6 +53,23 @@ export interface UploadMediaResponse {
   public_id: string;
 }
 
+export interface AiAnalysis {
+  id: string;
+  asset_id: string;
+  description: string;
+  objects: string[];
+  activities: string[];
+  scene: string;
+  visible_condition: string;
+  confidence: number;
+  source?: 'gemini' | 'simulated';
+  created_at: string;
+}
+
+export interface MediaAssetWithAnalysis extends MediaAsset {
+  ai_analysis?: AiAnalysis | null;
+}
+
 
 export interface User {
   id: string;

@@ -10,19 +10,21 @@ import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { MediaCard } from '@/components/ui/MediaCard';
 import { UploadMediaModal } from '@/components/media/UploadMediaModal';
+import { MediaDetailModal } from '@/components/media/MediaDetailModal';
 import { getProject, getAssets } from '@/lib/api/client';
-import { Project, MediaAsset } from '@/types';
+import { Project, MediaAsset, MediaAssetWithAnalysis, AiAnalysis } from '@/types';
 
 export default function ProjectDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const resolvedParams = use(params);
   const projectId = resolvedParams.id;
 
   const [project, setProject] = useState<Project | null>(null);
-  const [projectAssets, setProjectAssets] = useState<MediaAsset[]>([]);
+  const [projectAssets, setProjectAssets] = useState<MediaAssetWithAnalysis[]>([]);
   const [activeTab, setActiveTab] = useState('overview');
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
+  const [selectedAssetForInspection, setSelectedAssetForInspection] = useState<MediaAssetWithAnalysis | null>(null);
 
   const loadData = async () => {
     try {
@@ -195,7 +197,12 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
             ) : (
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 {projectAssets.slice(0, 4).map((asset) => (
-                  <MediaCard key={asset.id} asset={asset} projectName={project.name} />
+                  <MediaCard
+                    key={asset.id}
+                    asset={asset}
+                    projectName={project.name}
+                    onClick={() => setSelectedAssetForInspection(asset)}
+                  />
                 ))}
               </div>
             )}
@@ -235,7 +242,12 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
           ) : (
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
               {projectAssets.map((asset) => (
-                <MediaCard key={asset.id} asset={asset} projectName={project.name} />
+                <MediaCard
+                  key={asset.id}
+                  asset={asset}
+                  projectName={project.name}
+                  onClick={() => setSelectedAssetForInspection(asset)}
+                />
               ))}
             </div>
           )}
@@ -272,6 +284,22 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
         onClose={() => setIsUploadModalOpen(false)}
         onUploaded={handleAssetUploaded}
         defaultProjectId={project.id}
+      />
+
+      {/* Evidence Inspector Modal */}
+      <MediaDetailModal
+        isOpen={!!selectedAssetForInspection}
+        onClose={() => setSelectedAssetForInspection(null)}
+        asset={selectedAssetForInspection}
+        projectName={project.name}
+        onAnalysisUpdated={(assetId, analysis) => {
+          setProjectAssets((prev) =>
+            prev.map((a) => (a.id === assetId ? { ...a, ai_analysis: analysis } : a))
+          );
+          if (selectedAssetForInspection && selectedAssetForInspection.id === assetId) {
+            setSelectedAssetForInspection((prev) => (prev ? { ...prev, ai_analysis: analysis } : null));
+          }
+        }}
       />
     </div>
   );

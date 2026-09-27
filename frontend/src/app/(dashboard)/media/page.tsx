@@ -8,17 +8,19 @@ import { Select } from '@/components/ui/Select';
 import { MediaCard } from '@/components/ui/MediaCard';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { UploadMediaModal } from '@/components/media/UploadMediaModal';
+import { MediaDetailModal } from '@/components/media/MediaDetailModal';
 import { getAssets, getProjects } from '@/lib/api/client';
-import { MediaAsset, Project } from '@/types';
+import { MediaAssetWithAnalysis, Project, AiAnalysis } from '@/types';
 
 export default function MediaPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedProjectId, setSelectedProjectId] = useState('all');
-  const [assets, setAssets] = useState<MediaAsset[]>([]);
+  const [assets, setAssets] = useState<MediaAssetWithAnalysis[]>([]);
   const [projects, setProjects] = useState<Project[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
+  const [selectedAssetForInspection, setSelectedAssetForInspection] = useState<MediaAssetWithAnalysis | null>(null);
 
   const fetchData = async () => {
     try {
@@ -61,15 +63,32 @@ export default function MediaPage() {
         const pName = (projectMap.get(asset.project_id) || '').toLowerCase();
         const uploader = (asset.uploaded_by || '').toLowerCase();
         const assetId = asset.id.toLowerCase();
-        return pName.includes(query) || uploader.includes(query) || assetId.includes(query);
+        const activity = (asset.ai_analysis?.activities || []).join(' ').toLowerCase();
+        const scene = (asset.ai_analysis?.scene || '').toLowerCase();
+        return (
+          pName.includes(query) ||
+          uploader.includes(query) ||
+          assetId.includes(query) ||
+          activity.includes(query) ||
+          scene.includes(query)
+        );
       }
 
       return true;
     });
   }, [assets, selectedProjectId, searchTerm, projectMap]);
 
-  const handleAssetUploaded = (newAsset: MediaAsset) => {
+  const handleAssetUploaded = (newAsset: any) => {
     setAssets((prev) => [newAsset, ...prev]);
+  };
+
+  const handleAnalysisUpdated = (assetId: string, analysis: AiAnalysis) => {
+    setAssets((prev) =>
+      prev.map((a) => (a.id === assetId ? { ...a, ai_analysis: analysis } : a))
+    );
+    if (selectedAssetForInspection && selectedAssetForInspection.id === assetId) {
+      setSelectedAssetForInspection((prev) => (prev ? { ...prev, ai_analysis: analysis } : null));
+    }
   };
 
   return (
@@ -79,7 +98,7 @@ export default function MediaPage() {
         <div>
           <h1 className="text-2xl font-bold text-primary-text tracking-tight">Media Evidence</h1>
           <p className="text-sm text-secondary-text mt-0.5">
-            Ingest, organize, and inspect visual evidence from all field locations.
+            Ingest, organize, and inspect visual evidence with automated AI verification.
           </p>
         </div>
         <div className="flex items-center gap-2">
@@ -102,11 +121,11 @@ export default function MediaPage() {
         </div>
       </div>
 
-      {/* Filter controls */}
-      <div className="flex flex-col md:flex-row items-center gap-3 bg-white p-3 rounded-xl border border-border shadow-xs">
-        <div className="w-full md:w-80">
+      {/* Filter and Search Bar */}
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 bg-card p-3 rounded-xl border border-border">
+        <div className="w-full sm:w-80">
           <SearchInput
-            placeholder="Search by project, uploader, or ID..."
+            placeholder="Search by project, uploader, activity..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
@@ -179,6 +198,7 @@ export default function MediaPage() {
               key={asset.id}
               asset={asset}
               projectName={projectMap.get(asset.project_id) || 'Unknown Project'}
+              onClick={() => setSelectedAssetForInspection(asset)}
             />
           ))}
         </div>
@@ -190,6 +210,19 @@ export default function MediaPage() {
         onClose={() => setIsUploadModalOpen(false)}
         onUploaded={handleAssetUploaded}
         defaultProjectId={selectedProjectId !== 'all' ? selectedProjectId : undefined}
+      />
+
+      {/* Media Detail & Evidence Inspector Modal */}
+      <MediaDetailModal
+        isOpen={!!selectedAssetForInspection}
+        onClose={() => setSelectedAssetForInspection(null)}
+        asset={selectedAssetForInspection}
+        projectName={
+          selectedAssetForInspection
+            ? projectMap.get(selectedAssetForInspection.project_id)
+            : undefined
+        }
+        onAnalysisUpdated={handleAnalysisUpdated}
       />
     </div>
   );
