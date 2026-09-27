@@ -1,142 +1,180 @@
-# AI Impact & Sustainability Media Intelligence Platform 🌿
+# Vision
 
-[![Phase 0 Completed](https://img.shields.io/badge/Phase_0-Complete-success.svg?style=flat-square)](#)
-[![Next.js](https://img.shields.io/badge/Frontend-Next.js_15-black.svg?style=flat-square&logo=next.js)](#)
-[![Express](https://img.shields.io/badge/Backend-Node.js_/_Express-green.svg?style=flat-square&logo=express)](#)
-[![TypeScript](https://img.shields.io/badge/Language-TypeScript-blue.svg?style=flat-square&logo=typescript)](#)
-[![Tailwind CSS](https://img.shields.io/badge/Styling-Tailwind_CSS-38bdf8.svg?style=flat-square&logo=tailwindcss)](#)
+An end-to-end media intelligence and verification platform for environmental, social, and sustainability initiatives. Vision ingests field photos and videos, pairs them with tamper-resistant geographic metadata, and verifies physical ground-truth progress through multimodal AI analysis.
 
-> **Visual Evidence Intelligence Platform** transforming unstructured field photos and videos into searchable, traceable evidence of real-world environmental and social impact activities.
-
----
-
-## 🏗️ Architecture Overview
-
-The platform is engineered using a strictly decoupled client-server architecture to ensure high performance, security, and scalability.
-
-```
-                  ┌────────────────────────────────────────┐
-                  │           Next.js 15 Frontend          │
-                  │   App Router • Tailwind • Lucide UI    │
-                  └───────────────────┬────────────────────┘
-                                      │ REST API Requests
-                                      ▼
-                  ┌────────────────────────────────────────┐
-                  │         Node.js / Express Backend      │
-                  │   TypeScript • Zod • Error Handlers    │
-                  └─────────┬────────────────────┬─────────┘
-                            │                    │
-        ┌───────────────────┴──────┐      ┌──────┴───────────────────┐
-        │ Supabase (PostgreSQL/pgvector) │  │ Cloudinary Vision Media  │
-        │ Database & Fallback Store│      │ Ingestion Pipeline Store │
-        └──────────────────────────┘      └──────────────────────────┘
-```
+[![Next.js 15](https://img.shields.io/badge/Next.js-15_App_Router-black?style=flat-square&logo=next.js)](https://nextjs.org/)
+[![Express](https://img.shields.io/badge/Express-4.x-000000?style=flat-square&logo=express)](https://expressjs.com/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.x-3178C6?style=flat-square&logo=typescript)](https://www.typescriptlang.org/)
+[![Supabase](https://img.shields.io/badge/Supabase-PostgreSQL-3ECF8E?style=flat-square&logo=supabase)](https://supabase.com/)
+[![Cloudinary](https://img.shields.io/badge/Cloudinary-Media_CDN-3448C5?style=flat-square&logo=cloudinary)](https://cloudinary.com/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind-3.4-38BDF8?style=flat-square&logo=tailwindcss)](https://tailwindcss.com/)
 
 ---
 
-## ✨ Phase 0 Features & Key Capabilities
+## Architecture
 
-- 🛡️ **Decoupled Architecture**: Independent frontend (`:3000`) & backend (`:5000`) servers.
-- 📦 **In-Memory & Production DB Fallback**: Operates out-of-the-box with pre-seeded test data even without live cloud keys.
-- 🔐 **Authentication & Session Simulation**: Secure token-based header auth with pre-filled demo accounts.
-- 📁 **Project Portfolio Management**: Full CRUD capabilities for ESG & sustainability projects with metric tracking.
-- 🖼️ **Media Evidence Ingestion**: Metadata-rich visual evidence viewer with status tracking (Verified, Pending, Flagged).
-- 🔍 **Unified Semantic & Keyword Search**: High-performance multi-filter discovery interface.
-- 📊 **ESG Reporting Module**: Generated summary analytics and downloadable impact reporting views.
-- 🎨 **Design System**: Premium custom UI built with white, gray, and vibrant emerald/cyan accents.
+Vision is decoupled into an autonomous Next.js 15 frontend application, an Express TypeScript REST backend, Cloudinary asset storage, and a Supabase PostgreSQL persistence layer.
 
----
+```mermaid
+graph TD
+    subgraph Client ["Frontend (Next.js 15 App Router)"]
+        UI["Dashboard & Project UI"]
+        UploadModal["Media Ingestion Modal (GPS + Drag-n-Drop)"]
+        Inspector["Evidence Inspector & AI Badges"]
+    end
 
-## 📂 Repository Structure
+    subgraph Backend ["Backend API (Express + TypeScript)"]
+        API["REST Endpoints (/api/*)"]
+        ZodValidator["Zod Schema Validation"]
+        UploadStream["Multer 15MB Memory Buffer"]
+        CloudinaryService["Cloudinary SDK (Stream Uploader)"]
+        DBRepo["Supabase Repository Layer"]
+        VisionEngine["Vision Analysis Service (Phase 2)"]
+    end
 
-```
-ai-impact-platform/
-├── backend/                  # Node.js / Express REST API Application
-│   ├── src/
-│   │   ├── config/           # Environment & database configuration
-│   │   ├── controllers/      # Route request handlers
-│   │   ├── middleware/       # Zod validation, auth & global error middleware
-│   │   ├── repositories/     # Data access layer (Supabase + In-Memory fallback)
-│   │   ├── routes/           # REST endpoints definition
-│   │   ├── schemas/          # Zod validation schemas
-│   │   ├── services/         # Business logic layer
-│   │   ├── types/            # TypeScript interfaces & types
-│   │   ├── utils/            # Custom AppError & response wrappers
-│   │   ├── app.ts            # Express application initialization
-│   │   └── server.ts         # Server bootstrap entrypoint
-│   ├── schema.sql            # Supabase PostgreSQL schema definition
-│   ├── tsconfig.json
-│   └── package.json
-│
-└── frontend/                 # Next.js 15 Web Application
-    ├── src/
-    │   ├── app/              # Next.js App Router pages & sub-routes
-    │   │   ├── (auth)/       # Authentication pages (Login)
-    │   │   ├── (dashboard)/  # Main platform dashboard & workspace routes
-    │   │   └── layout.tsx    # Root HTML & metadata provider
-    │   ├── components/       # Reusable UI component library & layout shells
-    │   ├── lib/              # API client, auth context & utility functions
-    │   └── types/            # Shared client types
-    ├── tailwind.config.ts
-    ├── tsconfig.json
-    └── package.json
+    subgraph Storage ["Cloud Infrastructure"]
+        Cloudinary[("Cloudinary Media CDN\n(Optimized WebP / MP4)")]
+        Supabase[("Supabase PostgreSQL\n(Projects, Assets, AI Analysis)")]
+    end
+
+    UI -->|REST / JWT| API
+    UploadModal -->|multipart/form-data| UploadStream
+    UploadStream --> ZodValidator
+    ZodValidator --> CloudinaryService
+    CloudinaryService -->|Secure Stream Upload| Cloudinary
+    Cloudinary -->|URL + Public ID| CloudinaryService
+    CloudinaryService --> DBRepo
+    DBRepo -->|SQL Query / RPC| Supabase
+    API --> VisionEngine
+    VisionEngine -.->|Multimodal Analysis| Supabase
 ```
 
 ---
 
-## 🚀 Quick Start & Installation
+## Ingestion and Verification Flow
+
+Field teams submit on-site photo or video evidence with real-time GPS metadata. The ingestion pipeline validates the payload, streams it to Cloudinary, indexes it in Supabase, and updates the frontend gallery.
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor FieldUser as Field Officer / Auditor
+    participant Browser as Next.js 15 Client
+    participant Server as Express REST API
+    participant CDN as Cloudinary Storage
+    participant DB as Supabase PostgreSQL
+
+    FieldUser->>Browser: Selects media file & captures GPS coordinates
+    Browser->>Browser: Validates file type (image/*, video/*) & coordinate ranges
+    Browser->>Server: POST /api/assets/upload (multipart/form-data)
+    Server->>Server: Multer memory streaming & 15MB limit enforcement
+    Server->>CDN: cloudinary.uploader.upload_stream()
+    CDN-->>Server: Returns secure_url, public_id, format, dimensions
+    Server-->>Browser: 201 Created (Cloudinary URL payload)
+    
+    Browser->>Server: POST /api/assets (project_id, url, lat/lng, public_id)
+    Server->>Server: Zod schema validation (lat: -90..90, lng: -180..180)
+    Server->>DB: INSERT INTO assets (...)
+    DB-->>Server: Confirmed row insertion
+    Server-->>Browser: 201 Created (Asset record)
+    Browser->>Browser: Live updates Gallery & Project Evidence feeds
+```
+
+---
+
+## Development Milestones
+
+| Milestone | Scope | Deliverables | Status |
+| :--- | :--- | :--- | :--- |
+| **Phase 0** | **Core Architecture & Schemas** | Decoupled client/server, project schema, in-memory fallbacks, basic routing | Completed |
+| **Phase 1** | **Media Ingestion Pipeline** | Cloudinary integration, GPS capture, drag-and-drop modal, live gallery feeds | Completed |
+| **Phase 2** | **AI Vision Analysis** | Multimodal structured JSON extraction, automated tagging, evidence inspector | In Progress |
+| **Phase 3** | **Vector Search & Similarity** | pgvector embeddings, duplicate detection, cross-project semantic queries | Planned |
+| **Phase 4** | **ESG Impact Reports** | Metric aggregation, PDF report generation, public verification share links | Planned |
+
+---
+
+## Quickstart
 
 ### Prerequisites
+- Node.js `v18.x` or higher
+- npm `v9.x` or higher
 
-- **Node.js**: `v18.x` or later
-- **npm**: `v9.x` or later
+### 1. Installation
 
-### 1. Run the Backend API
-
-```bash
-cd backend
-npm install
-npm run dev
-```
-
-The backend server runs at `http://localhost:5000`.
-Health endpoint: `http://localhost:5000/api/health`
-
-### 2. Run the Frontend Application
+Install both backend and frontend dependencies from the root repository:
 
 ```bash
-cd frontend
-npm install
-npm run dev
+git clone https://github.com/Swatantra-66/Vision.git
+cd Vision
+npm run install:all
 ```
 
-The frontend application runs at `http://localhost:3000`.
-
----
-
-## 🔑 Environment Configuration
-
-Copy `.env.example` files to `.env` in both `backend/` and `frontend/` folders:
+### 2. Environment Configuration
 
 #### Backend (`backend/.env`):
 ```env
 PORT=5000
 NODE_ENV=development
 FRONTEND_URL=http://localhost:3000
-SUPABASE_URL=https://mock-supabase.supabase.co
-SUPABASE_SERVICE_ROLE_KEY=mock-key
-CLOUDINARY_CLOUD_NAME=mock-cloud
-CLOUDINARY_API_KEY=mock-key
-CLOUDINARY_API_SECRET=mock-secret
+
+# Supabase
+SUPABASE_URL=https://your-project-id.supabase.co
+SUPABASE_SERVICE_ROLE_KEY=eyJhbGciOi...
+
+# Cloudinary
+CLOUDINARY_CLOUD_NAME=your_cloud_name
+CLOUDINARY_API_KEY=your_api_key
+CLOUDINARY_API_SECRET=your_api_secret
 ```
 
 #### Frontend (`frontend/.env.local`):
 ```env
-NEXT_PUBLIC_API_BASE_URL=http://localhost:5000/api
-NEXT_PUBLIC_DEMO_USER_EMAIL=sarthak@example.com
+NEXT_PUBLIC_API_URL=http://localhost:5000/api
+NEXT_PUBLIC_SUPABASE_URL=https://your-project-id.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOi...
 ```
+
+*Note: If cloud credentials are not provided, the backend falls back to an internal in-memory store for local testing.*
+
+### 3. Running Locally
+
+Run both the backend API (`:5000`) and the Next.js frontend (`:3000`) concurrently:
+
+```bash
+npm run dev
+```
+
+- Frontend: `http://localhost:3000`
+- Backend Health Check: `http://localhost:5000/api/health`
+- Media Gallery: `http://localhost:3000/media`
 
 ---
 
-© 2026 Sarthak Pandey. All Rights Reserved.
+## REST API Reference
 
+| Method | Endpoint | Description | Payload / Parameters |
+| :--- | :--- | :--- | :--- |
+| `GET` | `/api/health` | Service health status check | None |
+| `GET` | `/api/projects` | List active projects | Filter query params |
+| `GET` | `/api/projects/:id` | Get project detail and metrics | `id: UUID` |
+| `POST` | `/api/assets/upload` | Stream image or video to Cloudinary | `multipart/form-data` (`file`) |
+| `POST` | `/api/assets` | Register uploaded asset in database | `{ project_id, url, latitude, longitude, ... }` |
+| `GET` | `/api/assets` | List ingested media assets | `?projectId=:id` |
+
+---
+
+## Database Schema
+
+The platform uses PostgreSQL via Supabase. Schema definitions are maintained in [`backend/schema.sql`](backend/schema.sql):
+
+- **`projects`**: Project titles, descriptions, sustainability categories, locations, target goals.
+- **`assets`**: Cloudinary URLs, public IDs, file types, GPS coordinates (latitude/longitude), upload timestamps.
+- **`ai_analysis`**: Structured multimodal outputs (detected objects, activities, scene classifications, confidence metrics).
+
+---
+
+## Contributors
+
+- **Sarthak Pandey** ([@Sarthak-Pandey](https://github.com/Sarthak-Pandey))
+- **Swatantra** ([@Swatantra-66](https://github.com/Swatantra-66))
