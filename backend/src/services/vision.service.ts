@@ -152,33 +152,71 @@ You MUST return a JSON object with the following fields:
   "confidence": a float number between 0.70 and 0.99 indicating detection certainty
 }`;
 
-    const modelName = this.resolveModelName();
+    const primaryModel = this.resolveModelName();
+    const candidateModels = Array.from(
+      new Set([primaryModel, 'gemini-3.8-flash', 'gemini-3.5-flash', 'gemini-3.7-flash', 'gemini-flash-latest', 'gemini-3.6-flash'])
+    );
 
-    const response = await this.genAI.models.generateContent({
-      model: modelName,
-      contents: [
-        {
-          role: 'user',
-          parts: [
+    let lastError: any = null;
+    let responseText: string | null = null;
+
+    for (let attempt = 0; attempt < candidateModels.length; attempt++) {
+      const model = candidateModels[attempt];
+      try {
+        console.log(`[VisionService] Attempting Gemini inference with model: ${model}`);
+        const response = await this.genAI.models.generateContent({
+          model,
+          contents: [
             {
-              inlineData: {
-                mimeType,
-                data: base64Data,
-              },
-            },
-            {
-              text: systemPrompt,
+              role: 'user',
+              parts: [
+                {
+                  inlineData: {
+                    mimeType,
+                    data: base64Data,
+                  },
+                },
+                {
+                  text: systemPrompt,
+                },
+              ],
             },
           ],
-        },
-      ],
-      config: {
-        responseMimeType: 'application/json',
-      },
-    });
+          config: {
+            responseMimeType: 'application/json',
+          },
+        });
 
-    const responseText = response.text;
-    if (!responseText) throw new Error('Empty response from Gemini Vision');
+        if (response.text) {
+          responseText = response.text;
+          console.log(`[VisionService] Successful Gemini inference with model: ${model}`);
+          break;
+        }
+      } catch (err: any) {
+        lastError = err;
+        const errInfo = this.extractProviderErrorInfo(err);
+        console.warn(`[VisionService] Model ${model} failed (${errInfo.code} ${errInfo.status}): ${errInfo.message}`);
+
+        // Stop fallback loop immediately for non-recoverable provider errors
+        // (e.g. invalid server API key, disabled billing/permissions, malformed payloads, or project-wide quota exhaustion)
+        if (errInfo.isFatal) {
+          console.error(`[VisionService] Non-recoverable provider error encountered on ${model}. Aborting model fallback loop.`);
+          break;
+        }
+
+        // Apply bounded jittered backoff for transient errors (503 demand spikes, 500 provider errors, or per-model rate limits)
+        // Model deprecation / 404 proceeds immediately to the next candidate
+        if (errInfo.code !== 404 && attempt < candidateModels.length - 1) {
+          const delay = Math.min(1000, 200 * Math.pow(1.5, attempt)) + Math.floor(Math.random() * 100);
+          console.log(`[VisionService] Waiting ${delay}ms before trying next candidate...`);
+          await new Promise((resolve) => setTimeout(resolve, delay));
+        }
+      }
+    }
+
+    if (!responseText) {
+      throw lastError || new Error('All Gemini Vision models failed to respond');
+    }
 
     const parsed = JSON.parse(responseText);
 
@@ -234,12 +272,56 @@ You MUST return a JSON object with the following fields:
   }
 
   private resolveModelName(): string {
-    let raw = (process.env.GEMINI_MODEL || 'gemini-3.6-flash').trim().toLowerCase();
+    let raw = (process.env.GEMINI_MODEL || 'gemini-3.8-flash').trim().toLowerCase();
     // Normalize typos and spaces like "geimi 3.6 flash" -> "gemini-3.6-flash"
     raw = raw.replace(/^geimi/i, 'gemini').replace(/\s+/g, '-');
     if (!raw.startsWith('gemini-') && !raw.startsWith('models/')) {
       raw = `gemini-${raw}`;
     }
     return raw;
+  }
+
+  private extractProviderErrorInfo(err: any): {
+    code: number;
+    status: string;
+    message: string;
+    isFatal: boolean;
+  } {
+    let code = typeof err?.status === 'number' ? err.status : 500;
+    let status = '';
+    let message = err?.message || 'Unknown provider error';
+
+    try {
+      const parsed = typeof message === 'string' && message.startsWith('{') ? JSON.parse(message) : null;
+      if (parsed?.error) {
+        if (typeof parsed.error.code === 'number') code = parsed.error.code;
+        if (typeof parsed.error.status === 'string') status = parsed.error.status;
+        if (typeof parsed.error.message === 'string') message = parsed.error.message;
+      }
+    } catch {
+      // not JSON
+    }
+
+    const lowerMessage = message.toLowerCase();
+    const lowerStatus = status.toLowerCase();
+
+    // Determine if this error is non-transient / non-recoverable by switching models:
+    // 400 / INVALID_ARGUMENT: Payload/format error that will fail identically across all models
+    // 401 / UNAUTHENTICATED: Invalid or rejected server API key
+    // 403 / PERMISSION_DENIED: Billing disabled, account suspended, API not enabled
+    // Project-wide daily quota exhaustion (e.g. "Quota exceeded for metric: ... PerDay")
+    const isFatal =
+      code === 400 ||
+      code === 401 ||
+      code === 403 ||
+      lowerStatus === 'unauthenticated' ||
+      lowerStatus === 'permission_denied' ||
+      lowerStatus === 'invalid_argument' ||
+      (code === 429 &&
+        (lowerMessage.includes('perday') ||
+          lowerMessage.includes('per_day') ||
+          lowerMessage.includes('free_tier_requests, limit: 0')));
+
+    return { code, status, message, isFatal };
   }
 }

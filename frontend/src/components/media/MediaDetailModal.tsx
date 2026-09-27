@@ -92,7 +92,16 @@ export const MediaDetailModal: React.FC<MediaDetailModalProps> = ({
         pendingRequestsRef.current.get(targetAssetId) === token &&
         currentAssetIdRef.current === targetAssetId
       ) {
-        setError(err.message || 'Failed to complete vision analysis');
+        let msg = err.message || 'Failed to complete vision analysis';
+        try {
+          const parsed = JSON.parse(msg);
+          if (parsed?.error?.message) {
+            msg = parsed.error.message;
+          }
+        } catch {
+          // not JSON
+        }
+        setError(msg);
       }
     } finally {
       if (pendingRequestsRef.current.get(targetAssetId) === token) {
