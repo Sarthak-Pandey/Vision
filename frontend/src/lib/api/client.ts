@@ -3,8 +3,10 @@ import {
   CreateProjectPayload,
   UpdateProjectPayload,
   MediaAsset,
+  MediaAssetWithAnalysis,
   CreateAssetPayload,
   UploadMediaResponse,
+  AiAnalysis,
   ApiResponse,
 } from '@/types';
 
@@ -64,9 +66,9 @@ export async function deleteProject(id: string): Promise<void> {
   });
 }
 
-export async function getAssets(projectId?: string): Promise<MediaAsset[]> {
+export async function getAssets(projectId?: string): Promise<MediaAssetWithAnalysis[]> {
   const query = projectId ? `?projectId=${encodeURIComponent(projectId)}` : '';
-  return request<MediaAsset[]>(`/assets${query}`);
+  return request<MediaAssetWithAnalysis[]>(`/assets${query}`);
 }
 
 export async function uploadMediaFile(file: File): Promise<UploadMediaResponse> {
@@ -98,3 +100,12 @@ export async function createAsset(data: CreateAssetPayload): Promise<MediaAsset>
   });
 }
 
+export async function analyzeAsset(assetId: string): Promise<AiAnalysis> {
+  return request<AiAnalysis>(`/assets/${assetId}/analyze`, {
+    method: 'POST',
+  });
+}
+
+export async function getAssetAnalysis(assetId: string): Promise<AiAnalysis | null> {
+  return request<AiAnalysis | null>(`/assets/${assetId}/analysis`);
+}

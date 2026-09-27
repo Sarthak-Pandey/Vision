@@ -30,6 +30,8 @@ router.get('/', controller.getAssets);
 router.post('/upload', upload.single('file'), controller.uploadMedia);
 router.get('/signature', controller.getUploadSignature);
 router.post('/', validate(createAssetSchema), controller.createAsset);
+router.post('/:id/analyze', controller.analyzeAsset);
+router.get('/:id/analysis', controller.getAssetAnalysis);
 
 export default router;
 

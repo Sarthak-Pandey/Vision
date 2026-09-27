@@ -1,15 +1,22 @@
 import { Request, Response, NextFunction } from 'express';
 import { AssetService } from '../services/asset.service.js';
 import { CloudinaryService } from '../services/cloudinary.service.js';
-import { BadRequestError } from '../utils/errors.js';
+import { VisionService } from '../services/vision.service.js';
+import { ProjectService } from '../services/project.service.js';
+import { BadRequestError, NotFoundError } from '../utils/errors.js';
+import { AiAnalysis } from '../types/index.js';
 
 export class AssetController {
   private assetService: AssetService;
   private cloudinaryService: CloudinaryService;
+  private visionService: VisionService;
+  private projectService: ProjectService;
 
   constructor() {
     this.assetService = new AssetService();
     this.cloudinaryService = new CloudinaryService();
+    this.visionService = new VisionService();
+    this.projectService = new ProjectService();
   }
 
   getAssets = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
@@ -22,9 +29,18 @@ export class AssetController {
         assets = await this.assetService.getAllAssets();
       }
 
+      // Efficiently fetch only the latest AI analysis for the requested asset IDs
+      const assetIds = assets.map((a) => a.id);
+      const analysisMap = await this.visionService.getLatestAnalysesForAssets(assetIds);
+
+      const enrichedAssets = assets.map((asset) => ({
+        ...asset,
+        ai_analysis: analysisMap.get(asset.id) || null,
+      }));
+
       res.status(200).json({
         success: true,
-        data: assets,
+        data: enrichedAssets,
       });
     } catch (error) {
       next(error);
@@ -34,9 +50,66 @@ export class AssetController {
   createAsset = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       const asset = await this.assetService.createAsset(req.body);
+
+      // Trigger automated vision analysis in background upon asset registration
+      (async () => {
+        try {
+          let projectName: string | undefined;
+          if (asset.project_id) {
+            const project = await this.projectService.getProjectById(asset.project_id);
+            if (project) projectName = project.name;
+          }
+          await this.visionService.analyzeAsset(asset, projectName);
+          console.log(`[AssetController] Automated AI Vision analysis completed for asset: ${asset.id}`);
+        } catch (visionErr: any) {
+          console.warn(`[AssetController] Background vision analysis failed for asset ${asset.id}:`, visionErr.message);
+        }
+      })();
+
       res.status(201).json({
         success: true,
         data: asset,
+      });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  analyzeAsset = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const { id } = req.params;
+      const asset = await this.assetService.getAssetById(id);
+      if (!asset) {
+        throw new NotFoundError(`Asset with ID ${id} not found`);
+      }
+
+      let projectName: string | undefined;
+      if (asset.project_id) {
+        try {
+          const project = await this.projectService.getProjectById(asset.project_id);
+          if (project) projectName = project.name;
+        } catch {
+          // ignore
+        }
+      }
+
+      const analysis = await this.visionService.analyzeAsset(asset, projectName);
+      res.status(200).json({
+        success: true,
+        data: analysis,
+      });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  getAssetAnalysis = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const { id } = req.params;
+      const analysis = await this.visionService.getAnalysisByAssetId(id);
+      res.status(200).json({
+        success: true,
+        data: analysis,
       });
     } catch (error) {
       next(error);
@@ -72,4 +145,3 @@ export class AssetController {
     }
   };
 }
-
