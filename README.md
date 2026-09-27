@@ -29,7 +29,7 @@ graph TD
         UploadStream["Multer 15MB Memory Buffer"]
         CloudinaryService["Cloudinary SDK (Stream Uploader)"]
         DBRepo["Supabase Repository Layer"]
-        VisionEngine["Vision Analysis Service (Phase 2)"]
+        VisionEngine["Multimodal Vision Analysis Engine"]
     end
 
     subgraph Storage ["Cloud Infrastructure"]
@@ -88,9 +88,19 @@ sequenceDiagram
 | :--- | :--- | :--- | :--- |
 | **Phase 0** | **Core Architecture & Schemas** | Decoupled client/server, project schema, in-memory fallbacks, basic routing | Completed |
 | **Phase 1** | **Media Ingestion Pipeline** | Cloudinary integration, GPS capture, drag-and-drop modal, live gallery feeds | Completed |
-| **Phase 2** | **AI Vision Analysis** | Multimodal structured JSON extraction, automated tagging, evidence inspector | In Progress |
+| **Phase 2** | **AI Vision Analysis** | Multimodal structured JSON extraction, resilient multi-model fallback chain, automated tagging, Visual Evidence Inspector | Completed |
 | **Phase 3** | **Vector Search & Similarity** | pgvector embeddings, duplicate detection, cross-project semantic queries | Planned |
 | **Phase 4** | **ESG Impact Reports** | Metric aggregation, PDF report generation, public verification share links | Planned |
+
+---
+
+## Phase 2: AI Vision Analysis Capabilities
+
+- **Multimodal Ground-Truth Verification**: Inspects uploaded photographic and video evidence through multimodal vision intelligence, automatically detecting verifiable environmental markers, activities, and physical conditions.
+- **Resilient Fallback & Backoff**: Automatically handles upstream provider capacity spikes with bounded jittered exponential backoff and multi-model candidate failover.
+- **Fail-Safe Diagnostics**: Upstream provider credential errors (`401`/`403`) are isolated server-side and mapped to `502 Bad Gateway`, safeguarding application client authentication state.
+- **Evidence Inspector Modal**: Detailed visual drawer in the frontend with confidence scores, identified physical objects, sustainability activities, condition assessments, and interactive Google Maps GPS pins.
+- **Provenance & Auditability**: Every inspection records provenance tracking (`source: 'gemini' | 'simulated'`) and prevents N+1 query overhead via asset-batched retrieval.
 
 ---
 
@@ -126,6 +136,10 @@ SUPABASE_SERVICE_ROLE_KEY=eyJhbGciOi...
 CLOUDINARY_CLOUD_NAME=your_cloud_name
 CLOUDINARY_API_KEY=your_api_key
 CLOUDINARY_API_SECRET=your_api_secret
+
+# Vision AI Configuration
+GEMINI_API_KEY=your_api_key
+GEMINI_MODEL=gemini-3.8-flash
 ```
 
 #### Frontend (`frontend/.env.local`):
@@ -135,7 +149,7 @@ NEXT_PUBLIC_SUPABASE_URL=https://your-project-id.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOi...
 ```
 
-*Note: If cloud credentials are not provided, the backend falls back to an internal in-memory store for local testing.*
+*Note: If cloud credentials are not provided, the backend falls back to an internal in-memory store and intelligent contextual simulation for local testing.*
 
 ### 3. Running Locally
 
@@ -161,6 +175,8 @@ npm run dev
 | `POST` | `/api/assets/upload` | Stream image or video to Cloudinary | `multipart/form-data` (`file`) |
 | `POST` | `/api/assets` | Register uploaded asset in database | `{ project_id, url, latitude, longitude, ... }` |
 | `GET` | `/api/assets` | List ingested media assets | `?projectId=:id` |
+| `POST` | `/api/assets/:id/analyze` | Execute automated AI Vision multimodal inspection | `id: UUID` |
+| `GET` | `/api/assets/:id/analysis` | Fetch existing AI evidence analysis for an asset | `id: UUID` |
 
 ---
 
@@ -170,7 +186,7 @@ The platform uses PostgreSQL via Supabase. Schema definitions are maintained in 
 
 - **`projects`**: Project titles, descriptions, sustainability categories, locations, target goals.
 - **`assets`**: Cloudinary URLs, public IDs, file types, GPS coordinates (latitude/longitude), upload timestamps.
-- **`ai_analysis`**: Structured multimodal outputs (detected objects, activities, scene classifications, confidence metrics).
+- **`ai_analysis`**: Structured multimodal outputs (description, detected objects, activities, scene classifications, physical conditions, confidence metrics, source provenance).
 
 ---
 
