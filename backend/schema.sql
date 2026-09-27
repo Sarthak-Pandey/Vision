@@ -36,5 +36,10 @@ CREATE TABLE IF NOT EXISTS ai_analysis (
   scene TEXT,
   visible_condition TEXT,
   confidence NUMERIC(4, 3),
+  source TEXT DEFAULT 'gemini',
   created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );
+
+-- Migration: ensure source column exists on existing ai_analysis tables
+ALTER TABLE ai_analysis ADD COLUMN IF NOT EXISTS source TEXT DEFAULT 'gemini';
+
