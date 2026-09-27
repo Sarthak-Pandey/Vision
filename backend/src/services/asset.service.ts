@@ -12,6 +12,10 @@ export class AssetService {
     return this.assetRepository.findByProjectId(projectId);
   }
 
+  async getAssetsByProjectIds(projectIds: string[]): Promise<Asset[]> {
+    return this.assetRepository.findByProjectIds(projectIds);
+  }
+
   async getAllAssets(): Promise<Asset[]> {
     return this.assetRepository.findAll();
   }

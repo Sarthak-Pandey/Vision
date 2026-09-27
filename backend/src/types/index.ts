@@ -5,7 +5,10 @@ export interface Project {
   location?: string | null;
   start_date?: string | null;
   end_date?: string | null;
+  created_by?: string | null;
   created_at: string;
+  updated_at?: string | null;
+  media_count?: number;
 }
 
 export interface CreateProjectInput {
@@ -14,6 +17,7 @@ export interface CreateProjectInput {
   location?: string;
   start_date?: string;
   end_date?: string;
+  created_by?: string;
 }
 
 export interface UpdateProjectInput {
@@ -22,6 +26,8 @@ export interface UpdateProjectInput {
   location?: string;
   start_date?: string;
   end_date?: string;
+  created_by?: string;
+  updated_at?: string;
 }
 
 export interface Asset {

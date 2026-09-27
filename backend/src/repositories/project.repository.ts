@@ -1,6 +1,7 @@
 import { supabase, isSupabaseConfigured } from '../config/database.js';
 import { Project, CreateProjectInput, UpdateProjectInput } from '../types/index.js';
 import { randomUUID } from 'crypto';
+import { AssetRepository } from './asset.repository.js';
 
 // In-memory fallback store for development when Supabase URL/Key is not set
 const mockProjectsStore: Project[] = [
@@ -11,7 +12,9 @@ const mockProjectsStore: Project[] = [
     location: 'Delhi',
     start_date: '2025-01-01',
     end_date: '2026-09-30',
+    created_by: 'user-demo-123',
     created_at: new Date('2025-01-01T00:00:00Z').toISOString(),
+    updated_at: new Date('2025-01-01T00:00:00Z').toISOString(),
   },
   {
     id: 'proj-2',
@@ -20,7 +23,9 @@ const mockProjectsStore: Project[] = [
     location: 'Rajasthan',
     start_date: '2024-06-15',
     end_date: '2025-12-31',
+    created_by: 'user-demo-123',
     created_at: new Date('2024-06-15T00:00:00Z').toISOString(),
+    updated_at: new Date('2024-06-15T00:00:00Z').toISOString(),
   },
   {
     id: 'proj-3',
@@ -29,45 +34,102 @@ const mockProjectsStore: Project[] = [
     location: 'Sundarbans, West Bengal',
     start_date: '2025-03-01',
     end_date: '2027-03-01',
+    created_by: 'user-demo-456',
     created_at: new Date('2025-03-01T00:00:00Z').toISOString(),
+    updated_at: new Date('2025-03-01T00:00:00Z').toISOString(),
   },
 ];
 
 export class ProjectRepository {
-  async findAll(): Promise<Project[]> {
+  private assetRepository: AssetRepository;
+
+  constructor() {
+    this.assetRepository = new AssetRepository();
+  }
+
+  async findAll(userId?: string): Promise<Project[]> {
     if (isSupabaseConfigured() && supabase) {
-      const { data, error } = await supabase
+      let query = supabase
         .from('projects')
-        .select('*')
-        .order('created_at', { ascending: false });
+        .select('*, assets(count)');
+
+      if (userId) {
+        query = query.eq('created_by', userId);
+      }
+
+      const { data, error } = await query.order('created_at', { ascending: false });
 
       if (error) {
         throw new Error(`Supabase error: ${error.message}`);
       }
-      return data as Project[];
+      return (data || []).map((row: any) => {
+        const { assets, ...projectData } = row;
+        const count = Array.isArray(assets) && assets.length > 0 ? Number(assets[0].count || 0) : 0;
+        return {
+          ...projectData,
+          media_count: count,
+        } as Project;
+      });
     }
 
-    return [...mockProjectsStore].sort(
+    const allAssets = await this.assetRepository.findAll();
+    const filteredMock = userId
+      ? mockProjectsStore.filter((p) => p.created_by === userId)
+      : [...mockProjectsStore];
+
+    const result = filteredMock.map((p) => {
+      const count = allAssets.filter((a) => a.project_id === p.id).length;
+      return {
+        ...p,
+        media_count: count,
+      };
+    });
+
+    return result.sort(
       (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
     );
   }
 
-  async findById(id: string): Promise<Project | null> {
+  async findById(id: string, userId?: string): Promise<Project | null> {
     if (isSupabaseConfigured() && supabase) {
-      const { data, error } = await supabase
+      let query = supabase
         .from('projects')
-        .select('*')
-        .eq('id', id)
-        .single();
+        .select('*, assets(count)')
+        .eq('id', id);
+
+      if (userId) {
+        query = query.eq('created_by', userId);
+      }
+
+      const { data, error } = await query.maybeSingle();
 
       if (error || !data) return null;
-      return data as Project;
+      const { assets, ...projectData } = data as any;
+      const count = Array.isArray(assets) && assets.length > 0 ? Number(assets[0].count || 0) : 0;
+      return {
+        ...projectData,
+        media_count: count,
+      } as Project;
     }
 
-    return mockProjectsStore.find((p) => p.id === id) || null;
+    const project = mockProjectsStore.find(
+      (p) => p.id === id && (!userId || p.created_by === userId)
+    );
+    if (!project) return null;
+
+    const allAssets = await this.assetRepository.findAll();
+    const count = allAssets.filter((a) => a.project_id === project.id).length;
+
+    return {
+      ...project,
+      media_count: count,
+    };
   }
 
-  async create(input: CreateProjectInput): Promise<Project> {
+  async create(input: CreateProjectInput, userId?: string): Promise<Project> {
+    const nowIso = new Date().toISOString();
+    const ownerId = userId || input.created_by || 'user-demo-123';
+
     if (isSupabaseConfigured() && supabase) {
       const { data, error } = await supabase
         .from('projects')
@@ -78,6 +140,8 @@ export class ProjectRepository {
             location: input.location || null,
             start_date: input.start_date || null,
             end_date: input.end_date || null,
+            created_by: ownerId,
+            updated_at: nowIso,
           },
         ])
         .select('*')
@@ -86,7 +150,7 @@ export class ProjectRepository {
       if (error) {
         throw new Error(`Supabase create error: ${error.message}`);
       }
-      return data as Project;
+      return { ...data, media_count: 0 } as Project;
     }
 
     const newProject: Project = {
@@ -96,46 +160,81 @@ export class ProjectRepository {
       location: input.location || null,
       start_date: input.start_date || null,
       end_date: input.end_date || null,
-      created_at: new Date().toISOString(),
+      created_by: ownerId,
+      created_at: nowIso,
+      updated_at: nowIso,
+      media_count: 0,
     };
 
     mockProjectsStore.unshift(newProject);
     return newProject;
   }
 
-  async update(id: string, input: UpdateProjectInput): Promise<Project | null> {
+  async update(id: string, input: UpdateProjectInput, userId?: string): Promise<Project | null> {
+    // Exclude created_by modification from client updates
+    const { created_by, ...safeFields } = input as any;
+
+    const updateData = {
+      ...safeFields,
+      updated_at: new Date().toISOString(),
+    };
+
     if (isSupabaseConfigured() && supabase) {
-      const { data, error } = await supabase
+      let query = supabase
         .from('projects')
-        .update(input)
-        .eq('id', id)
-        .select('*')
-        .single();
+        .update(updateData)
+        .eq('id', id);
+
+      if (userId) {
+        query = query.eq('created_by', userId);
+      }
+
+      const { data, error } = await query.select('*, assets(count)').maybeSingle();
 
       if (error || !data) return null;
-      return data as Project;
+      const { assets, ...projectData } = data as any;
+      const count = Array.isArray(assets) && assets.length > 0 ? Number(assets[0].count || 0) : 0;
+      return {
+        ...projectData,
+        media_count: count,
+      } as Project;
     }
 
-    const index = mockProjectsStore.findIndex((p) => p.id === id);
+    const index = mockProjectsStore.findIndex(
+      (p) => p.id === id && (!userId || p.created_by === userId)
+    );
     if (index === -1) return null;
 
     mockProjectsStore[index] = {
       ...mockProjectsStore[index],
-      ...input,
+      ...updateData,
     };
 
-    return mockProjectsStore[index];
+    const allAssets = await this.assetRepository.findAll();
+    const count = allAssets.filter((a) => a.project_id === id).length;
+
+    return {
+      ...mockProjectsStore[index],
+      media_count: count,
+    };
   }
 
-  async delete(id: string): Promise<boolean> {
+  async delete(id: string, userId?: string): Promise<boolean> {
     if (isSupabaseConfigured() && supabase) {
-      const { error } = await supabase.from('projects').delete().eq('id', id);
+      let query = supabase.from('projects').delete().eq('id', id);
+      if (userId) {
+        query = query.eq('created_by', userId);
+      }
+      const { error } = await query;
       return !error;
     }
 
-    const index = mockProjectsStore.findIndex((p) => p.id === id);
+    const index = mockProjectsStore.findIndex(
+      (p) => p.id === id && (!userId || p.created_by === userId)
+    );
     if (index === -1) return false;
     mockProjectsStore.splice(index, 1);
     return true;
   }
 }
+

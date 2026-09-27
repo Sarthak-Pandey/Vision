@@ -1,23 +1,26 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Modal } from '@/components/ui/Modal';
 import { Input } from '@/components/ui/Input';
 import { Textarea } from '@/components/ui/Textarea';
 import { Button } from '@/components/ui/Button';
-import { createProject } from '@/lib/api/client';
+import { updateProject } from '@/lib/api/client';
 import { Toast } from '@/components/ui/Toast';
+import { Project } from '@/types';
 
-export interface CreateProjectModalProps {
+export interface EditProjectModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onCreated?: () => void;
+  project: Project;
+  onUpdated?: (updatedProject: Project) => void;
 }
 
-export const CreateProjectModal: React.FC<CreateProjectModalProps> = ({
+export const EditProjectModal: React.FC<EditProjectModalProps> = ({
   isOpen,
   onClose,
-  onCreated,
+  project,
+  onUpdated,
 }) => {
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
@@ -27,6 +30,16 @@ export const CreateProjectModal: React.FC<CreateProjectModalProps> = ({
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (project) {
+      setName(project.name || '');
+      setDescription(project.description || '');
+      setLocation(project.location || '');
+      setStartDate(project.start_date ? project.start_date.split('T')[0] : '');
+      setEndDate(project.end_date ? project.end_date.split('T')[0] : '');
+    }
+  }, [project, isOpen]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -64,7 +77,7 @@ export const CreateProjectModal: React.FC<CreateProjectModalProps> = ({
 
     try {
       setIsLoading(true);
-      await createProject({
+      const updated = await updateProject(project.id, {
         name: trimmedName,
         description: description.trim() || undefined,
         location: location.trim() || undefined,
@@ -72,20 +85,15 @@ export const CreateProjectModal: React.FC<CreateProjectModalProps> = ({
         end_date: endDate || undefined,
       });
 
-      setToastMessage('Project created successfully!');
+      setToastMessage('Project updated successfully!');
       setTimeout(() => {
-        setName('');
-        setDescription('');
-        setLocation('');
-        setStartDate('');
-        setEndDate('');
         setIsLoading(false);
-        if (onCreated) onCreated();
+        if (onUpdated) onUpdated(updated);
         onClose();
       }, 500);
     } catch (err: any) {
       setIsLoading(false);
-      setError(err.message || 'Failed to create project');
+      setError(err.message || 'Failed to update project details.');
     }
   };
 
@@ -94,8 +102,8 @@ export const CreateProjectModal: React.FC<CreateProjectModalProps> = ({
       <Modal
         isOpen={isOpen}
         onClose={onClose}
-        title="Create New Project"
-        description="Fill in details to set up a new impact tracking project."
+        title="Edit Project"
+        description="Update metadata and configuration for this impact project."
       >
         <form onSubmit={handleSubmit} className="space-y-4">
           {error && (
@@ -147,7 +155,7 @@ export const CreateProjectModal: React.FC<CreateProjectModalProps> = ({
               Cancel
             </Button>
             <Button type="submit" isLoading={isLoading}>
-              Create Project
+              Save Changes
             </Button>
           </div>
         </form>

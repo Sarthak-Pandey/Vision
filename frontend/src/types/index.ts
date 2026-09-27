@@ -5,7 +5,10 @@ export interface Project {
   location?: string | null;
   start_date?: string | null;
   end_date?: string | null;
+  created_by?: string | null;
   created_at: string;
+  updated_at?: string | null;
+  media_count?: number;
 }
 
 export interface CreateProjectPayload {
@@ -14,6 +17,7 @@ export interface CreateProjectPayload {
   location?: string;
   start_date?: string;
   end_date?: string;
+  created_by?: string;
 }
 
 export interface UpdateProjectPayload {
@@ -22,6 +26,46 @@ export interface UpdateProjectPayload {
   location?: string;
   start_date?: string;
   end_date?: string;
+  created_by?: string;
+  updated_at?: string;
+}
+
+export interface ActivitySummaryItem {
+  activity: string;
+  normalizedKey: string;
+  count: number;
+}
+
+export interface TimelineMonthGroup {
+  monthName: string;
+  monthKey: string;
+  count: number;
+  assets: MediaAssetWithAnalysis[];
+}
+
+export interface TimelineYearGroup {
+  year: string;
+  totalAssets: number;
+  months: TimelineMonthGroup[];
+}
+
+export interface LocationClusterItem {
+  key: string;
+  latitude: number;
+  longitude: number;
+  formattedCoordinates: string;
+  count: number;
+  sampleAssetUrl?: string;
+}
+
+export interface ProjectStatsSummary {
+  mediaCount: number;
+  activityCount: number;
+  locationCount: number;
+  activities: ActivitySummaryItem[];
+  timeline: TimelineYearGroup[];
+  locations: LocationClusterItem[];
+  undatedAssetsCount: number;
 }
 
 export interface MediaAsset {

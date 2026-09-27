@@ -10,7 +10,8 @@ export class ProjectController {
 
   getProjects = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
-      const projects = await this.projectService.getAllProjects();
+      const userId = (req as any).user?.id;
+      const projects = await this.projectService.getAllProjects(userId);
       res.status(200).json({
         success: true,
         data: projects,
@@ -22,8 +23,9 @@ export class ProjectController {
 
   getProjectById = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
+      const userId = (req as any).user?.id;
       const { id } = req.params;
-      const project = await this.projectService.getProjectById(id);
+      const project = await this.projectService.getProjectById(id, userId);
       res.status(200).json({
         success: true,
         data: project,
@@ -35,7 +37,10 @@ export class ProjectController {
 
   createProject = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
-      const project = await this.projectService.createProject(req.body);
+      const userId = (req as any).user?.id;
+      // Strip any client-supplied created_by to prevent ownership spoofing
+      const { created_by, ...inputData } = req.body;
+      const project = await this.projectService.createProject(inputData, userId);
       res.status(201).json({
         success: true,
         data: project,
@@ -47,8 +52,11 @@ export class ProjectController {
 
   updateProject = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
+      const userId = (req as any).user?.id;
       const { id } = req.params;
-      const project = await this.projectService.updateProject(id, req.body);
+      // Strip any client-supplied created_by
+      const { created_by, ...inputData } = req.body;
+      const project = await this.projectService.updateProject(id, inputData, userId);
       res.status(200).json({
         success: true,
         data: project,
@@ -60,8 +68,9 @@ export class ProjectController {
 
   deleteProject = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
+      const userId = (req as any).user?.id;
       const { id } = req.params;
-      await this.projectService.deleteProject(id);
+      await this.projectService.deleteProject(id, userId);
       res.status(200).json({
         success: true,
         data: { message: 'Project deleted successfully' },
@@ -71,3 +80,4 @@ export class ProjectController {
     }
   };
 }
+

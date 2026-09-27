@@ -145,7 +145,7 @@ export default function ProjectsPage() {
                 </div>
               </div>
               <div className="flex items-center gap-6 text-xs text-secondary-text">
-                <span>37 media</span>
+                <span>{project.media_count ?? 0} media</span>
                 <span>{project.start_date || 'N/A'} – {project.end_date || 'N/A'}</span>
               </div>
             </Link>

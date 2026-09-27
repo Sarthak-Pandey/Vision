@@ -9,7 +9,8 @@ export interface ProjectCardProps {
   mediaCount?: number;
 }
 
-export const ProjectCard: React.FC<ProjectCardProps> = ({ project, mediaCount = 37 }) => {
+export const ProjectCard: React.FC<ProjectCardProps> = ({ project, mediaCount }) => {
+  const displayMediaCount = mediaCount ?? project.media_count ?? 0;
   const formatDate = (dateStr?: string | null) => {
     if (!dateStr) return 'N/A';
     try {
@@ -35,7 +36,7 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project, mediaCount = 
           />
           <div className="absolute bottom-2 left-3 z-20 flex items-center gap-1.5 bg-black/60 backdrop-blur-xs text-white text-xs px-2 py-0.5 rounded-md">
             <ImageIcon className="w-3 h-3 text-brand-orange" />
-            <span>{mediaCount} media</span>
+            <span>{displayMediaCount} media</span>
           </div>
         </div>
 
