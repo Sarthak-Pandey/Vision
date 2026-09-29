@@ -15,6 +15,7 @@ import {
   Edit,
   Trash2,
   Sparkles,
+  Layers,
 } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Tabs } from '@/components/ui/Tabs';
@@ -31,7 +32,9 @@ import { LocationSummary } from '@/components/projects/LocationSummary';
 import { RecentMedia } from '@/components/projects/RecentMedia';
 import { ProjectTimeline } from '@/components/projects/ProjectTimeline';
 import { SemanticSearchSection } from '@/components/search/SemanticSearchSection';
+import { BeforeAfterSection } from '@/components/comparisons/BeforeAfterSection';
 import { getProject, getAssets } from '@/lib/api/client';
+
 import { Project, MediaAsset, MediaAssetWithAnalysis } from '@/types';
 import { calculateProjectStats } from '@/lib/utils/projectStats';
 
@@ -81,12 +84,14 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
 
   const tabs = [
     { id: 'overview', label: 'Overview' },
+    { id: 'comparisons', label: 'Before / After' },
     { id: 'search', label: 'AI Search' },
     { id: 'media', label: 'Media', count: stats.mediaCount },
     { id: 'activities', label: 'Activities', count: stats.activityCount },
     { id: 'locations', label: 'Locations', count: stats.locationCount },
     { id: 'timeline', label: 'Timeline' },
   ];
+
 
   const formatDateRange = (start?: string | null, end?: string | null) => {
     const formatSingle = (str?: string | null) => {
@@ -206,6 +211,19 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
 
           <Button
             variant="outline"
+            onClick={() => setActiveTab('comparisons')}
+            className={`gap-1.5 shrink-0 text-xs ${
+              activeTab === 'comparisons'
+                ? 'bg-brand-dark-orange text-white border-brand-dark-orange'
+                : 'border-orange-300 text-brand-dark-orange hover:bg-orange-50'
+            }`}
+          >
+            <Layers className="w-3.5 h-3.5" />
+            <span>Before / After</span>
+          </Button>
+
+          <Button
+            variant="outline"
             onClick={() => setActiveTab('search')}
             className={`gap-1.5 shrink-0 text-xs ${
               activeTab === 'search'
@@ -230,6 +248,18 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
       {/* Navigation Tabs */}
       <Tabs tabs={tabs} activeTab={activeTab} onChange={setActiveTab} />
 
+      {/* Tab: Before / After Intelligence */}
+      {activeTab === 'comparisons' && (
+        <div className="animate-in fade-in duration-200">
+          <BeforeAfterSection
+            projectId={project.id}
+            projectName={project.name}
+            assets={projectAssets}
+            onAssetSelect={setSelectedAssetForInspection}
+          />
+        </div>
+      )}
+
       {/* Tab: Semantic Search */}
       {activeTab === 'search' && (
         <div className="animate-in fade-in duration-200">
@@ -240,6 +270,7 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
           />
         </div>
       )}
+
 
       {/* Tab 1: Overview */}
       {activeTab === 'overview' && (

@@ -159,3 +159,60 @@ export interface IndexingStats {
   indexed: number;
   pending: number;
 }
+
+// ============================================================================
+// Phase 5: Before / After Intelligence Types
+// ============================================================================
+
+export type ComparisonCategory =
+  | 'vegetation'
+  | 'waste'
+  | 'water'
+  | 'land'
+  | 'infrastructure'
+  | 'human_activity'
+  | 'condition';
+
+export type ComparisonDirection =
+  | 'increase'
+  | 'decrease'
+  | 'new'
+  | 'removed'
+  | 'changed'
+  | 'unchanged'
+  | 'uncertain';
+
+export interface ComparisonChange {
+  description: string;
+  category: ComparisonCategory;
+  direction: ComparisonDirection;
+  confidence: number;
+}
+
+export interface ComparisonResult {
+  summary: string;
+  changes: ComparisonChange[];
+  overall_confidence: number;
+}
+
+export interface ComparisonRecord {
+  id: string;
+  project_id: string;
+  before_asset_id: string;
+  after_asset_id: string;
+  comparison_result: ComparisonResult;
+  confidence: number;
+  status: 'completed' | 'inconclusive' | 'failed';
+  model: string;
+  created_by?: string | null;
+  created_at: string;
+  updated_at: string;
+  before_asset?: MediaAsset | null;
+  after_asset?: MediaAsset | null;
+}
+
+export interface CreateComparisonPayload {
+  beforeAssetId: string;
+  afterAssetId: string;
+}
+

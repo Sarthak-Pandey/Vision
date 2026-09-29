@@ -11,6 +11,8 @@ import {
   SearchResult,
   SemanticSearchParams,
   IndexingStats,
+  ComparisonRecord,
+  CreateComparisonPayload,
 } from '@/types';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
@@ -136,3 +138,31 @@ export async function triggerIndexing(
     body: JSON.stringify({ projectId, batchSize }),
   });
 }
+
+// ============================================================================
+// Phase 5: Before / After Intelligence Client API
+// ============================================================================
+
+export async function createComparison(
+  projectId: string,
+  payload: CreateComparisonPayload
+): Promise<ComparisonRecord> {
+  return request<ComparisonRecord>(`/projects/${projectId}/comparisons`, {
+    method: 'POST',
+    body: JSON.stringify(payload),
+  });
+}
+
+export async function getProjectComparisons(
+  projectId: string
+): Promise<ComparisonRecord[]> {
+  return request<ComparisonRecord[]>(`/projects/${projectId}/comparisons`);
+}
+
+export async function getComparisonById(
+  projectId: string,
+  comparisonId: string
+): Promise<ComparisonRecord> {
+  return request<ComparisonRecord>(`/projects/${projectId}/comparisons/${comparisonId}`);
+}
+
