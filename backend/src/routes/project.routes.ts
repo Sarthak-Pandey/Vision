@@ -5,6 +5,7 @@ import { authenticate } from '../middleware/auth.middleware.js';
 import { createProjectSchema, updateProjectSchema } from '../schemas/project.schema.js';
 import comparisonRoutes from './comparison.routes.js';
 import claimRoutes from './claim.routes.js';
+import evidenceGapRoutes from './evidence-gap.routes.js';
 
 const router = Router();
 const controller = new ProjectController();
@@ -17,6 +18,9 @@ router.use('/:projectId/comparisons', comparisonRoutes);
 
 // Phase 6: Nested Evidence & Claims
 router.use('/:projectId/claims', claimRoutes);
+
+// Phase 7: Nested Evidence Gap Detection
+router.use('/:projectId/evidence-gaps', evidenceGapRoutes);
 
 
 router.get('/', controller.getProjects);
