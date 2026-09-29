@@ -4,6 +4,7 @@ import { CloudinaryService } from '../services/cloudinary.service.js';
 import { VisionService } from '../services/vision.service.js';
 import { ProjectService } from '../services/project.service.js';
 import { SearchService } from '../services/search.service.js';
+import { ClaimService } from '../services/claim.service.js';
 import { BadRequestError, NotFoundError } from '../utils/errors.js';
 import { Asset, AiAnalysis } from '../types/index.js';
 
@@ -13,6 +14,7 @@ export class AssetController {
   private visionService: VisionService;
   private projectService: ProjectService;
   private searchService: SearchService;
+  private claimService: ClaimService;
 
   constructor() {
     this.assetService = new AssetService();
@@ -20,7 +22,9 @@ export class AssetController {
     this.visionService = new VisionService();
     this.projectService = new ProjectService();
     this.searchService = new SearchService();
+    this.claimService = new ClaimService();
   }
+
 
   getAssets = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
@@ -72,11 +76,17 @@ export class AssetController {
 
       const asset = await this.assetService.createAsset(assetPayload);
 
-      // Trigger automated vision analysis & multimodal embedding generation in background upon asset registration
+      // Trigger automated vision analysis, claims generation, and embedding in background
       (async () => {
         try {
-          await this.visionService.analyzeAsset(asset, project.name);
+          const analysis = await this.visionService.analyzeAsset(asset, project.name);
           console.log(`[AssetController] Automated AI Vision analysis completed for asset: ${asset.id}`);
+          try {
+            await this.claimService.generateClaimsFromPhase2(project.id, asset, analysis, userId);
+            console.log(`[AssetController] Generated evidence claims from vision analysis for asset: ${asset.id}`);
+          } catch (claimErr: any) {
+            console.warn(`[AssetController] Failed to generate claims for asset ${asset.id}:`, claimErr.message);
+          }
         } catch (visionErr: any) {
           console.warn(`[AssetController] Background vision analysis failed for asset ${asset.id}:`, visionErr.message);
         }
@@ -113,6 +123,13 @@ export class AssetController {
 
       const analysis = await this.visionService.analyzeAsset(asset, project.name);
 
+      // Generate claims from analysis
+      try {
+        await this.claimService.generateClaimsFromPhase2(project.id, asset, analysis, userId);
+      } catch (claimErr: any) {
+        console.warn(`[AssetController] Failed to generate claims for asset ${asset.id}:`, claimErr.message);
+      }
+
       // Also ensure embedding exists for asset upon manual re-analysis
       (async () => {
         try {
@@ -126,6 +143,7 @@ export class AssetController {
         success: true,
         data: analysis,
       });
+
     } catch (error) {
       next(error);
     }
