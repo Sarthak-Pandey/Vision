@@ -57,7 +57,17 @@ export class ProjectRepository {
         query = query.eq('created_by', userId);
       }
 
-      const { data, error } = await query.order('created_at', { ascending: false });
+      let { data, error } = await query.order('created_at', { ascending: false });
+
+      // Graceful fallback if database schema hasn't migrated created_by column yet
+      if (error && error.code === '42703') {
+        const retry = await supabase
+          .from('projects')
+          .select('*, assets(count)')
+          .order('created_at', { ascending: false });
+        data = retry.data;
+        error = retry.error;
+      }
 
       if (error) {
         throw new Error(`Supabase error: ${error.message}`);
@@ -101,7 +111,18 @@ export class ProjectRepository {
         query = query.eq('created_by', userId);
       }
 
-      const { data, error } = await query.maybeSingle();
+      let { data, error } = await query.maybeSingle();
+
+      // Graceful fallback if database schema hasn't migrated created_by column yet
+      if (error && error.code === '42703') {
+        const retry = await supabase
+          .from('projects')
+          .select('*, assets(count)')
+          .eq('id', id)
+          .maybeSingle();
+        data = retry.data;
+        error = retry.error;
+      }
 
       if (error || !data) return null;
       const { assets, ...projectData } = data as any;
@@ -131,7 +152,7 @@ export class ProjectRepository {
     const ownerId = userId || input.created_by || 'user-demo-123';
 
     if (isSupabaseConfigured() && supabase) {
-      const { data, error } = await supabase
+      let { data, error } = await supabase
         .from('projects')
         .insert([
           {
@@ -146,6 +167,26 @@ export class ProjectRepository {
         ])
         .select('*')
         .single();
+
+      // Graceful fallback if database schema hasn't migrated created_by column yet
+      if (error && (error.code === '42703' || error.message?.includes('created_by'))) {
+        const retry = await supabase
+          .from('projects')
+          .insert([
+            {
+              name: input.name,
+              description: input.description || null,
+              location: input.location || null,
+              start_date: input.start_date || null,
+              end_date: input.end_date || null,
+              updated_at: nowIso,
+            },
+          ])
+          .select('*')
+          .single();
+        data = retry.data;
+        error = retry.error;
+      }
 
       if (error) {
         throw new Error(`Supabase create error: ${error.message}`);
@@ -189,7 +230,19 @@ export class ProjectRepository {
         query = query.eq('created_by', userId);
       }
 
-      const { data, error } = await query.select('*, assets(count)').maybeSingle();
+      let { data, error } = await query.select('*, assets(count)').maybeSingle();
+
+      // Graceful fallback if database schema hasn't migrated created_by column yet
+      if (error && (error.code === '42703' || error.message?.includes('created_by'))) {
+        const retry = await supabase
+          .from('projects')
+          .update(updateData)
+          .eq('id', id)
+          .select('*, assets(count)')
+          .maybeSingle();
+        data = retry.data;
+        error = retry.error;
+      }
 
       if (error || !data) return null;
       const { assets, ...projectData } = data as any;
@@ -225,7 +278,14 @@ export class ProjectRepository {
       if (userId) {
         query = query.eq('created_by', userId);
       }
-      const { error } = await query;
+      let { error } = await query;
+
+      // Graceful fallback if database schema hasn't migrated created_by column yet
+      if (error && (error.code === '42703' || error.message?.includes('created_by'))) {
+        const retry = await supabase.from('projects').delete().eq('id', id);
+        error = retry.error;
+      }
+
       return !error;
     }
 

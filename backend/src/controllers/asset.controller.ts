@@ -3,6 +3,7 @@ import { AssetService } from '../services/asset.service.js';
 import { CloudinaryService } from '../services/cloudinary.service.js';
 import { VisionService } from '../services/vision.service.js';
 import { ProjectService } from '../services/project.service.js';
+import { SearchService } from '../services/search.service.js';
 import { BadRequestError, NotFoundError } from '../utils/errors.js';
 import { Asset, AiAnalysis } from '../types/index.js';
 
@@ -11,12 +12,14 @@ export class AssetController {
   private cloudinaryService: CloudinaryService;
   private visionService: VisionService;
   private projectService: ProjectService;
+  private searchService: SearchService;
 
   constructor() {
     this.assetService = new AssetService();
     this.cloudinaryService = new CloudinaryService();
     this.visionService = new VisionService();
     this.projectService = new ProjectService();
+    this.searchService = new SearchService();
   }
 
   getAssets = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
@@ -69,13 +72,20 @@ export class AssetController {
 
       const asset = await this.assetService.createAsset(assetPayload);
 
-      // Trigger automated vision analysis in background upon asset registration
+      // Trigger automated vision analysis & multimodal embedding generation in background upon asset registration
       (async () => {
         try {
           await this.visionService.analyzeAsset(asset, project.name);
           console.log(`[AssetController] Automated AI Vision analysis completed for asset: ${asset.id}`);
         } catch (visionErr: any) {
           console.warn(`[AssetController] Background vision analysis failed for asset ${asset.id}:`, visionErr.message);
+        }
+
+        try {
+          await this.searchService.indexAsset(asset);
+          console.log(`[AssetController] Automated image embedding completed for asset: ${asset.id}`);
+        } catch (embErr: any) {
+          console.warn(`[AssetController] Background image embedding failed for asset ${asset.id}:`, embErr.message);
         }
       })();
 
@@ -102,6 +112,16 @@ export class AssetController {
       const project = await this.projectService.getProjectById(asset.project_id, userId);
 
       const analysis = await this.visionService.analyzeAsset(asset, project.name);
+
+      // Also ensure embedding exists for asset upon manual re-analysis
+      (async () => {
+        try {
+          await this.searchService.indexAsset(asset);
+        } catch (embErr: any) {
+          console.warn(`[AssetController] Background embedding refresh failed for asset ${asset.id}:`, embErr.message);
+        }
+      })();
+
       res.status(200).json({
         success: true,
         data: analysis,
