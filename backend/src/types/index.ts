@@ -5,6 +5,7 @@ export interface Project {
   location?: string | null;
   start_date?: string | null;
   end_date?: string | null;
+  project_type?: ProjectType | string | null;
   created_by?: string | null;
   created_at: string;
   updated_at?: string | null;
@@ -17,6 +18,7 @@ export interface CreateProjectInput {
   location?: string;
   start_date?: string;
   end_date?: string;
+  project_type?: ProjectType | string;
   created_by?: string;
 }
 
@@ -26,6 +28,7 @@ export interface UpdateProjectInput {
   location?: string;
   start_date?: string;
   end_date?: string;
+  project_type?: ProjectType | string;
   created_by?: string;
   updated_at?: string;
 }
@@ -217,6 +220,7 @@ export interface EvidenceClaim {
   confidence: number;
   sourceType: ClaimSourceType;
   sourceId?: string | null;
+  category?: EvidenceCategory | null;
   normalizedClaim: string;
   createdBy?: string | null;
   createdAt: string;
@@ -230,6 +234,7 @@ export interface CreateClaimInput {
   confidence: number;
   sourceType: ClaimSourceType;
   sourceId?: string | null;
+  category?: EvidenceCategory | null;
   evidenceAssetIds: string[];
   createdBy?: string | null;
 }
@@ -242,4 +247,62 @@ export interface ClaimsTelemetry {
   comparisonSourcesCount: number;
   averageConfidence: number;
 }
+
+// ============================================================================
+// Phase 7: Evidence Gap Detection Types
+// ============================================================================
+
+export type EvidenceCategory =
+  | 'initial_condition'
+  | 'activity'
+  | 'immediate_result'
+  | 'long_term_outcome'
+  | 'beneficiary_evidence'
+  | 'quantitative_measurement';
+
+export type ProjectType =
+  | 'tree_plantation'
+  | 'river_restoration'
+  | 'solar_installation'
+  | 'waste_cleanup'
+  | 'other';
+
+export interface EvidenceCategorySource {
+  assetId: string;
+  url?: string;
+  type?: string;
+  captureDate?: string | null;
+  claimId?: string;
+  claimText?: string;
+  sourceType?: string;
+  role?: string;
+}
+
+export interface EvidenceCategoryStatus {
+  category: EvidenceCategory;
+  label: string;
+  status: 'available' | 'missing';
+  evidenceCount: number;
+  sources: EvidenceCategorySource[];
+  explanation: string;
+  suggestedNextAction?: string;
+}
+
+export interface EvidenceGapReport {
+  projectId: string;
+  projectName: string;
+  projectType: ProjectType;
+  projectTypeConfigured: boolean;
+  expected: EvidenceCategory[];
+  available: EvidenceCategory[];
+  missing: EvidenceCategory[];
+  coverage: {
+    available: number;
+    expected: number;
+    percentage: number;
+  };
+  categories: EvidenceCategoryStatus[];
+  timestamp: string;
+}
+
 

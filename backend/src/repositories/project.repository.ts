@@ -12,6 +12,7 @@ const mockProjectsStore: Project[] = [
     location: 'Delhi',
     start_date: '2025-01-01',
     end_date: '2026-09-30',
+    project_type: 'river_restoration',
     created_by: 'user-demo-123',
     created_at: new Date('2025-01-01T00:00:00Z').toISOString(),
     updated_at: new Date('2025-01-01T00:00:00Z').toISOString(),
@@ -23,6 +24,7 @@ const mockProjectsStore: Project[] = [
     location: 'Rajasthan',
     start_date: '2024-06-15',
     end_date: '2025-12-31',
+    project_type: 'solar_installation',
     created_by: 'user-demo-123',
     created_at: new Date('2024-06-15T00:00:00Z').toISOString(),
     updated_at: new Date('2024-06-15T00:00:00Z').toISOString(),
@@ -34,6 +36,7 @@ const mockProjectsStore: Project[] = [
     location: 'Sundarbans, West Bengal',
     start_date: '2025-03-01',
     end_date: '2027-03-01',
+    project_type: 'tree_plantation',
     created_by: 'user-demo-456',
     created_at: new Date('2025-03-01T00:00:00Z').toISOString(),
     updated_at: new Date('2025-03-01T00:00:00Z').toISOString(),
@@ -150,6 +153,7 @@ export class ProjectRepository {
   async create(input: CreateProjectInput, userId?: string): Promise<Project> {
     const nowIso = new Date().toISOString();
     const ownerId = userId || input.created_by || 'user-demo-123';
+    const projectType = input.project_type || 'other';
 
     if (isSupabaseConfigured() && supabase) {
       let { data, error } = await supabase
@@ -161,6 +165,7 @@ export class ProjectRepository {
             location: input.location || null,
             start_date: input.start_date || null,
             end_date: input.end_date || null,
+            project_type: projectType,
             created_by: ownerId,
             updated_at: nowIso,
           },
@@ -179,6 +184,7 @@ export class ProjectRepository {
               location: input.location || null,
               start_date: input.start_date || null,
               end_date: input.end_date || null,
+              project_type: projectType,
               updated_at: nowIso,
             },
           ])
@@ -201,6 +207,7 @@ export class ProjectRepository {
       location: input.location || null,
       start_date: input.start_date || null,
       end_date: input.end_date || null,
+      project_type: projectType,
       created_by: ownerId,
       created_at: nowIso,
       updated_at: nowIso,

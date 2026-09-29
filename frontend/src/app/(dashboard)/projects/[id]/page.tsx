@@ -35,6 +35,7 @@ import { ProjectTimeline } from '@/components/projects/ProjectTimeline';
 import { SemanticSearchSection } from '@/components/search/SemanticSearchSection';
 import { BeforeAfterSection } from '@/components/comparisons/BeforeAfterSection';
 import { EvidenceClaimsSection } from '@/components/evidence/EvidenceClaimsSection';
+import { EvidenceCoverageSection } from '@/components/evidence/EvidenceCoverageSection';
 import { getProject, getAssets } from '@/lib/api/client';
 
 import { Project, MediaAsset, MediaAssetWithAnalysis } from '@/types';
@@ -87,6 +88,7 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
   const tabs = [
     { id: 'overview', label: 'Overview' },
     { id: 'claims', label: 'Evidence & Claims' },
+    { id: 'gaps', label: 'Evidence Gaps' },
     { id: 'comparisons', label: 'Before / After' },
     { id: 'search', label: 'AI Search' },
     { id: 'media', label: 'Media', count: stats.mediaCount },
@@ -272,6 +274,18 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
             projectName={project.name}
             projectAssets={projectAssets}
             onAssetSelect={setSelectedAssetForInspection}
+          />
+        </div>
+      )}
+
+      {/* Tab: Evidence Gaps & Coverage (Phase 7) */}
+      {activeTab === 'gaps' && (
+        <div className="animate-in fade-in duration-200">
+          <EvidenceCoverageSection
+            projectId={project.id}
+            projectName={project.name}
+            onAssetSelect={setSelectedAssetForInspection}
+            onNavigateToTab={setActiveTab}
           />
         </div>
       )}
