@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState, use, useMemo } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import {
   ArrowLeft,
   MapPin,
@@ -14,6 +14,7 @@ import {
   UploadCloud,
   Edit,
   Trash2,
+  Sparkles,
 } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Tabs } from '@/components/ui/Tabs';
@@ -29,6 +30,7 @@ import { ActivitySummary } from '@/components/projects/ActivitySummary';
 import { LocationSummary } from '@/components/projects/LocationSummary';
 import { RecentMedia } from '@/components/projects/RecentMedia';
 import { ProjectTimeline } from '@/components/projects/ProjectTimeline';
+import { SemanticSearchSection } from '@/components/search/SemanticSearchSection';
 import { getProject, getAssets } from '@/lib/api/client';
 import { Project, MediaAsset, MediaAssetWithAnalysis } from '@/types';
 import { calculateProjectStats } from '@/lib/utils/projectStats';
@@ -37,10 +39,11 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
   const resolvedParams = use(params);
   const projectId = resolvedParams.id;
   const router = useRouter();
+  const searchParams = useSearchParams();
 
   const [project, setProject] = useState<Project | null>(null);
   const [projectAssets, setProjectAssets] = useState<MediaAssetWithAnalysis[]>([]);
-  const [activeTab, setActiveTab] = useState('overview');
+  const [activeTab, setActiveTab] = useState(searchParams.get('tab') || 'overview');
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -78,6 +81,7 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
 
   const tabs = [
     { id: 'overview', label: 'Overview' },
+    { id: 'search', label: 'AI Search' },
     { id: 'media', label: 'Media', count: stats.mediaCount },
     { id: 'activities', label: 'Activities', count: stats.activityCount },
     { id: 'locations', label: 'Locations', count: stats.locationCount },
@@ -201,6 +205,19 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
           </Button>
 
           <Button
+            variant="outline"
+            onClick={() => setActiveTab('search')}
+            className={`gap-1.5 shrink-0 text-xs ${
+              activeTab === 'search'
+                ? 'bg-primary text-primary-foreground border-primary'
+                : 'border-primary/40 text-primary hover:bg-primary/10'
+            }`}
+          >
+            <Sparkles className="w-3.5 h-3.5" />
+            <span>AI Search</span>
+          </Button>
+
+          <Button
             onClick={() => setIsUploadModalOpen(true)}
             className="gap-2 shrink-0 text-xs"
           >
@@ -212,6 +229,17 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
 
       {/* Navigation Tabs */}
       <Tabs tabs={tabs} activeTab={activeTab} onChange={setActiveTab} />
+
+      {/* Tab: Semantic Search */}
+      {activeTab === 'search' && (
+        <div className="animate-in fade-in duration-200">
+          <SemanticSearchSection
+            projectId={project.id}
+            projectName={project.name}
+            onAssetSelect={setSelectedAssetForInspection}
+          />
+        </div>
+      )}
 
       {/* Tab 1: Overview */}
       {activeTab === 'overview' && (
