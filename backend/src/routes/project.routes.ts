@@ -3,12 +3,16 @@ import { ProjectController } from '../controllers/project.controller.js';
 import { validate } from '../middleware/validation.middleware.js';
 import { authenticate } from '../middleware/auth.middleware.js';
 import { createProjectSchema, updateProjectSchema } from '../schemas/project.schema.js';
+import comparisonRoutes from './comparison.routes.js';
 
 const router = Router();
 const controller = new ProjectController();
 
 // Apply auth protection
 router.use(authenticate);
+
+// Phase 5: Nested Before/After comparisons
+router.use('/:projectId/comparisons', comparisonRoutes);
 
 router.get('/', controller.getProjects);
 router.get('/:id', controller.getProjectById);
@@ -17,3 +21,4 @@ router.patch('/:id', validate(updateProjectSchema), controller.updateProject);
 router.delete('/:id', controller.deleteProject);
 
 export default router;
+
