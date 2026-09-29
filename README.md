@@ -64,13 +64,23 @@ graph TD
 | **Phase 2** | **AI Vision Analysis** | Multimodal structured JSON extraction, resilient multi-model fallback chain, automated tagging, Visual Evidence Inspector | Completed |
 | **Phase 3** | **Project Management & Dashboard** | Project creation, editing, deletion, real-time statistics, chronological timeline, activity breakdown, geo-clustering, multi-tenant security controls | Completed |
 | **Phase 4** | **Semantic Image Search** | Multimodal image/query embeddings, PostgreSQL pgvector HNSW indexing, project-scoped similarity search UI | Completed |
-| **Phase 5** | **ESG Impact Reports** | Metric aggregation, PDF report generation, public verification share links | Planned |
+| **Phase 5** | **Before / After Intelligence** | Observable visual change comparison, duplicate prevention, chronological validation, side-by-side evidence UI | Completed |
+| **Phase 6** | **ESG Impact Reports** | Metric aggregation, PDF report generation, public verification share links | Planned |
 
 ---
 
 ## Key Features
 
+### Phase 5: Before / After Intelligence
+
+- **Multimodal Visual Comparison Engine**: Powered by Google Gemini Vision (`gemini-3.8-flash`) inspecting two ground-truth field photos from the same project to detect observable physical changes (vegetation, visible waste, water appearance, land stability, infrastructure, human activity).
+- **Strict Visual Verification Guarantees**: Restricts output strictly to visible photographic differences. Prohibits unsupported scientific claims (no fabricated carbon reduction %, biodiversity %, or chemical water purity metrics).
+- **Duplicate Comparison Prevention**: Checks unique composite index `(project_id, before_asset_id, after_asset_id)` in PostgreSQL before invoking AI models, returning existing saved records to eliminate unnecessary AI API costs.
+- **Chronological & Asset Safety**: Verifies that both assets belong to the authorized project, ensures both are valid images, guards image streaming with a 15-second timeout and 20MB ceiling, and flags reverse-chronological dates (`before > after`).
+- **Interactive Before / After UI**: Embedded directly into project dashboards with dual-photo picker, swap controls, chronological warnings, side-by-side comparison previews, observable change cards with direction badges, model confidence rating, and saved comparisons history.
+
 ### Phase 4: Semantic Image Search (pgvector)
+
 
 - **Multimodal Image Vector Representation**: Generates 1536-dimensional embeddings directly from raw photographic evidence into a shared multimodal vector space (`gemini-embedding-2`), allowing users to search visual evidence using natural language queries rather than manually assigned keywords.
 - **In-Database Similarity Search (PostgreSQL + pgvector)**: Runs sub-millisecond cosine similarity queries inside PostgreSQL using an HNSW index (`vector_cosine_ops`) and stored `match_assets` RPC, eliminating costly client-side vector transfers.
@@ -177,6 +187,12 @@ npm run dev
 | `GET` | `/api/assets` | List ingested media assets for project | `?projectId=:id` |
 | `POST` | `/api/assets/:id/analyze` | Execute automated AI Vision multimodal inspection | `id: UUID` |
 | `GET` | `/api/assets/:id/analysis` | Fetch existing AI evidence analysis for an asset | `id: UUID` |
+| `POST` | `/api/search` | Multimodal semantic natural language image search | `{ projectId, query, threshold, limit }` |
+| `POST` | `/api/search/index` | Backfill embedding generation for unindexed images | `{ projectId, batchSize }` |
+| `GET` | `/api/search/stats` | Telemetry stats for indexed image coverage | `?projectId=:id` |
+| `POST` | `/api/projects/:projectId/comparisons` | Run or retrieve Before/After AI visual comparison | `{ beforeAssetId, afterAssetId }` |
+| `GET` | `/api/projects/:projectId/comparisons` | List saved comparisons for project | `projectId: UUID` |
+| `GET` | `/api/projects/:projectId/comparisons/:id` | Get specific comparison result by ID | `projectId: UUID, id: UUID` |
 
 ---
 
@@ -187,6 +203,9 @@ The platform uses PostgreSQL via Supabase. Schema definitions are maintained in 
 - **`projects`**: Project names, descriptions, locations, start/end dates, `created_by` owner IDs, creation timestamps.
 - **`assets`**: Cloudinary URLs, public IDs, file types, GPS coordinates (latitude/longitude), upload timestamps, foreign key `project_id REFERENCES projects(id) ON DELETE CASCADE`.
 - **`ai_analysis`**: Multimodal outputs (description, detected objects, activities, scene classifications, physical conditions, confidence metrics, source provenance), foreign key `asset_id REFERENCES assets(id) ON DELETE CASCADE`.
+- **`embeddings`**: 1536-dimensional multimodal vectors for images, HNSW cosine index `vector_cosine_ops`, foreign key `asset_id REFERENCES assets(id) ON DELETE CASCADE`.
+- **`comparisons`**: Structured Before/After visual comparison results, confidence scores, models, foreign keys `project_id REFERENCES projects(id)`, `before_asset_id REFERENCES assets(id)`, `after_asset_id REFERENCES assets(id)` on delete cascade, unique constraint on `(project_id, before_asset_id, after_asset_id)`.
+
 
 ---
 
