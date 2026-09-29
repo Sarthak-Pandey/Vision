@@ -13,6 +13,9 @@ import {
   IndexingStats,
   ComparisonRecord,
   CreateComparisonPayload,
+  EvidenceClaim,
+  ClaimsTelemetry,
+  ClaimSourceType,
 } from '@/types';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
@@ -165,4 +168,53 @@ export async function getComparisonById(
 ): Promise<ComparisonRecord> {
   return request<ComparisonRecord>(`/projects/${projectId}/comparisons/${comparisonId}`);
 }
+
+// ============================================================================
+// Phase 6: Evidence & Traceability Client API
+// ============================================================================
+
+export interface GetClaimsFilters {
+  sourceType?: ClaimSourceType;
+  minConfidence?: number;
+  limit?: number;
+  offset?: number;
+}
+
+export interface GetClaimsResponse {
+  claims: EvidenceClaim[];
+  telemetry: ClaimsTelemetry;
+}
+
+export async function getProjectClaims(
+  projectId: string,
+  filters?: GetClaimsFilters
+): Promise<GetClaimsResponse> {
+  const queryParams = new URLSearchParams();
+  if (filters?.sourceType) queryParams.set('sourceType', filters.sourceType);
+  if (filters?.minConfidence !== undefined) queryParams.set('minConfidence', String(filters.minConfidence));
+  if (filters?.limit) queryParams.set('limit', String(filters.limit));
+  if (filters?.offset) queryParams.set('offset', String(filters.offset));
+
+  const query = queryParams.toString() ? `?${queryParams.toString()}` : '';
+  return request<GetClaimsResponse>(`/projects/${projectId}/claims${query}`);
+}
+
+export async function getClaimById(
+  projectId: string,
+  claimId: string
+): Promise<EvidenceClaim> {
+  return request<EvidenceClaim>(`/projects/${projectId}/claims/${claimId}`);
+}
+
+export async function syncProjectClaims(
+  projectId: string
+): Promise<{ syncedClaims: number; claims: EvidenceClaim[] }> {
+  return request<{ syncedClaims: number; claims: EvidenceClaim[] }>(
+    `/projects/${projectId}/claims/sync`,
+    {
+      method: 'POST',
+    }
+  );
+}
+
 
