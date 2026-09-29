@@ -9,10 +9,14 @@ CREATE TABLE IF NOT EXISTS projects (
   location TEXT,
   start_date DATE,
   end_date DATE,
+  project_type VARCHAR(50) DEFAULT 'other',
   created_by TEXT,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );
+
+-- Migration: ensure project_type column exists on projects
+ALTER TABLE projects ADD COLUMN IF NOT EXISTS project_type VARCHAR(50) DEFAULT 'other';
 
 -- Assets table
 CREATE TABLE IF NOT EXISTS assets (
@@ -154,12 +158,17 @@ CREATE TABLE IF NOT EXISTS evidence_claims (
   confidence NUMERIC(4, 3) NOT NULL,
   source_type TEXT NOT NULL, -- 'asset_analysis' | 'comparison' | 'manual'
   source_id TEXT,            -- ID of ai_analysis record or comparison record
+  category VARCHAR(50),      -- 'initial_condition' | 'activity' | 'immediate_result' | 'long_term_outcome' | 'beneficiary_evidence' | 'quantitative_measurement'
   normalized_claim TEXT NOT NULL,
   created_by TEXT,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
   CONSTRAINT unique_project_source_claim UNIQUE (project_id, source_type, source_id, normalized_claim)
 );
+
+-- Migration: ensure category column exists on evidence_claims
+ALTER TABLE evidence_claims ADD COLUMN IF NOT EXISTS category VARCHAR(50);
+CREATE INDEX IF NOT EXISTS evidence_claims_category_idx ON evidence_claims(category);
 
 CREATE INDEX IF NOT EXISTS evidence_claims_project_id_idx ON evidence_claims(project_id);
 CREATE INDEX IF NOT EXISTS evidence_claims_source_idx ON evidence_claims(source_type, source_id);
