@@ -130,3 +130,32 @@ export interface ApiResponse<T> {
     details?: any;
   };
 }
+
+export interface SearchResult {
+  asset_id: string;
+  url: string;
+  type: string;
+  capture_date?: string | null;
+  latitude?: number | null;
+  longitude?: number | null;
+  project_id: string;
+  similarity: number;
+  activity?: string | null;
+  description?: string | null;
+}
+
+export interface SemanticSearchParams {
+  projectId: string;
+  query: string;
+  mediaType?: string;
+  startDate?: string;
+  endDate?: string;
+  threshold?: number;
+  limit?: number;
+}
+
+export interface IndexingStats {
+  total: number;
+  indexed: number;
+  pending: number;
+}
