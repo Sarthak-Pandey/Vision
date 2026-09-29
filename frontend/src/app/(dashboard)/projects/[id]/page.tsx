@@ -16,6 +16,7 @@ import {
   Trash2,
   Sparkles,
   Layers,
+  ShieldCheck,
 } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Tabs } from '@/components/ui/Tabs';
@@ -33,6 +34,7 @@ import { RecentMedia } from '@/components/projects/RecentMedia';
 import { ProjectTimeline } from '@/components/projects/ProjectTimeline';
 import { SemanticSearchSection } from '@/components/search/SemanticSearchSection';
 import { BeforeAfterSection } from '@/components/comparisons/BeforeAfterSection';
+import { EvidenceClaimsSection } from '@/components/evidence/EvidenceClaimsSection';
 import { getProject, getAssets } from '@/lib/api/client';
 
 import { Project, MediaAsset, MediaAssetWithAnalysis } from '@/types';
@@ -84,6 +86,7 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
 
   const tabs = [
     { id: 'overview', label: 'Overview' },
+    { id: 'claims', label: 'Evidence & Claims' },
     { id: 'comparisons', label: 'Before / After' },
     { id: 'search', label: 'AI Search' },
     { id: 'media', label: 'Media', count: stats.mediaCount },
@@ -211,6 +214,19 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
 
           <Button
             variant="outline"
+            onClick={() => setActiveTab('claims')}
+            className={`gap-1.5 shrink-0 text-xs ${
+              activeTab === 'claims'
+                ? 'bg-teal-700 text-white border-teal-700'
+                : 'border-teal-300 text-teal-700 hover:bg-teal-50'
+            }`}
+          >
+            <ShieldCheck className="w-3.5 h-3.5" />
+            <span>Evidence & Claims</span>
+          </Button>
+
+          <Button
+            variant="outline"
             onClick={() => setActiveTab('comparisons')}
             className={`gap-1.5 shrink-0 text-xs ${
               activeTab === 'comparisons'
@@ -247,6 +263,18 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
 
       {/* Navigation Tabs */}
       <Tabs tabs={tabs} activeTab={activeTab} onChange={setActiveTab} />
+
+      {/* Tab: Evidence & Claims (Phase 6) */}
+      {activeTab === 'claims' && (
+        <div className="animate-in fade-in duration-200">
+          <EvidenceClaimsSection
+            projectId={project.id}
+            projectName={project.name}
+            projectAssets={projectAssets}
+            onAssetSelect={setSelectedAssetForInspection}
+          />
+        </div>
+      )}
 
       {/* Tab: Before / After Intelligence */}
       {activeTab === 'comparisons' && (

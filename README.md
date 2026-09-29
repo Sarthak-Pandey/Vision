@@ -65,13 +65,25 @@ graph TD
 | **Phase 3** | **Project Management & Dashboard** | Project creation, editing, deletion, real-time statistics, chronological timeline, activity breakdown, geo-clustering, multi-tenant security controls | Completed |
 | **Phase 4** | **Semantic Image Search** | Multimodal image/query embeddings, PostgreSQL pgvector HNSW indexing, project-scoped similarity search UI | Completed |
 | **Phase 5** | **Before / After Intelligence** | Observable visual change comparison, duplicate prevention, chronological validation, side-by-side evidence UI | Completed |
-| **Phase 6** | **ESG Impact Reports** | Metric aggregation, PDF report generation, public verification share links | Planned |
+| **Phase 6** | **Evidence & Traceability** | Observable AI claims linked to verified original media, dual-source extraction (Phase 2 & Phase 5), deterministic deduplication, RLS/IDOR protection, Audit & Traceability UI | Completed |
+| **Phase 7** | **ESG Impact Reports** | Metric aggregation, PDF report generation, public verification share links | Planned |
 
 ---
 
 ## Key Features
 
-### Phase 5: Before / After Intelligence
+### Phase 6: Evidence & Traceability
+
+- **End-to-End Visual Auditability**: Establishes a verifiable chain of custody:
+  `AI OBSERVATION → CLAIM → EVIDENCE ASSET IDs → ASSET RECORDS → CLOUDINARY → ORIGINAL MEDIA`
+  Ensures every AI claim is backed by the exact high-resolution field photos that produced it.
+- **Dual-Source Observation Extraction**:
+  - **Source 1 (Phase 2 Vision)**: Direct observable activities, conditions, and evidence statements extracted from single-photo AI analysis linked directly to that asset.
+  - **Source 2 (Phase 5 Before/After)**: Verified physical changes (vegetation, erosion, waste reduction) extracted from comparisons and linked to both the Before and After assets.
+- **Strict Anti-Hallucination & Evidence Invariants**: Rejects any claim with 0 evidence assets. Validates confidence strictly in the range $0 \le c \le 1$. Prohibits unsubstantiated scientific extrapolation (e.g. no fabricated carbon sequestration % or chemical metrics).
+- **Deterministic Claim Deduplication**: Normalizes claim text (`trim`, lowercase, whitespace collapse) and enforces a unique constraint on `(project_id, source_type, source_id, normalized_claim)` so background retries remain 100% idempotent.
+- **Multi-Tenant Security & IDOR Protection**: Server-side project ownership checks prevent cross-project asset references and reject attempts to access evidence across tenants.
+- **Interactive Evidence & Claims Dashboard**: Filterable claims view (`All`, `AI Vision Analysis`, `Before/After Comparisons`, `Low Confidence`), real-time telemetry metrics (total claims, evidence-backed count, average confidence, source breakdown), expandable audit records, and instant one-click media inspection.
 
 - **Multimodal Visual Comparison Engine**: Powered by Google Gemini Vision (`gemini-3.8-flash`) inspecting two ground-truth field photos from the same project to detect observable physical changes (vegetation, visible waste, water appearance, land stability, infrastructure, human activity).
 - **Strict Visual Verification Guarantees**: Restricts output strictly to visible photographic differences. Prohibits unsupported scientific claims (no fabricated carbon reduction %, biodiversity %, or chemical water purity metrics).
@@ -193,6 +205,10 @@ npm run dev
 | `POST` | `/api/projects/:projectId/comparisons` | Run or retrieve Before/After AI visual comparison | `{ beforeAssetId, afterAssetId }` |
 | `GET` | `/api/projects/:projectId/comparisons` | List saved comparisons for project | `projectId: UUID` |
 | `GET` | `/api/projects/:projectId/comparisons/:id` | Get specific comparison result by ID | `projectId: UUID, id: UUID` |
+| `GET` | `/api/projects/:projectId/claims` | List project claims with telemetry and source filtering | `?sourceType=&minConfidence=&limit=` |
+| `GET` | `/api/projects/:projectId/claims/:claimId` | Get single claim with hydrated evidence media assets | `projectId: UUID, claimId: UUID` |
+| `POST` | `/api/projects/:projectId/claims` | Create a verified evidence-backed claim | `{ claim, confidence, sourceType, evidenceAssetIds }` |
+| `POST` | `/api/projects/:projectId/claims/sync` | Extract and sync claims from all project media & comparisons | `projectId: UUID` |
 
 ---
 
@@ -205,6 +221,8 @@ The platform uses PostgreSQL via Supabase. Schema definitions are maintained in 
 - **`ai_analysis`**: Multimodal outputs (description, detected objects, activities, scene classifications, physical conditions, confidence metrics, source provenance), foreign key `asset_id REFERENCES assets(id) ON DELETE CASCADE`.
 - **`embeddings`**: 1536-dimensional multimodal vectors for images, HNSW cosine index `vector_cosine_ops`, foreign key `asset_id REFERENCES assets(id) ON DELETE CASCADE`.
 - **`comparisons`**: Structured Before/After visual comparison results, confidence scores, models, foreign keys `project_id REFERENCES projects(id)`, `before_asset_id REFERENCES assets(id)`, `after_asset_id REFERENCES assets(id)` on delete cascade, unique constraint on `(project_id, before_asset_id, after_asset_id)`.
+- **`evidence_claims`**: Observable claims, confidence scores, source types (`asset_analysis`, `comparison`, `manual`), source IDs, normalized statement key, created by identity, timestamps, unique constraint on `(project_id, source_type, source_id, normalized_claim)`.
+- **`claim_evidence`**: Junction table linking `claim_id REFERENCES evidence_claims(id)` to `asset_id REFERENCES assets(id)` on delete cascade, with composite primary key `(claim_id, asset_id)` preventing duplicate evidence associations.
 
 
 ---

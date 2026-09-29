@@ -2,6 +2,7 @@ import { GoogleGenAI } from '@google/genai';
 import { ProjectService } from './project.service.js';
 import { AssetService } from './asset.service.js';
 import { ComparisonRepository } from '../repositories/comparison.repository.js';
+import { ClaimRepository } from '../repositories/claim.repository.js';
 import {
   ComparisonRecord,
   ComparisonResult,
@@ -18,6 +19,7 @@ export class ComparisonService {
   private projectService: ProjectService;
   private assetService: AssetService;
   private comparisonRepository: ComparisonRepository;
+  private claimRepo: ClaimRepository;
   private genAI: GoogleGenAI | null = null;
   private readonly defaultModel: string = 'gemini-3.8-flash';
 
@@ -25,6 +27,8 @@ export class ComparisonService {
     this.projectService = new ProjectService();
     this.assetService = new AssetService();
     this.comparisonRepository = new ComparisonRepository();
+    this.claimRepo = new ClaimRepository();
+
 
     const apiKey = process.env.GEMINI_API_KEY;
     if (apiKey && apiKey.trim().length > 0) {
@@ -183,6 +187,30 @@ export class ComparisonService {
       model: modelName,
       created_by: userId || null,
     });
+
+    // 8. Generate Evidence Claims for Phase 6 (if comparison succeeded and conclusive)
+    if (status === 'completed' && Array.isArray(validated.changes) && validated.changes.length > 0) {
+      for (const change of validated.changes) {
+        if (!change.description || change.description.trim().length === 0) continue;
+        const confidence = typeof change.confidence === 'number'
+          ? Math.min(Math.max(change.confidence, 0), 1)
+          : validated.overall_confidence;
+
+        try {
+          await this.claimRepo.createClaim({
+            projectId,
+            claim: change.description.trim(),
+            confidence,
+            sourceType: 'comparison',
+            sourceId: saved.id,
+            evidenceAssetIds: [beforeAssetId, afterAssetId],
+            createdBy: userId,
+          });
+        } catch (claimErr: any) {
+          console.warn('[ComparisonService] Failed to create evidence claim for change:', claimErr.message);
+        }
+      }
+    }
 
     return saved;
   }
