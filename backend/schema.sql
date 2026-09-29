@@ -142,3 +142,36 @@ CREATE INDEX IF NOT EXISTS comparisons_project_id_idx ON comparisons(project_id)
 -- Composite index on asset pair for duplicate checks
 CREATE INDEX IF NOT EXISTS comparisons_pair_idx ON comparisons(project_id, before_asset_id, after_asset_id);
 
+-- ============================================================================
+-- Phase 6: Evidence & Traceability
+-- ============================================================================
+
+-- Evidence claims table
+CREATE TABLE IF NOT EXISTS evidence_claims (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  project_id UUID NOT NULL REFERENCES projects(id) ON DELETE CASCADE,
+  claim TEXT NOT NULL,
+  confidence NUMERIC(4, 3) NOT NULL,
+  source_type TEXT NOT NULL, -- 'asset_analysis' | 'comparison' | 'manual'
+  source_id TEXT,            -- ID of ai_analysis record or comparison record
+  normalized_claim TEXT NOT NULL,
+  created_by TEXT,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
+  CONSTRAINT unique_project_source_claim UNIQUE (project_id, source_type, source_id, normalized_claim)
+);
+
+CREATE INDEX IF NOT EXISTS evidence_claims_project_id_idx ON evidence_claims(project_id);
+CREATE INDEX IF NOT EXISTS evidence_claims_source_idx ON evidence_claims(source_type, source_id);
+
+-- Claim evidence junction table (Many-to-Many traceability)
+CREATE TABLE IF NOT EXISTS claim_evidence (
+  claim_id UUID NOT NULL REFERENCES evidence_claims(id) ON DELETE CASCADE,
+  asset_id UUID NOT NULL REFERENCES assets(id) ON DELETE CASCADE,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
+  PRIMARY KEY (claim_id, asset_id)
+);
+
+CREATE INDEX IF NOT EXISTS claim_evidence_asset_id_idx ON claim_evidence(asset_id);
+
+
