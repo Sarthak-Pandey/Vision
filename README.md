@@ -66,11 +66,26 @@ graph TD
 | **Phase 4** | **Semantic Image Search** | Multimodal image/query embeddings, PostgreSQL pgvector HNSW indexing, project-scoped similarity search UI | Completed |
 | **Phase 5** | **Before / After Intelligence** | Observable visual change comparison, duplicate prevention, chronological validation, side-by-side evidence UI | Completed |
 | **Phase 6** | **Evidence & Traceability** | Observable AI claims linked to verified original media, dual-source extraction (Phase 2 & Phase 5), deterministic deduplication, RLS/IDOR protection, Audit & Traceability UI | Completed |
-| **Phase 7** | **ESG Impact Reports** | Metric aggregation, PDF report generation, public verification share links | Planned |
+| **Phase 7** | **Evidence Gap Detection** | Rule-based expectation taxonomy, mathematical gap calculation (expected - available), project-type requirements, coverage telemetry, actionable collection suggestions | Completed |
+| **Phase 8** | **ESG Impact Reports** | Metric aggregation, PDF report generation, public verification share links | Planned |
 
 ---
 
 ## Key Features
+
+### Phase 7: Evidence Gap Detection
+
+- **Deterministic Rule-Based Engine**: Replaces speculative AI decision-making with explainable set-difference rules:
+  $$\text{Expected Evidence} - \text{Available Evidence} = \text{Missing Evidence}$$
+- **Fixed Intervention Taxonomy**: Standardized across 6 stable categories:
+  `initial_condition`, `activity`, `immediate_result`, `long_term_outcome`, `beneficiary_evidence`, `quantitative_measurement`.
+- **Configured Project Types**: Rule profiles for `tree_plantation` (6/6), `river_restoration` (6/6), `solar_installation` (5/6), and `waste_cleanup` (5/6). Gracefully handles custom/unconfigured types without fabricating arbitrary requirements.
+- **Multi-Source Evidence Derivation**: Automatically maps Phase 2 single-photo analyses and Phase 5 Before/After comparisons to qualifying evidence categories.
+- **Strict Conservative Guardrails**:
+  - Distinguishes visual observations from quantitative measurements (images alone never satisfy `quantitative_measurement`).
+  - Distinguishes visible persons from verified social outcomes (images containing people never automatically satisfy `beneficiary_evidence`).
+  - Distinguishes immediate post-work conditions from sustained multi-month ecological recovery (`long_term_outcome`).
+- **Interactive Evidence Coverage Dashboard**: Two-column layout (*Evidence Available* vs. *Evidence Gaps*), coverage telemetry percentage, supporting media tray with instant inspector modals, and actionable *"Suggested next collection"* guidance.
 
 ### Phase 6: Evidence & Traceability
 
@@ -209,6 +224,7 @@ npm run dev
 | `GET` | `/api/projects/:projectId/claims/:claimId` | Get single claim with hydrated evidence media assets | `projectId: UUID, claimId: UUID` |
 | `POST` | `/api/projects/:projectId/claims` | Create a verified evidence-backed claim | `{ claim, confidence, sourceType, evidenceAssetIds }` |
 | `POST` | `/api/projects/:projectId/claims/sync` | Extract and sync claims from all project media & comparisons | `projectId: UUID` |
+| `GET` | `/api/projects/:projectId/evidence-gaps` | Evaluate expected vs available evidence and detect gaps | `projectId: UUID` |
 
 ---
 
