@@ -16,6 +16,7 @@ import {
   EvidenceClaim,
   ClaimsTelemetry,
   ClaimSourceType,
+  EvidenceGapReport,
 } from '@/types';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
@@ -216,5 +217,16 @@ export async function syncProjectClaims(
     }
   );
 }
+
+// ============================================================================
+// Phase 7: Evidence Gap Detection Client API
+// ============================================================================
+
+export async function getEvidenceGaps(
+  projectId: string
+): Promise<EvidenceGapReport> {
+  return request<EvidenceGapReport>(`/projects/${projectId}/evidence-gaps`);
+}
+
 
 
