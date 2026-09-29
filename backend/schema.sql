@@ -117,3 +117,28 @@ BEGIN
 END;
 $$;
 
+-- ============================================================================
+-- Phase 5: Before / After Intelligence
+-- ============================================================================
+
+CREATE TABLE IF NOT EXISTS comparisons (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  project_id UUID NOT NULL REFERENCES projects(id) ON DELETE CASCADE,
+  before_asset_id UUID NOT NULL REFERENCES assets(id) ON DELETE CASCADE,
+  after_asset_id UUID NOT NULL REFERENCES assets(id) ON DELETE CASCADE,
+  comparison_result JSONB NOT NULL,
+  confidence NUMERIC(4, 3) NOT NULL,
+  status TEXT NOT NULL DEFAULT 'completed',
+  model TEXT NOT NULL DEFAULT 'gemini-3.8-flash',
+  created_by TEXT,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
+  CONSTRAINT unique_comparison_pair UNIQUE (project_id, before_asset_id, after_asset_id)
+);
+
+-- Index on project_id for listing comparisons
+CREATE INDEX IF NOT EXISTS comparisons_project_id_idx ON comparisons(project_id);
+
+-- Composite index on asset pair for duplicate checks
+CREATE INDEX IF NOT EXISTS comparisons_pair_idx ON comparisons(project_id, before_asset_id, after_asset_id);
+
