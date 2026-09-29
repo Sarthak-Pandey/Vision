@@ -8,6 +8,9 @@ import {
   UploadMediaResponse,
   AiAnalysis,
   ApiResponse,
+  SearchResult,
+  SemanticSearchParams,
+  IndexingStats,
 } from '@/types';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
@@ -108,4 +111,28 @@ export async function analyzeAsset(assetId: string): Promise<AiAnalysis> {
 
 export async function getAssetAnalysis(assetId: string): Promise<AiAnalysis | null> {
   return request<AiAnalysis | null>(`/assets/${assetId}/analysis`);
+}
+
+export async function semanticSearch(
+  params: SemanticSearchParams
+): Promise<{ results: SearchResult[]; total: number; query: string; threshold: number }> {
+  return request<{ results: SearchResult[]; total: number; query: string; threshold: number }>('/search', {
+    method: 'POST',
+    body: JSON.stringify(params),
+  });
+}
+
+export async function getIndexingStats(projectId: string): Promise<IndexingStats> {
+  const query = `?projectId=${encodeURIComponent(projectId)}`;
+  return request<IndexingStats>(`/search/stats${query}`);
+}
+
+export async function triggerIndexing(
+  projectId: string,
+  batchSize?: number
+): Promise<{ processed: number; successful: number; failed: number; pending: number }> {
+  return request<{ processed: number; successful: number; failed: number; pending: number }>('/search/index', {
+    method: 'POST',
+    body: JSON.stringify({ projectId, batchSize }),
+  });
 }
