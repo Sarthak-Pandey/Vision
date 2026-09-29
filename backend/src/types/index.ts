@@ -92,3 +92,47 @@ export interface CreateAiAnalysisInput {
   confidence: number;
   source?: 'gemini' | 'simulated';
 }
+
+export interface EmbeddingRecord {
+  id: string;
+  asset_id: string;
+  embedding: number[];
+  model: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface CreateEmbeddingInput {
+  asset_id: string;
+  embedding: number[];
+  model?: string;
+}
+
+export interface SearchResult {
+  asset_id: string;
+  url: string;
+  type: string;
+  capture_date?: string | null;
+  latitude?: number | null;
+  longitude?: number | null;
+  project_id: string;
+  similarity: number;
+  activity?: string | null;
+  description?: string | null;
+}
+
+export interface SemanticSearchParams {
+  projectId: string;
+  query: string;
+  mediaType?: string;
+  startDate?: string;
+  endDate?: string;
+  threshold?: number;
+  limit?: number;
+}
+
+export interface IndexingStats {
+  total: number;
+  indexed: number;
+  pending: number;
+}
