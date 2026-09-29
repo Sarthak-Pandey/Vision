@@ -192,3 +192,54 @@ export interface CreateComparisonInput {
   beforeAssetId: string;
   afterAssetId: string;
 }
+
+// ============================================================================
+// Phase 6: Evidence & Traceability Types
+// ============================================================================
+
+export type ClaimSourceType = 'asset_analysis' | 'comparison' | 'manual';
+
+export interface EvidenceAsset {
+  assetId: string;
+  url: string;
+  type: string;
+  captureDate?: string | null;
+  latitude?: number | null;
+  longitude?: number | null;
+  uploadedBy?: string | null;
+  role?: 'evidence' | 'before' | 'after';
+}
+
+export interface EvidenceClaim {
+  id: string;
+  projectId: string;
+  claim: string;
+  confidence: number;
+  sourceType: ClaimSourceType;
+  sourceId?: string | null;
+  normalizedClaim: string;
+  createdBy?: string | null;
+  createdAt: string;
+  updatedAt: string;
+  evidence: EvidenceAsset[];
+}
+
+export interface CreateClaimInput {
+  projectId: string;
+  claim: string;
+  confidence: number;
+  sourceType: ClaimSourceType;
+  sourceId?: string | null;
+  evidenceAssetIds: string[];
+  createdBy?: string | null;
+}
+
+export interface ClaimsTelemetry {
+  totalClaims: number;
+  evidenceBackedClaims: number;
+  lowConfidenceClaims: number;
+  analysisSourcesCount: number;
+  comparisonSourcesCount: number;
+  averageConfidence: number;
+}
+
