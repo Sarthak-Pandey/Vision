@@ -63,12 +63,20 @@ graph TD
 | **Phase 1** | **Media Ingestion Pipeline** | Cloudinary integration, GPS capture, drag-and-drop modal, live gallery feeds | Completed |
 | **Phase 2** | **AI Vision Analysis** | Multimodal structured JSON extraction, resilient multi-model fallback chain, automated tagging, Visual Evidence Inspector | Completed |
 | **Phase 3** | **Project Management & Dashboard** | Project creation, editing, deletion, real-time statistics, chronological timeline, activity breakdown, geo-clustering, multi-tenant security controls | Completed |
-| **Phase 4** | **Vector Search & Similarity** | pgvector embeddings, duplicate detection, cross-project semantic queries | Planned |
+| **Phase 4** | **Semantic Image Search** | Multimodal image/query embeddings, PostgreSQL pgvector HNSW indexing, project-scoped similarity search UI | Completed |
 | **Phase 5** | **ESG Impact Reports** | Metric aggregation, PDF report generation, public verification share links | Planned |
 
 ---
 
 ## Key Features
+
+### Phase 4: Semantic Image Search (pgvector)
+
+- **Multimodal Image Vector Representation**: Generates 1536-dimensional embeddings directly from raw photographic evidence into a shared multimodal vector space (`gemini-embedding-2`), allowing users to search visual evidence using natural language queries rather than manually assigned keywords.
+- **In-Database Similarity Search (PostgreSQL + pgvector)**: Runs sub-millisecond cosine similarity queries inside PostgreSQL using an HNSW index (`vector_cosine_ops`) and stored `match_assets` RPC, eliminating costly client-side vector transfers.
+- **Strict Project Authorization & Multi-Tenant Scoping**: All search requests require authentication and enforce server-side project ownership, strictly preventing cross-tenant vector leakage.
+- **Automated Ingestion Pipeline & Safe Idempotent Backfill**: Automatically triggers background embedding generation for newly uploaded assets without blocking response times. Existing assets are indexed safely without risk of duplication or asset deletion.
+- **Interactive Semantic Discovery UI**: Dedicated AI Search tab in the project dashboard equipped with prompt suggestion chips (*"workers planting trees"*, *"river restoration"*), match similarity rankings, real-time indexing status telemetry, and direct visual evidence modal inspection.
 
 ### Phase 3: Project Management & Intelligence Dashboard
 
