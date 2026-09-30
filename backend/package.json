@@ -21,7 +21,6 @@
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
     "multer": "^2.4.0",
-    "vision-platform": "file:..",
     "zod": "^3.24.2"
   },
   "devDependencies": {
