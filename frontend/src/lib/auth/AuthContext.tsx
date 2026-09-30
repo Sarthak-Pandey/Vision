@@ -20,7 +20,9 @@ const AuthContext = createContext<AuthContextType>({
   logout: () => {},
 });
 
-export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -29,41 +31,35 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       const storedToken = localStorage.getItem('impact_access_token');
       const storedUser = localStorage.getItem('impact_user');
+
       if (storedToken && storedUser) {
         setUser(JSON.parse(storedUser));
       }
     } catch (err) {
       console.warn('Failed to restore auth session:', err);
+      localStorage.removeItem('impact_access_token');
+      localStorage.removeItem('impact_user');
     } finally {
       setIsLoading(false);
     }
   }, []);
 
   const login = async (email: string, password: string) => {
-    try {
-      const { token, user: authUser } = await loginApi(email, password);
-      const sessionUser: User = {
-        id: authUser.id,
-        email: authUser.email,
-        name: authUser.name,
-        role: 'Team Member',
-      };
+    // Use only real backend/Supabase authentication.
+    // Do NOT fall back to demo-token.
+    const { token, user: authUser } = await loginApi(email, password);
 
-      localStorage.setItem('impact_access_token', token);
-      localStorage.setItem('impact_user', JSON.stringify(sessionUser));
-      setUser(sessionUser);
-    } catch {
-      // Fallback to Guest session when backend auth service is unconfigured/unavailable
-      const guestUser: User = {
-        id: 'user-guest-123',
-        email: email || 'guest@example.com',
-        name: 'Guest User',
-        role: 'Guest Account',
-      };
-      localStorage.setItem('impact_access_token', 'demo-token');
-      localStorage.setItem('impact_user', JSON.stringify(guestUser));
-      setUser(guestUser);
-    }
+    const sessionUser: User = {
+      id: authUser.id,
+      email: authUser.email,
+      name: authUser.name,
+      role: 'Team Member',
+    };
+
+    localStorage.setItem('impact_access_token', token);
+    localStorage.setItem('impact_user', JSON.stringify(sessionUser));
+
+    setUser(sessionUser);
   };
 
   const logout = () => {
