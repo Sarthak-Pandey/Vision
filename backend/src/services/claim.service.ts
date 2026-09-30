@@ -3,12 +3,14 @@ import { AssetService } from './asset.service.js';
 import { ClaimRepository } from '../repositories/claim.repository.js';
 import { AiAnalysisRepository } from '../repositories/ai-analysis.repository.js';
 import { ComparisonRepository } from '../repositories/comparison.repository.js';
+import { ConfidenceService } from './confidence.service.js';
 import {
   EvidenceClaim,
   ClaimsTelemetry,
   Asset,
   AiAnalysis,
   ComparisonRecord,
+  ProjectConfidenceReport,
 } from '../types/index.js';
 import { CreateClaimSchema, GetClaimsQuerySchema } from '../schemas/claim.schema.js';
 import { ValidationError, NotFoundError } from '../utils/errors.js';
@@ -19,6 +21,7 @@ export class ClaimService {
   private claimRepo: ClaimRepository;
   private aiAnalysisRepo: AiAnalysisRepository;
   private comparisonRepo: ComparisonRepository;
+  private confidenceService: ConfidenceService;
 
   constructor() {
     this.projectService = new ProjectService();
@@ -26,6 +29,7 @@ export class ClaimService {
     this.claimRepo = new ClaimRepository();
     this.aiAnalysisRepo = new AiAnalysisRepository();
     this.comparisonRepo = new ComparisonRepository();
+    this.confidenceService = new ConfidenceService();
   }
 
   async getClaims(
@@ -38,14 +42,45 @@ export class ClaimService {
     }
 
     // 1. Authorize project access
-    await this.projectService.getProjectById(projectId, userId);
+    const project = await this.projectService.getProjectById(projectId, userId);
 
-    const [claims, telemetry] = await Promise.all([
+    const [rawClaims, telemetry] = await Promise.all([
       this.claimRepo.findByProjectId(projectId, filters),
       this.claimRepo.getTelemetry(projectId),
     ]);
 
-    return { claims, telemetry };
+    // Compute dynamic Phase 8 composite confidence for each claim
+    const claims = rawClaims.map((claim) => ({
+      ...claim,
+      compositeConfidence: this.confidenceService.evaluateClaimConfidence(claim, project, rawClaims),
+    }));
+
+    // Enrich telemetry with composite metrics
+    let highCount = 0;
+    let medCount = 0;
+    let lowCount = 0;
+    let compositeSum = 0;
+    let evaluatedCount = 0;
+
+    for (const c of claims) {
+      if (c.compositeConfidence?.available && c.compositeConfidence.score !== null) {
+        compositeSum += c.compositeConfidence.score;
+        evaluatedCount++;
+        if (c.compositeConfidence.level === 'HIGH') highCount++;
+        else if (c.compositeConfidence.level === 'MEDIUM') medCount++;
+        else if (c.compositeConfidence.level === 'LOW') lowCount++;
+      }
+    }
+
+    const enrichedTelemetry: ClaimsTelemetry = {
+      ...telemetry,
+      averageCompositeConfidence:
+        evaluatedCount > 0 ? Math.round((compositeSum / evaluatedCount) * 100) / 100 : undefined,
+      highConfidenceClaims: highCount,
+      mediumConfidenceClaims: medCount,
+    };
+
+    return { claims, telemetry: enrichedTelemetry };
   }
 
   async getClaimById(projectId: string, claimId: string, userId?: string): Promise<EvidenceClaim> {
@@ -57,14 +92,23 @@ export class ClaimService {
     }
 
     // 1. Authorize project access
-    await this.projectService.getProjectById(projectId, userId);
+    const project = await this.projectService.getProjectById(projectId, userId);
 
     const claim = await this.claimRepo.findById(claimId);
     if (!claim || claim.projectId !== projectId) {
       throw new NotFoundError(`Claim with ID ${claimId} not found in this project`);
     }
 
+    const allClaims = await this.claimRepo.findByProjectId(projectId);
+    claim.compositeConfidence = this.confidenceService.evaluateClaimConfidence(claim, project, allClaims);
+
     return claim;
+  }
+
+  async getProjectConfidenceReport(projectId: string, userId?: string): Promise<ProjectConfidenceReport> {
+    const project = await this.projectService.getProjectById(projectId, userId);
+    const { claims } = await this.getClaims(projectId, undefined, userId);
+    return this.confidenceService.generateProjectConfidenceReport(projectId, claims, project.name);
   }
 
   async createClaim(
@@ -75,7 +119,7 @@ export class ClaimService {
     const { claim, confidence, sourceType, sourceId, evidenceAssetIds } = input;
 
     // 1. Authorize project access
-    await this.projectService.getProjectById(projectId, userId);
+    const project = await this.projectService.getProjectById(projectId, userId);
 
     const trimmedClaim = (claim || '').trim();
     if (!trimmedClaim) {
@@ -105,7 +149,7 @@ export class ClaimService {
       verifiedAssetIds.push(asset.id);
     }
 
-    return this.claimRepo.createClaim({
+    const createdClaim = await this.claimRepo.createClaim({
       projectId,
       claim: trimmedClaim,
       confidence,
@@ -114,6 +158,9 @@ export class ClaimService {
       evidenceAssetIds: verifiedAssetIds,
       createdBy: userId || null,
     });
+
+    createdClaim.compositeConfidence = this.confidenceService.evaluateClaimConfidence(createdClaim, project);
+    return createdClaim;
   }
 
   async generateClaimsFromPhase2(

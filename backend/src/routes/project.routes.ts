@@ -6,6 +6,7 @@ import { createProjectSchema, updateProjectSchema } from '../schemas/project.sch
 import comparisonRoutes from './comparison.routes.js';
 import claimRoutes from './claim.routes.js';
 import evidenceGapRoutes from './evidence-gap.routes.js';
+import confidenceRoutes from './confidence.routes.js';
 
 const router = Router();
 const controller = new ProjectController();
@@ -21,6 +22,9 @@ router.use('/:projectId/claims', claimRoutes);
 
 // Phase 7: Nested Evidence Gap Detection
 router.use('/:projectId/evidence-gaps', evidenceGapRoutes);
+
+// Phase 8: Nested Evidence Confidence System
+router.use('/:projectId/confidence', confidenceRoutes);
 
 
 router.get('/', controller.getProjects);
