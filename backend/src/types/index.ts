@@ -368,3 +368,146 @@ export interface ProjectConfidenceReport {
   disclaimer: string;
   timestamp: string;
 }
+
+// ============================================================================
+// Phase 9: Project Impact Report Types
+// ============================================================================
+
+export interface ReportProjectOverview {
+  id: string;
+  name: string;
+  description: string | null;
+  location: string | null;
+  startDate: string | null;
+  endDate: string | null;
+  projectType: string;
+  createdDate: string;
+  mediaCount: number;
+}
+
+export interface ReportTimelineMonth {
+  monthName: string;
+  monthKey: string;
+  count: number;
+}
+
+export interface ReportTimelineYear {
+  year: string;
+  totalAssets: number;
+  months: ReportTimelineMonth[];
+}
+
+export interface ReportTimelineSection {
+  timeline: ReportTimelineYear[];
+  undatedAssetsCount: number;
+  totalDatedAssets: number;
+}
+
+export interface ReportActivityItem {
+  activity: string;
+  normalizedKey: string;
+  assetCount: number;
+}
+
+export interface ReportActivitySection {
+  activities: ReportActivityItem[];
+  totalActivitiesCount: number;
+  mediaWithActivitiesCount: number;
+}
+
+export interface ReportLocationCluster {
+  key: string;
+  latitude: number;
+  longitude: number;
+  formattedCoordinates: string;
+  assetCount: number;
+  sampleAssetUrl?: string;
+}
+
+export interface ReportLocationSection {
+  locationsCount: number;
+  locations: ReportLocationCluster[];
+  summaryText: string;
+}
+
+export interface ReportObservedChange {
+  description: string;
+  category: ComparisonCategory;
+  direction: ComparisonDirection;
+  confidence: number;
+  comparisonId: string;
+  occurrences: number;
+  supportingComparisonIds: string[];
+}
+
+export interface ReportComparisonItem {
+  id: string;
+  beforeAssetId: string;
+  afterAssetId: string;
+  beforeAssetUrl: string;
+  afterAssetUrl: string;
+  beforeCaptureDate: string | null;
+  afterCaptureDate: string | null;
+  summary: string;
+  confidence: number;
+  compositeConfidence?: CompositeConfidence;
+  changes: ComparisonChange[];
+}
+
+export interface ReportBeforeAfterSection {
+  comparisonsCount: number;
+  comparisons: ReportComparisonItem[];
+}
+
+export interface ReportEvidenceQualitySection {
+  compositeConfidence: number | null;
+  compositePercentage: number | null;
+  confidenceLevel: ConfidenceLevel;
+  signalsSummary: {
+    visionConfidence: number | null;
+    metadataConsistency: number | null;
+    imageQuality: number | null;
+    crossAssetAgreement: number | null;
+    temporalConsistency: number | null;
+  };
+  totalClaims: number;
+  evidenceBackedClaimsCount: number;
+  claimsWithoutEvidenceCount: number;
+  disclaimer: string;
+}
+
+export interface ReportEvidenceGapsSection {
+  projectType: ProjectType;
+  projectTypeConfigured: boolean;
+  expectedCategories: EvidenceCategory[];
+  availableCategories: EvidenceCategory[];
+  missingCategories: EvidenceCategory[];
+  coveragePercentage: number;
+  categories: EvidenceCategoryStatus[];
+}
+
+export interface ReportSourceAsset {
+  id: string;
+  url: string;
+  type: string;
+  captureDate: string | null;
+  latitude: number | null;
+  longitude: number | null;
+  activities: string[];
+  supportingClaims: { id: string; claim: string; confidence: number }[];
+  usedInComparisons: { id: string; role: 'before' | 'after' }[];
+}
+
+export interface ImpactReport {
+  project: ReportProjectOverview;
+  timeline: ReportTimelineSection;
+  activities: ReportActivitySection;
+  locations: ReportLocationSection;
+  beforeAfter: ReportBeforeAfterSection;
+  observedChanges: ReportObservedChange[];
+  evidenceQuality: ReportEvidenceQualitySection;
+  evidenceGaps: ReportEvidenceGapsSection;
+  sourceAssets: ReportSourceAsset[];
+  generatedAt: string;
+}
+

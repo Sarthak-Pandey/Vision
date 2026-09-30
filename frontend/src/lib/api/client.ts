@@ -20,6 +20,7 @@ import {
   ProjectConfidenceReport,
   CompositeConfidence,
   ConfidenceSignals,
+  ImpactReport,
 } from '@/types';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
@@ -249,6 +250,16 @@ export async function calculateConfidence(
     method: 'POST',
     body: JSON.stringify({ signals }),
   });
+}
+
+// ============================================================================
+// Phase 9: Project Impact Report Client API
+// ============================================================================
+
+export async function getProjectImpactReport(
+  projectId: string
+): Promise<ImpactReport> {
+  return request<ImpactReport>(`/projects/${projectId}/report`);
 }
 
 

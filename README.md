@@ -68,13 +68,33 @@ graph TD
 | **Phase 6** | **Evidence & Traceability** | Observable AI claims linked to verified original media, dual-source extraction (Phase 2 & Phase 5), deterministic deduplication, RLS/IDOR protection, Audit & Traceability UI | Completed |
 | **Phase 7** | **Evidence Gap Detection** | Rule-based expectation taxonomy, mathematical gap calculation (expected - available), project-type requirements, coverage telemetry, actionable collection suggestions | Completed |
 | **Phase 8** | **Evidence Confidence System** | Deterministic 5-signal composite heuristic score (Vision 40%, Metadata 20%, Image Quality 15%, Cross-Asset 15%, Temporal 10%), weight normalization, explainable breakdown UI | Completed |
-| **Phase 9** | **ESG Impact Reports** | Metric aggregation, PDF report generation, public verification share links | Planned |
+| **Phase 9** | **Project Impact Reports** | 9-section project-level impact/evidence report composition layer, factual grounding, audit-grade traceability matrix, print-ready document view | Completed |
+
 
 ---
 
 ## Key Features
 
+### Phase 9: Project Impact & Evidence Reports
+
+- **Synthesis & Composition Layer**: Consolidates normalized data from Phases 2–8 into an audit-grade, multi-section project impact and evidence report without re-querying or invoking external AI pipelines.
+- **Strict Factual & Evidence Grounding**:
+  - Rejects unsupported scientific extrapolations (no fabricated carbon reduction %, biodiversity %, or chemical purity metrics).
+  - Distinguishes observable photographic facts and evidence-backed claims from scientific certainty.
+- **9 Core Structured Sections**:
+  1. **Project Overview**: Project metadata, dates, operational period, and media counts safely formatted without nulls or invalid dates.
+  2. **Timeline**: Chronological Year → Month asset volume distribution, highlighting undated assets transparently.
+  3. **Activities**: Case-insensitive normalized activity categories attributed to media without inflating total asset counts.
+  4. **Locations**: Multi-coordinate cluster mapping (~110m precision) showing distinct operational sites.
+  5. **Before / After Evidence**: Dual-media photographic comparison pairs with capture dates, AI summary, and visual change tags.
+  6. **Observed Changes**: Aggregated physical observations preserving verbatim wording and tracking comparison occurrences.
+  7. **Evidence Quality**: Phase 8 5-signal composite confidence telemetry, signal breakdown bars, claims counts, and mandatory heuristic disclaimer.
+  8. **Evidence Gaps**: Phase 7 rule-based taxonomy coverage, available stages, missing categories, and actionable collection suggestions.
+  9. **Source Assets & Traceability Matrix**: Complete audit ledger connecting each piece of evidence to the claims and comparisons it supports, clickable for full-resolution inspection.
+- **Dedicated Report Routing & Print Support**: Dedicated `/projects/:id/report` route with responsive layout, floating section table of contents, and `@media print` export styling.
+
 ### Phase 8: Evidence Confidence System
+
 
 - **Deterministic Multi-Signal Composite Engine**: Computes an explainable MVP composite score evaluating evidence signal strength without invoking additional AI models or uncalibrated probabilities:
   $$\text{Final Confidence} = \frac{\sum (\text{signal}_i \times \text{weight}_i)}{\sum \text{available weights}}$$
@@ -247,6 +267,7 @@ npm run dev
 | `GET` | `/api/projects/:projectId/evidence-gaps` | Evaluate expected vs available evidence and detect gaps | `projectId: UUID` |
 | `GET` | `/api/projects/:projectId/confidence` | Get project-level composite confidence telemetry and breakdown | `projectId: UUID` |
 | `POST` | `/api/projects/:projectId/confidence/calculate` | Test composite confidence calculation from custom signals | `{ signals: ConfidenceSignals }` |
+| `GET` | `/api/projects/:projectId/report` | Generate comprehensive 9-section project impact and evidence report | `projectId: UUID` |
 
 ---
 
@@ -261,6 +282,8 @@ The platform uses PostgreSQL via Supabase. Schema definitions are maintained in 
 - **`comparisons`**: Structured Before/After visual comparison results, confidence scores, models, foreign keys `project_id REFERENCES projects(id)`, `before_asset_id REFERENCES assets(id)`, `after_asset_id REFERENCES assets(id)` on delete cascade, unique constraint on `(project_id, before_asset_id, after_asset_id)`.
 - **`evidence_claims`**: Observable claims, confidence scores, source types (`asset_analysis`, `comparison`, `manual`), source IDs, normalized statement key, created by identity, timestamps, unique constraint on `(project_id, source_type, source_id, normalized_claim)`.
 - **`claim_evidence`**: Junction table linking `claim_id REFERENCES evidence_claims(id)` to `asset_id REFERENCES assets(id)` on delete cascade, with composite primary key `(claim_id, asset_id)` preventing duplicate evidence associations.
+- **`reports`**: Project impact report snapshot metadata and historical evidence archives, foreign key `project_id REFERENCES projects(id) ON DELETE CASCADE`.
+
 
 
 ---

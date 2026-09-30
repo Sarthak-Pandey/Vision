@@ -17,6 +17,7 @@ import {
   Sparkles,
   Layers,
   ShieldCheck,
+  FileText,
 } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Tabs } from '@/components/ui/Tabs';
@@ -36,9 +37,10 @@ import { SemanticSearchSection } from '@/components/search/SemanticSearchSection
 import { BeforeAfterSection } from '@/components/comparisons/BeforeAfterSection';
 import { EvidenceClaimsSection } from '@/components/evidence/EvidenceClaimsSection';
 import { EvidenceCoverageSection } from '@/components/evidence/EvidenceCoverageSection';
-import { getProject, getAssets } from '@/lib/api/client';
+import { ImpactReportView } from '@/components/reports/ImpactReportView';
+import { getProject, getAssets, getProjectImpactReport } from '@/lib/api/client';
 
-import { Project, MediaAsset, MediaAssetWithAnalysis } from '@/types';
+import { Project, MediaAsset, MediaAssetWithAnalysis, ImpactReport } from '@/types';
 import { calculateProjectStats } from '@/lib/utils/projectStats';
 
 export default function ProjectDetailPage({ params }: { params: Promise<{ id: string }> }) {
@@ -91,6 +93,7 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
     { id: 'gaps', label: 'Evidence Gaps' },
     { id: 'comparisons', label: 'Before / After' },
     { id: 'search', label: 'AI Search' },
+    { id: 'report', label: 'Impact Report' },
     { id: 'media', label: 'Media', count: stats.mediaCount },
     { id: 'activities', label: 'Activities', count: stats.activityCount },
     { id: 'locations', label: 'Locations', count: stats.locationCount },
@@ -253,6 +256,16 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
             <span>AI Search</span>
           </Button>
 
+          <Link href={`/projects/${project.id}/report`}>
+            <Button
+              variant="outline"
+              className="gap-1.5 shrink-0 text-xs border-indigo-300 text-indigo-700 hover:bg-indigo-50 font-semibold shadow-2xs"
+            >
+              <FileText className="w-3.5 h-3.5" />
+              <span>View Impact Report</span>
+            </Button>
+          </Link>
+
           <Button
             onClick={() => setIsUploadModalOpen(true)}
             className="gap-2 shrink-0 text-xs"
@@ -310,6 +323,13 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
             projectName={project.name}
             onAssetSelect={setSelectedAssetForInspection}
           />
+        </div>
+      )}
+
+      {/* Tab: Project Impact Report (Phase 9) */}
+      {activeTab === 'report' && (
+        <div className="animate-in fade-in duration-200">
+          <ProjectReportTabContent projectId={project.id} />
         </div>
       )}
 
@@ -456,3 +476,63 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
     </div>
   );
 }
+
+function ProjectReportTabContent({ projectId }: { projectId: string }) {
+  const [report, setReport] = useState<ImpactReport | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const loadReport = async () => {
+    try {
+      setIsLoading(true);
+      setError(null);
+      const data = await getProjectImpactReport(projectId);
+      setReport(data);
+    } catch (err: any) {
+      setError(err.message || 'Failed to load project report');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadReport();
+  }, [projectId]);
+
+  if (isLoading) {
+    return (
+      <div className="p-12 text-center space-y-3 bg-white rounded-2xl border border-slate-200">
+        <div className="inline-block animate-spin text-brand-primary">
+          <Sparkles className="w-6 h-6" />
+        </div>
+        <p className="text-sm font-semibold text-slate-700">Composing project impact report...</p>
+      </div>
+    );
+  }
+
+  if (error || !report) {
+    return (
+      <div className="p-8 text-center text-sm text-rose-600 bg-white rounded-2xl border border-rose-200 space-y-3">
+        <p>{error || 'Failed to generate report.'}</p>
+        <Button variant="outline" size="sm" onClick={loadReport}>
+          Retry
+        </Button>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-4">
+      <div className="flex justify-end">
+        <Link href={`/projects/${projectId}/report`}>
+          <Button variant="outline" className="gap-1.5 text-xs font-semibold">
+            <FileText className="w-3.5 h-3.5" />
+            <span>Open Dedicated Print-Ready Page</span>
+          </Button>
+        </Link>
+      </div>
+      <ImpactReportView report={report} onRefresh={loadReport} />
+    </div>
+  );
+}
+
