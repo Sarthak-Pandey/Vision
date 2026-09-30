@@ -35,6 +35,7 @@ import {
 } from '@/lib/api/client';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
+import { ConfidenceIndicator } from '@/components/evidence/ConfidenceIndicator';
 
 interface BeforeAfterSectionProps {
   projectId: string;
@@ -717,10 +718,14 @@ export const BeforeAfterSection: React.FC<BeforeAfterSectionProps> = ({
                 </div>
 
                 <div className="flex items-center gap-2">
-                  <div className="px-3 py-1.5 rounded-lg bg-orange-50 border border-orange-200 text-xs font-bold text-brand-dark-orange flex items-center gap-1.5">
-                    <Sparkles className="w-3.5 h-3.5" />
-                    Model confidence: {Math.round(activeComparison.confidence * 100)}%
-                  </div>
+                  {activeComparison.compositeConfidence ? (
+                    <ConfidenceIndicator confidence={activeComparison.compositeConfidence} compact />
+                  ) : (
+                    <div className="px-3 py-1.5 rounded-lg bg-orange-50 border border-orange-200 text-xs font-bold text-brand-dark-orange flex items-center gap-1.5">
+                      <Sparkles className="w-3.5 h-3.5" />
+                      Model confidence: {Math.round(activeComparison.confidence * 100)}%
+                    </div>
+                  )}
                 </div>
               </div>
 

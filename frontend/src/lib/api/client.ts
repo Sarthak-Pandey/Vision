@@ -17,6 +17,9 @@ import {
   ClaimsTelemetry,
   ClaimSourceType,
   EvidenceGapReport,
+  ProjectConfidenceReport,
+  CompositeConfidence,
+  ConfidenceSignals,
 } from '@/types';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
@@ -226,6 +229,26 @@ export async function getEvidenceGaps(
   projectId: string
 ): Promise<EvidenceGapReport> {
   return request<EvidenceGapReport>(`/projects/${projectId}/evidence-gaps`);
+}
+
+// ============================================================================
+// Phase 8: Evidence Confidence System Client API
+// ============================================================================
+
+export async function getProjectConfidence(
+  projectId: string
+): Promise<ProjectConfidenceReport> {
+  return request<ProjectConfidenceReport>(`/projects/${projectId}/confidence`);
+}
+
+export async function calculateConfidence(
+  projectId: string,
+  signals: ConfidenceSignals
+): Promise<CompositeConfidence> {
+  return request<CompositeConfidence>(`/projects/${projectId}/confidence/calculate`, {
+    method: 'POST',
+    body: JSON.stringify({ signals }),
+  });
 }
 
 
