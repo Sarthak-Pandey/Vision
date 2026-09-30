@@ -3,6 +3,7 @@ import { ProjectService } from './project.service.js';
 import { AssetService } from './asset.service.js';
 import { ComparisonRepository } from '../repositories/comparison.repository.js';
 import { ClaimRepository } from '../repositories/claim.repository.js';
+import { ConfidenceService } from './confidence.service.js';
 import {
   ComparisonRecord,
   ComparisonResult,
@@ -20,6 +21,7 @@ export class ComparisonService {
   private assetService: AssetService;
   private comparisonRepository: ComparisonRepository;
   private claimRepo: ClaimRepository;
+  private confidenceService: ConfidenceService;
   private genAI: GoogleGenAI | null = null;
   private readonly defaultModel: string = 'gemini-3.8-flash';
 
@@ -28,6 +30,7 @@ export class ComparisonService {
     this.assetService = new AssetService();
     this.comparisonRepository = new ComparisonRepository();
     this.claimRepo = new ClaimRepository();
+    this.confidenceService = new ConfidenceService();
 
 
     const apiKey = process.env.GEMINI_API_KEY;
@@ -48,8 +51,12 @@ export class ComparisonService {
       throw new ValidationError('Project ID is required');
     }
     // Authorize: Enforce that user owns/has access to this project
-    await this.projectService.getProjectById(projectId, userId);
-    return this.comparisonRepository.findByProjectId(projectId);
+    const project = await this.projectService.getProjectById(projectId, userId);
+    const records = await this.comparisonRepository.findByProjectId(projectId);
+    return records.map((record) => ({
+      ...record,
+      compositeConfidence: this.confidenceService.evaluateComparisonConfidence(record, project),
+    }));
   }
 
   async getComparisonById(id: string, projectId: string, userId?: string): Promise<ComparisonRecord> {
@@ -57,12 +64,13 @@ export class ComparisonService {
       throw new ValidationError('Comparison ID is required');
     }
     // Authorize: Enforce that user owns/has access to this project
-    await this.projectService.getProjectById(projectId, userId);
+    const project = await this.projectService.getProjectById(projectId, userId);
 
     const record = await this.comparisonRepository.findById(id);
     if (!record || record.project_id !== projectId) {
       throw new NotFoundError(`Comparison with ID ${id} not found in this project`);
     }
+    record.compositeConfidence = this.confidenceService.evaluateComparisonConfidence(record, project);
     return record;
   }
 
@@ -130,6 +138,7 @@ export class ComparisonService {
       console.log(
         `[ComparisonService] Reusing existing comparison record ${existing.id} for pair (${beforeAssetId} -> ${afterAssetId})`
       );
+      existing.compositeConfidence = this.confidenceService.evaluateComparisonConfidence(existing, project);
       return existing;
     }
 
@@ -212,6 +221,7 @@ export class ComparisonService {
       }
     }
 
+    saved.compositeConfidence = this.confidenceService.evaluateComparisonConfidence(saved, project);
     return saved;
   }
 

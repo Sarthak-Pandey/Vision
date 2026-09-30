@@ -36,6 +36,7 @@ import {
 } from '@/lib/api/client';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
+import { ConfidenceIndicator } from './ConfidenceIndicator';
 
 interface EvidenceClaimsSectionProps {
   projectId: string;
@@ -207,11 +208,17 @@ export const EvidenceClaimsSection: React.FC<EvidenceClaimsSectionProps> = ({
             </div>
 
             <div className="bg-white/5 backdrop-blur-sm rounded-xl p-3 border border-white/10">
-              <div className="text-xs text-slate-300 font-medium">Avg AI Confidence</div>
+              <div className="text-xs text-slate-300 font-medium">Evidence Confidence</div>
               <div className="text-2xl font-extrabold text-amber-300 mt-1">
-                {Math.round(telemetry.averageConfidence * 100)}%
+                {telemetry.averageCompositeConfidence !== undefined
+                  ? `${Math.round(telemetry.averageCompositeConfidence * 100)}%`
+                  : `${Math.round(telemetry.averageConfidence * 100)}%`}
               </div>
-              <div className="text-[11px] text-slate-300 mt-0.5">Vision model score</div>
+              <div className="text-[11px] text-teal-300 mt-0.5">
+                {telemetry.highConfidenceClaims !== undefined
+                  ? `${telemetry.highConfidenceClaims} High • ${telemetry.mediumConfidenceClaims || 0} Med`
+                  : '5-signal composite heuristic'}
+              </div>
             </div>
 
             <div className="bg-white/5 backdrop-blur-sm rounded-xl p-3 border border-white/10">
@@ -373,19 +380,16 @@ export const EvidenceClaimsSection: React.FC<EvidenceClaimsSectionProps> = ({
                           </span>
                         )}
 
-                        <span
-                          className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-semibold border ${getConfidenceBadgeColor(
-                            claim.confidence
-                          )}`}
-                        >
-                          <CheckCircle2 className="w-3 h-3" />
-                          <span>AI Confidence: {Math.round(claim.confidence * 100)}%</span>
-                        </span>
-
-                        {isLowConfidence && (
-                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-amber-100 text-amber-800 border border-amber-200">
-                            <AlertTriangle className="w-3 h-3 text-amber-600" />
-                            <span>Low confidence — review media</span>
+                        {claim.compositeConfidence ? (
+                          <ConfidenceIndicator confidence={claim.compositeConfidence} compact />
+                        ) : (
+                          <span
+                            className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-semibold border ${getConfidenceBadgeColor(
+                              claim.confidence
+                            )}`}
+                          >
+                            <CheckCircle2 className="w-3 h-3" />
+                            <span>AI Confidence: {Math.round(claim.confidence * 100)}%</span>
                           </span>
                         )}
                       </div>
@@ -573,6 +577,13 @@ export const EvidenceClaimsSection: React.FC<EvidenceClaimsSectionProps> = ({
                         {claim.normalizedClaim}
                       </div>
                     </div>
+
+                    {/* Phase 8 Multi-Signal Evidence Confidence Breakdown */}
+                    {claim.compositeConfidence && (
+                      <div className="pt-2">
+                        <ConfidenceIndicator confidence={claim.compositeConfidence} />
+                      </div>
+                    )}
                   </div>
                 )}
               </div>

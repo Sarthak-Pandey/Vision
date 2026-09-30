@@ -212,6 +212,7 @@ export interface ComparisonRecord {
   updated_at: string;
   before_asset?: MediaAsset | null;
   after_asset?: MediaAsset | null;
+  compositeConfidence?: CompositeConfidence;
 }
 
 export interface CreateComparisonPayload {
@@ -249,6 +250,7 @@ export interface EvidenceClaim {
   createdAt: string;
   updatedAt: string;
   evidence: EvidenceAsset[];
+  compositeConfidence?: CompositeConfidence;
 }
 
 export interface ClaimsTelemetry {
@@ -258,6 +260,9 @@ export interface ClaimsTelemetry {
   analysisSourcesCount: number;
   comparisonSourcesCount: number;
   averageConfidence: number;
+  averageCompositeConfidence?: number;
+  highConfidenceClaims?: number;
+  mediumConfidenceClaims?: number;
 }
 
 // ============================================================================
@@ -317,5 +322,61 @@ export interface EvidenceGapReport {
   timestamp: string;
 }
 
+// ============================================================================
+// Phase 8: Evidence Confidence System Types
+// ============================================================================
 
+export type ConfidenceLevel = 'LOW' | 'MEDIUM' | 'HIGH' | 'UNAVAILABLE';
 
+export interface ConfidenceSignals {
+  visionConfidence?: number | null;
+  metadataConsistency?: number | null;
+  imageQuality?: number | null;
+  crossAssetAgreement?: number | null;
+  temporalConsistency?: number | null;
+}
+
+export interface ConfidenceBreakdownItem {
+  name: string;
+  weight: number;
+  score: number | null;
+  percentage: number | null;
+  available: boolean;
+  explanation?: string;
+}
+
+export interface CompositeConfidence {
+  score: number | null;
+  percentage: number | null;
+  level: ConfidenceLevel;
+  available: boolean;
+  signals: ConfidenceSignals;
+  breakdown: Record<keyof ConfidenceSignals, ConfidenceBreakdownItem>;
+  evaluatedWeightsSum: number;
+  disclaimer: string;
+  explanation: string;
+}
+
+export interface ProjectConfidenceReport {
+  projectId: string;
+  projectName: string;
+  averageCompositeConfidence: number | null;
+  averageCompositePercentage: number | null;
+  level: ConfidenceLevel;
+  totalEvaluatedClaims: number;
+  confidenceDistribution: {
+    high: number;
+    medium: number;
+    low: number;
+    unavailable: number;
+  };
+  signalsSummary: {
+    visionConfidence: number | null;
+    metadataConsistency: number | null;
+    imageQuality: number | null;
+    crossAssetAgreement: number | null;
+    temporalConsistency: number | null;
+  };
+  disclaimer: string;
+  timestamp: string;
+}
