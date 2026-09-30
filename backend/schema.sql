@@ -183,4 +183,21 @@ CREATE TABLE IF NOT EXISTS claim_evidence (
 
 CREATE INDEX IF NOT EXISTS claim_evidence_asset_id_idx ON claim_evidence(asset_id);
 
+-- ============================================================================
+-- Phase 9: Project Impact Reports (Persistence & Snapshot Storage)
+-- ============================================================================
+
+CREATE TABLE IF NOT EXISTS reports (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  project_id UUID NOT NULL REFERENCES projects(id) ON DELETE CASCADE,
+  title TEXT NOT NULL,
+  snapshot_data JSONB,
+  created_by TEXT,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+CREATE INDEX IF NOT EXISTS reports_project_id_idx ON reports(project_id);
+
+
 
