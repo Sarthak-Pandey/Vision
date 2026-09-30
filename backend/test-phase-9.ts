@@ -19,6 +19,7 @@ function assert(condition: boolean, testName: string, detail?: string) {
 }
 
 async function runPhase9TestSuite() {
+  process.env.NODE_ENV = 'test';
   console.log('====================================================');
   console.log('RUNNING PHASE 9 PROJECT IMPACT REPORT TEST SUITE');
   console.log('====================================================');

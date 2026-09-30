@@ -3,6 +3,7 @@ import { Server } from 'http';
 import { AddressInfo } from 'net';
 
 async function runTests() {
+  process.env.NODE_ENV = 'test';
   console.log('====================================================');
   console.log('RUNNING PHASE 7 EVIDENCE GAP DETECTION TEST SUITE');
   console.log('====================================================');

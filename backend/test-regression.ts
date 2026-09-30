@@ -3,6 +3,7 @@ import { Server } from 'http';
 import { AddressInfo } from 'net';
 
 async function runRegressionTests() {
+  process.env.NODE_ENV = 'test';
   console.log('====================================================');
   console.log('RUNNING REGRESSION TEST SUITE (PHASES 1 - 4)');
   console.log('====================================================');

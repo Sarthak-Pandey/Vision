@@ -3,6 +3,7 @@ import { Server } from 'http';
 import { AddressInfo } from 'net';
 
 async function runTests() {
+  process.env.NODE_ENV = 'test';
   console.log('====================================================');
   console.log('RUNNING PHASE 5 BEFORE/AFTER INTELLIGENCE TEST SUITE');
   console.log('====================================================');
