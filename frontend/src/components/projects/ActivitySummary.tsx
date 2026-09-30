@@ -45,7 +45,7 @@ export const ActivitySummary: React.FC<ActivitySummaryProps> = ({ activities }) 
                     {item.activity}
                   </span>
                 </div>
-                <div className="flex items-center gap-1.5 bg-white px-2.5 py-1 rounded-lg border border-border text-xs font-semibold text-secondary-text shadow-2xs">
+                <div className="flex items-center gap-1.5 bg-card px-2.5 py-1 rounded-lg border border-border text-xs font-semibold text-muted-foreground shadow-2xs">
                   <span className="text-brand-dark-orange font-bold">{item.count}</span>
                   <span>{item.count === 1 ? 'asset' : 'assets'}</span>
                 </div>

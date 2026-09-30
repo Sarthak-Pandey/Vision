@@ -22,7 +22,7 @@ export const AppShell: React.FC<AppShellProps> = ({ children }) => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-white">
+      <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="w-6 h-6 border-2 border-brand-orange border-t-transparent rounded-full animate-spin" />
       </div>
     );

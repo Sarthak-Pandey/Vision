@@ -32,7 +32,12 @@ export default function SearchPage() {
 
   useEffect(() => {
     getProjects()
-      .then((data) => setProjects(data))
+      .then((data) => {
+        setProjects(data);
+        if (data.length > 0) {
+          setSelectedProjectId(data[0].id);
+        }
+      })
       .catch((err) => console.error('Failed to load projects for search filter:', err));
   }, []);
 
@@ -40,6 +45,9 @@ export default function SearchPage() {
     if (e) e.preventDefault();
     const searchQuery = (searchOverride !== undefined ? searchOverride : query).trim();
     if (!searchQuery) return;
+    if (searchOverride !== undefined) {
+      setQuery(searchOverride);
+    }
 
     try {
       setIsLoading(true);
@@ -47,10 +55,20 @@ export default function SearchPage() {
       setHasSearched(true);
       setActiveQuery(searchQuery);
 
-      const params: any = { query: searchQuery, limit: 12 };
-      if (selectedProjectId !== 'all') {
-        params.projectId = selectedProjectId;
+      const targetProjectId =
+        selectedProjectId && selectedProjectId !== 'all'
+          ? selectedProjectId
+          : projects[0]?.id;
+
+      if (!targetProjectId) {
+        throw new Error('No active project found to search within. Please create a project first.');
       }
+
+      const params: any = {
+        query: searchQuery,
+        projectId: targetProjectId,
+        limit: 12,
+      };
 
       const res = await semanticSearch(params);
       setResults(res.results || []);
@@ -70,23 +88,23 @@ export default function SearchPage() {
   return (
     <div className="space-y-6 max-w-5xl mx-auto">
       <div>
-        <h1 className="text-2xl font-bold text-primary-text tracking-tight">Search Evidence</h1>
-        <p className="text-sm text-secondary-text mt-0.5">
+        <h1 className="text-2xl font-bold text-foreground tracking-tight">Search Evidence</h1>
+        <p className="text-sm text-muted-foreground mt-0.5">
           Query field evidence across projects using 1536-dimensional semantic vector search.
         </p>
       </div>
 
       {/* Big Search Input */}
-      <form onSubmit={handleSearch} className="bg-white border border-border rounded-2xl p-4 shadow-xs space-y-3">
+      <form onSubmit={handleSearch} className="bg-card border border-border rounded-2xl p-4 shadow-xs space-y-3">
         <div className="flex flex-col sm:flex-row gap-3">
           <div className="relative flex-1">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-brand-orange" />
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
             <input
               type="text"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Describe what you want to find (e.g. saplings, cleared riverbank, solar microgrid)..."
-              className="w-full h-12 pl-12 pr-4 text-sm bg-secondary-bg border border-border rounded-xl text-primary-text placeholder:text-muted-text focus:outline-none focus:bg-white focus:border-brand-orange focus:ring-1 focus:ring-brand-orange transition-colors"
+              className="w-full h-12 pl-12 pr-4 text-sm bg-muted border border-border rounded-xl text-foreground placeholder:text-muted-foreground focus:outline-none focus:bg-background focus:ring-1 focus:ring-ring transition-colors"
             />
           </div>
 
@@ -98,27 +116,24 @@ export default function SearchPage() {
             />
           </div>
 
-          <Button type="submit" disabled={isLoading || !query.trim()} className="h-12 px-6 shrink-0 gap-2">
+          <Button type="submit" disabled={isLoading} className="h-12 px-6 shrink-0 gap-2 font-semibold">
             {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Search className="w-4 h-4" />}
             <span>Search</span>
           </Button>
         </div>
 
         {/* Suggestion Chips */}
-        <div className="flex flex-wrap items-center gap-2 pt-1 text-xs text-secondary-text">
-          <span className="font-medium text-muted-text flex items-center gap-1">
-            <Sparkles className="w-3.5 h-3.5 text-brand-orange" />
+        <div className="flex flex-wrap items-center gap-2 pt-1 text-xs text-muted-foreground">
+          <span className="font-medium text-muted-foreground flex items-center gap-1">
+            <Sparkles className="w-3.5 h-3.5 text-foreground" />
             Try:
           </span>
           {SAMPLE_QUERIES.map((sample) => (
             <button
               key={sample}
               type="button"
-              onClick={() => {
-                setQuery(sample);
-                handleSearch(undefined, sample);
-              }}
-              className="px-2.5 py-1 rounded-full bg-secondary-bg hover:bg-brand-light-orange hover:text-brand-dark-orange transition-colors border border-border/60 text-xs"
+              onClick={() => handleSearch(undefined, sample)}
+              className="px-2.5 py-1 rounded-full bg-muted hover:bg-accent text-muted-foreground hover:text-foreground transition-colors border border-border text-xs cursor-pointer"
             >
               {sample}
             </button>
@@ -148,11 +163,11 @@ export default function SearchPage() {
           </div>
 
           {results.length === 0 ? (
-            <div className="py-16 text-center bg-white border border-border rounded-2xl space-y-3">
-              <Database className="w-10 h-10 text-muted-text/40 mx-auto" />
+            <div className="py-16 text-center bg-card text-card-foreground border border-border rounded-2xl space-y-3">
+              <Database className="w-10 h-10 text-muted-foreground/40 mx-auto" />
               <div className="space-y-1">
-                <h4 className="text-sm font-semibold text-primary-text">No matching evidence found</h4>
-                <p className="text-xs text-secondary-text max-w-md mx-auto">
+                <h4 className="text-sm font-semibold text-foreground">No matching evidence found</h4>
+                <p className="text-xs text-muted-foreground max-w-md mx-auto">
                   Try broadening your search query or indexing newly uploaded media assets.
                 </p>
               </div>
@@ -197,13 +212,13 @@ export default function SearchPage() {
           )}
         </div>
       ) : (
-        <div className="py-16 text-center bg-white border border-border rounded-2xl space-y-3">
-          <div className="w-12 h-12 rounded-full bg-brand-light-orange text-brand-dark-orange flex items-center justify-center mx-auto">
-            <Sparkles className="w-6 h-6" />
+        <div className="py-16 text-center bg-card text-card-foreground border border-border rounded-2xl space-y-3">
+          <div className="w-12 h-12 rounded-full bg-muted text-foreground flex items-center justify-center mx-auto">
+            <Sparkles className="w-6 h-6 text-foreground" />
           </div>
           <div className="space-y-1">
-            <h3 className="text-base font-semibold text-primary-text">Natural Language Semantic Search</h3>
-            <p className="text-xs text-secondary-text max-w-md mx-auto">
+            <h3 className="text-base font-semibold text-foreground">Natural Language Semantic Search</h3>
+            <p className="text-xs text-muted-foreground max-w-md mx-auto">
               Search by describing visual features, actions, or conditions. pgvector measures cosine similarity between your query and ingested media.
             </p>
           </div>

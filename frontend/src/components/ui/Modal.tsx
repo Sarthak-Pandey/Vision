@@ -38,25 +38,25 @@ export const Modal: React.FC<ModalProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-xs animate-fade-in">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-fade-in">
       <div
         className={cn(
-          'w-full max-w-lg bg-white rounded-2xl border border-border shadow-xl overflow-hidden flex flex-col max-h-[90vh]',
+          'w-full max-w-lg bg-background rounded-lg border border-border shadow-xl overflow-hidden flex flex-col max-h-[90vh] animate-in fade-in-0 zoom-in-95 duration-150',
           className
         )}
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex items-center justify-between px-6 py-4 border-b border-border">
-          <div>
-            <h3 className="text-lg font-semibold text-primary-text">{title}</h3>
-            {description && <p className="text-xs text-secondary-text mt-0.5">{description}</p>}
+        <div className="flex items-center justify-between px-6 py-4 border-b border-border bg-card">
+          <div className="space-y-0.5">
+            <h3 className="text-base font-semibold leading-none text-foreground tracking-tight">{title}</h3>
+            {description && <p className="text-xs text-muted-foreground mt-1">{description}</p>}
           </div>
           <button
             onClick={onClose}
-            className="p-1 rounded-lg text-secondary-text hover:text-primary-text hover:bg-secondary-bg transition-colors"
+            className="rounded-md p-1 text-muted-foreground hover:text-foreground hover:bg-accent transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
             aria-label="Close modal"
           >
-            <X className="w-5 h-5" />
+            <X className="w-4 h-4" />
           </button>
         </div>
         <div className="p-6 overflow-y-auto">{children}</div>

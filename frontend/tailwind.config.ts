@@ -1,6 +1,7 @@
 import type { Config } from "tailwindcss";
 
 const config: Config = {
+  darkMode: ["class"],
   content: [
     "./src/pages/**/*.{js,ts,jsx,tsx,mdx}",
     "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
@@ -9,20 +10,51 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        background: "#FFFFFF",
-        "secondary-bg": "#F7F7F6",
-        card: "#FFFFFF",
-        border: "#E7E7E5",
-        "primary-text": "#1F1F1F",
-        "secondary-text": "#6B6B6B",
-        "muted-text": "#9A9A9A",
+        border: "hsl(var(--border))",
+        input: "hsl(var(--input))",
+        ring: "hsl(var(--ring))",
+        background: "hsl(var(--background))",
+        foreground: "hsl(var(--foreground))",
+        primary: {
+          DEFAULT: "hsl(var(--primary))",
+          foreground: "hsl(var(--primary-foreground))",
+        },
+        secondary: {
+          DEFAULT: "hsl(var(--secondary))",
+          foreground: "hsl(var(--secondary-foreground))",
+        },
+        destructive: {
+          DEFAULT: "hsl(var(--destructive))",
+          foreground: "hsl(var(--destructive-foreground))",
+        },
+        muted: {
+          DEFAULT: "hsl(var(--muted))",
+          foreground: "hsl(var(--muted-foreground))",
+        },
+        accent: {
+          DEFAULT: "hsl(var(--accent))",
+          foreground: "hsl(var(--accent-foreground))",
+        },
+        popover: {
+          DEFAULT: "hsl(var(--popover))",
+          foreground: "hsl(var(--popover-foreground))",
+        },
+        card: {
+          DEFAULT: "hsl(var(--card))",
+          foreground: "hsl(var(--card-foreground))",
+        },
+        // Backward compatibility mappings for existing component tokens
+        "secondary-bg": "hsl(var(--muted))",
+        "primary-text": "hsl(var(--foreground))",
+        "secondary-text": "hsl(var(--muted-foreground))",
+        "muted-text": "hsl(var(--muted-foreground) / 0.7)",
         brand: {
           primary: "#059669",
           "primary-hover": "#047857",
           "primary-light": "#ECFDF5",
-          orange: "#F97316",
-          "dark-orange": "#EA580C",
-          "light-orange": "#FFF7ED",
+          orange: "hsl(var(--brand-orange))",
+          "dark-orange": "hsl(var(--brand-dark-orange))",
+          "light-orange": "hsl(var(--brand-light-orange))",
         },
         status: {
           success: "#16A34A",
@@ -30,8 +62,17 @@ const config: Config = {
           error: "#DC2626",
         },
       },
+      borderRadius: {
+        lg: "var(--radius)",
+        md: "calc(var(--radius) - 2px)",
+        sm: "calc(var(--radius) - 4px)",
+      },
       fontFamily: {
         sans: ["Inter", "sans-serif"],
+      },
+      boxShadow: {
+        xs: "0 1px 2px 0 rgb(0 0 0 / 0.05)",
+        shadcn: "0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1)",
       },
     },
   },

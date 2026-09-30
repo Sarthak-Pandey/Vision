@@ -2,22 +2,27 @@ import React from 'react';
 import { cn } from '@/lib/utils/cn';
 
 export interface BadgeProps extends React.HTMLAttributes<HTMLSpanElement> {
-  variant?: 'default' | 'orange' | 'success' | 'warning' | 'error' | 'outline';
+  variant?: 'default' | 'orange' | 'success' | 'warning' | 'error' | 'outline' | 'secondary';
 }
 
 export const Badge: React.FC<BadgeProps> = ({ children, className, variant = 'default', ...props }) => {
   const variants = {
-    default: 'bg-secondary-bg text-secondary-text border border-border',
-    orange: 'bg-brand-light-orange text-brand-dark-orange border border-orange-200',
-    success: 'bg-green-50 text-status-success border border-green-200',
-    warning: 'bg-amber-50 text-status-warning border border-amber-200',
-    error: 'bg-red-50 text-status-error border border-red-200',
-    outline: 'bg-transparent text-primary-text border border-border',
+    default: 'border-transparent bg-primary text-primary-foreground hover:bg-primary/80 shadow-2xs',
+    secondary: 'border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80',
+    orange: 'border-orange-200/60 bg-brand-light-orange text-brand-dark-orange dark:bg-orange-950/40 dark:text-orange-400 dark:border-orange-900/40',
+    success: 'border-emerald-200/60 bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400 dark:border-emerald-900/40',
+    warning: 'border-amber-200/60 bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-400 dark:border-amber-900/40',
+    error: 'border-rose-200/60 bg-rose-50 text-rose-700 dark:bg-rose-950/40 dark:text-rose-400 dark:border-rose-900/40',
+    outline: 'border-border text-foreground',
   };
 
   return (
     <span
-      className={cn('inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium', variants[variant], className)}
+      className={cn(
+        'inline-flex items-center rounded-md border px-2.5 py-0.5 text-xs font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 select-none',
+        variants[variant],
+        className
+      )}
       {...props}
     >
       {children}
