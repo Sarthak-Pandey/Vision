@@ -10,7 +10,7 @@ import { BadRequestError } from '../utils/errors.js';
 const upload = multer({
   storage: multer.memoryStorage(),
   limits: {
-    fileSize: 15 * 1024 * 1024, // 15MB max file size
+    fileSize: 20 * 1024 * 1024, // 20MB max file size
   },
   fileFilter: (_req, file, cb) => {
     if (file.mimetype.startsWith('image/') || file.mimetype.startsWith('video/')) {

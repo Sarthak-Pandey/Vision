@@ -53,9 +53,9 @@ export const Header: React.FC = () => {
         <Dropdown
           trigger={
             <button className="flex items-center gap-2.5 p-1 rounded-lg hover:bg-secondary-bg transition-colors cursor-pointer">
-              <Avatar name={user?.name || 'Sarthak Pandey'} size="sm" />
+              <Avatar name={user?.name || user?.email || 'User'} size="sm" />
               <span className="text-xs font-semibold text-primary-text">
-                {user?.name || 'Sarthak Pandey'}
+                {user?.name || user?.email || 'User'}
               </span>
               <ChevronDown className="w-3.5 h-3.5 text-secondary-text" />
             </button>

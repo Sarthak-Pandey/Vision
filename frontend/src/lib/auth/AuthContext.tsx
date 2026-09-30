@@ -2,43 +2,60 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { User } from '@/types';
+import { loginApi } from '@/lib/api/client';
 
 interface AuthContextType {
   user: User | null;
   isAuthenticated: boolean;
-  login: (email: string, name?: string) => void;
+  isLoading: boolean;
+  login: (email: string, password: string) => Promise<void>;
   logout: () => void;
 }
 
 const AuthContext = createContext<AuthContextType>({
   user: null,
   isAuthenticated: false,
-  login: () => {},
+  isLoading: true,
+  login: async () => {},
   logout: () => {},
 });
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [user, setUser] = useState<User | null>(() => {
-    // Default logged in user for seamless demo, or read from storage
-    return {
-      id: 'usr-1',
-      email: 'sarthak.pandey@example.com',
-      name: 'Sarthak Pandey',
-      role: 'Team Member',
-    };
-  });
+  const [user, setUser] = useState<User | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const login = (email: string, name?: string) => {
-    const newUser: User = {
-      id: 'usr-' + Date.now(),
-      email,
-      name: name || email.split('@')[0] || 'User',
+  useEffect(() => {
+    // Restore authenticated session from localStorage if present
+    try {
+      const storedToken = localStorage.getItem('impact_access_token');
+      const storedUser = localStorage.getItem('impact_user');
+      if (storedToken && storedUser) {
+        setUser(JSON.parse(storedUser));
+      }
+    } catch (err) {
+      console.warn('Failed to restore auth session:', err);
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  const login = async (email: string, password: string) => {
+    const { token, user: authUser } = await loginApi(email, password);
+    const sessionUser: User = {
+      id: authUser.id,
+      email: authUser.email,
+      name: authUser.name,
       role: 'Team Member',
     };
-    setUser(newUser);
+
+    localStorage.setItem('impact_access_token', token);
+    localStorage.setItem('impact_user', JSON.stringify(sessionUser));
+    setUser(sessionUser);
   };
 
   const logout = () => {
+    localStorage.removeItem('impact_access_token');
+    localStorage.removeItem('impact_user');
     setUser(null);
   };
 
@@ -47,6 +64,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       value={{
         user,
         isAuthenticated: !!user,
+        isLoading,
         login,
         logout,
       }}
