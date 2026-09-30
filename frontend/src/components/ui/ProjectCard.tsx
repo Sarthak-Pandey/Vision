@@ -27,13 +27,15 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project, mediaCount })
     <Link href={`/projects/${project.id}`} className="block group">
       <Card hoverable className="h-full flex flex-col overflow-hidden p-0 border border-border">
         {/* Top Image Preview / Cover */}
-        <div className="h-36 w-full bg-secondary-bg relative overflow-hidden flex items-center justify-center border-b border-border">
-          <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent z-10" />
-          <img
-            src="https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?w=800&auto=format&fit=crop&q=60"
-            alt={project.name}
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-          />
+        <div className="h-32 w-full bg-gradient-to-br from-orange-50 via-amber-50/50 to-orange-100/70 relative overflow-hidden flex items-center justify-center border-b border-border">
+          <div className="flex flex-col items-center justify-center gap-1.5 text-brand-dark-orange">
+            <div className="w-12 h-12 rounded-xl bg-white shadow-xs border border-orange-200/60 flex items-center justify-center font-bold text-base text-brand-dark-orange group-hover:scale-105 transition-transform duration-300">
+              {project.name.slice(0, 2).toUpperCase()}
+            </div>
+            <span className="text-[11px] font-medium text-brand-dark-orange/90 capitalize tracking-wide">
+              {(project.project_type || 'Project').replace('_', ' ')}
+            </span>
+          </div>
           <div className="absolute bottom-2 left-3 z-20 flex items-center gap-1.5 bg-black/60 backdrop-blur-xs text-white text-xs px-2 py-0.5 rounded-md">
             <ImageIcon className="w-3 h-3 text-brand-orange" />
             <span>{displayMediaCount} media</span>
