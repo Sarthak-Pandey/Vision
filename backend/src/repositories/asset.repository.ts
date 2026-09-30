@@ -11,7 +11,7 @@ const mockAssetsStore: Asset[] = [
     capture_date: '2025-02-10T10:00:00Z',
     latitude: 28.6139,
     longitude: 77.209,
-    uploaded_by: 'Sarthak Pandey',
+    uploaded_by: 'Field Analyst',
     created_at: new Date('2025-02-10T10:00:00Z').toISOString(),
   },
   {
@@ -23,7 +23,7 @@ const mockAssetsStore: Asset[] = [
     capture_date: '2025-02-15T14:30:00Z',
     latitude: 28.6145,
     longitude: 77.2095,
-    uploaded_by: 'Sarthak Pandey',
+    uploaded_by: 'Field Analyst',
     created_at: new Date('2025-02-15T14:30:00Z').toISOString(),
   },
   {
@@ -134,7 +134,7 @@ export class AssetRepository {
       capture_date: data.capture_date || new Date().toISOString(),
       latitude: data.latitude ?? null,
       longitude: data.longitude ?? null,
-      uploaded_by: data.uploaded_by || 'Sarthak Pandey',
+      uploaded_by: data.uploaded_by || 'Field Analyst',
       created_at: new Date().toISOString(),
     };
 

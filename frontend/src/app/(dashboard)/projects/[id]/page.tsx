@@ -42,12 +42,14 @@ import { getProject, getAssets, getProjectImpactReport } from '@/lib/api/client'
 
 import { Project, MediaAsset, MediaAssetWithAnalysis, ImpactReport } from '@/types';
 import { calculateProjectStats } from '@/lib/utils/projectStats';
+import { useAuth } from '@/lib/auth/AuthContext';
 
 export default function ProjectDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const resolvedParams = use(params);
   const projectId = resolvedParams.id;
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { user } = useAuth();
 
   const [project, setProject] = useState<Project | null>(null);
   const [projectAssets, setProjectAssets] = useState<MediaAssetWithAnalysis[]>([]);
@@ -208,14 +210,16 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
             <span>Edit Project</span>
           </Button>
 
-          <Button
-            variant="outline"
-            onClick={() => setIsDeleteModalOpen(true)}
-            className="gap-1.5 text-xs text-status-error border-red-200 hover:bg-red-50"
-          >
-            <Trash2 className="w-3.5 h-3.5" />
-            <span>Delete</span>
-          </Button>
+          {!user?.isGuest && (
+            <Button
+              variant="outline"
+              onClick={() => setIsDeleteModalOpen(true)}
+              className="gap-1.5 text-xs text-status-error border-red-200 hover:bg-red-50"
+            >
+              <Trash2 className="w-3.5 h-3.5" />
+              <span>Delete</span>
+            </Button>
+          )}
 
           <Button
             variant="outline"

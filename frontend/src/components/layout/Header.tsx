@@ -38,6 +38,17 @@ export const Header: React.FC = () => {
         <SearchInput placeholder="Search projects, media..." />
       </div>
 
+      {/* Demo Mode Badge if Guest */}
+      {user?.isGuest && (
+        <div className="flex items-center gap-2 px-3 py-1 bg-amber-50 border border-amber-200/90 rounded-full text-amber-900 text-xs shadow-2xs">
+          <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
+          <span className="font-bold tracking-tight">Guest Demo</span>
+          <span className="text-amber-700 hidden md:inline text-[11px] font-medium">
+            • Demonstration workspace
+          </span>
+        </div>
+      )}
+
       {/* Right Controls */}
       <div className="flex items-center gap-4">
         <button

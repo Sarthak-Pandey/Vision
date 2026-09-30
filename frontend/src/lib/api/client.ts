@@ -65,6 +65,23 @@ export async function loginApi(
   return json.data;
 }
 
+export async function guestLoginApi(): Promise<{
+  token: string;
+  user: any;
+  defaultProjectId?: string;
+}> {
+  const response = await fetch(`${API_BASE_URL}/auth/guest-login`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+  });
+
+  const json = await response.json();
+  if (!response.ok || !json.success) {
+    throw new Error(json.error?.message || 'Unable to start the demo right now. Please try again.');
+  }
+  return json.data;
+}
+
 export async function getHealth(): Promise<{ success: boolean; message: string }> {
   return request<{ success: boolean; message: string }>('/health');
 }

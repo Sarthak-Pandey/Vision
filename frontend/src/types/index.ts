@@ -123,6 +123,7 @@ export interface User {
   email: string;
   name: string;
   role?: string;
+  isGuest?: boolean;
 }
 
 export interface ApiResponse<T> {

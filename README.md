@@ -189,7 +189,7 @@ graph TD
 Install both backend and frontend dependencies from the root repository:
 
 ```bash
-git clone https://github.com/Sarthak-Pandey/Vision.git
+git clone https://github.com/organization/Vision.git
 cd Vision
 npm run install:all
 ```
@@ -290,5 +290,4 @@ The platform uses PostgreSQL via Supabase. Schema definitions are maintained in 
 
 ## Contributors
 
-- **Sarthak Pandey** ([@Sarthak-Pandey](https://github.com/Sarthak-Pandey))
-- **Swatantra** ([@Swatantra-66](https://github.com/Swatantra-66))
+- **Impact Platform Team**

@@ -68,9 +68,9 @@ async function runRealE2EJourney() {
     });
     assert(resDemoHeader.status === 401, 'x-demo-user rejected with 401');
 
-    // 1.4 Real Login: User A (sarthak.pandey@example.com)
+    // 1.4 Real Login: User A (analyst.a@example.com)
     const loginARes = await anonClient.auth.signInWithPassword({
-      email: 'sarthak.pandey@example.com',
+      email: 'analyst.a@example.com',
       password: 'password123',
     });
     assert(
@@ -100,7 +100,7 @@ async function runRealE2EJourney() {
     });
     const meData = await resMe.json();
     assert(
-      resMe.status === 200 && meData.data?.email === 'sarthak.pandey@example.com',
+      resMe.status === 200 && meData.data?.email === 'analyst.a@example.com',
       'Backend verifies JWT with Supabase and extracts real user session'
     );
 

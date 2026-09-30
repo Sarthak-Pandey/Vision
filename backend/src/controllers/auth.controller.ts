@@ -21,6 +21,20 @@ export class AuthController {
     }
   };
 
+  guestLogin = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      // PART 6: The client cannot select or pass arbitrary user IDs.
+      // Server determines the dedicated demo identity.
+      const result = await this.authService.guestLogin();
+      res.status(200).json({
+        success: true,
+        data: result,
+      });
+    } catch (error) {
+      next(error);
+    }
+  };
+
   me = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       const user = (req as any).user;

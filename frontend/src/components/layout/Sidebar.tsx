@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils/cn';
 import { Avatar } from '@/components/ui/Avatar';
+import { useAuth } from '@/lib/auth/AuthContext';
 
 const mainNavItems = [
   { label: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
@@ -30,6 +31,7 @@ const secondaryNavItems = [
 
 export const Sidebar: React.FC = () => {
   const pathname = usePathname();
+  const { user } = useAuth();
 
   return (
     <aside className="w-[240px] h-screen sticky top-0 bg-white border-r border-border flex flex-col justify-between shrink-0 select-none z-30">
@@ -105,10 +107,24 @@ export const Sidebar: React.FC = () => {
       {/* User Section */}
       <div className="p-4 border-t border-border bg-white">
         <div className="flex items-center gap-3">
-          <Avatar name="Sarthak Pandey" size="sm" />
+          <Avatar
+            name={user?.isGuest ? 'Guest Demo' : (user?.name || user?.email || 'User')}
+            size="sm"
+          />
           <div className="min-w-0 flex-1">
-            <p className="text-xs font-semibold text-primary-text truncate">Sarthak Pandey</p>
-            <p className="text-[11px] text-secondary-text truncate">Team Member</p>
+            <div className="flex items-center gap-1.5">
+              <p className="text-xs font-semibold text-primary-text truncate">
+                {user?.isGuest ? 'Guest Demo' : (user?.name || user?.email || 'User')}
+              </p>
+              {user?.isGuest && (
+                <span className="px-1.5 py-0.5 text-[9px] font-bold bg-amber-100 text-amber-800 rounded">
+                  DEMO
+                </span>
+              )}
+            </div>
+            <p className="text-[11px] text-secondary-text truncate">
+              {user?.isGuest ? 'Demonstration Workspace' : (user?.role || 'Team Member')}
+            </p>
           </div>
         </div>
       </div>

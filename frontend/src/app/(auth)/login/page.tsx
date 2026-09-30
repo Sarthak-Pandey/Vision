@@ -5,18 +5,20 @@ import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { useAuth } from '@/lib/auth/AuthContext';
-import { ShieldCheck, Layers, FileCheck } from 'lucide-react';
+import { ShieldCheck, Layers, FileCheck, Compass } from 'lucide-react';
 
 export default function LoginPage() {
-  const [email, setEmail] = useState('sarthak.pandey@example.com');
-  const [password, setPassword] = useState('password123');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [isGuestLoading, setIsGuestLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const { login } = useAuth();
+  const { login, guestLogin } = useAuth();
   const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (isLoading || isGuestLoading) return;
     setIsLoading(true);
     setError(null);
     try {
@@ -26,6 +28,24 @@ export default function LoginPage() {
       setError(err.message || 'Invalid email or password');
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleGuestLogin = async () => {
+    if (isLoading || isGuestLoading) return;
+    setIsGuestLoading(true);
+    setError(null);
+    try {
+      const defaultProjectId = await guestLogin();
+      if (defaultProjectId) {
+        router.push(`/projects/${defaultProjectId}`);
+      } else {
+        router.push('/dashboard');
+      }
+    } catch (err: any) {
+      setError(err.message || 'Unable to start the demo right now. Please try again.');
+    } finally {
+      setIsGuestLoading(false);
     }
   };
 
@@ -88,25 +108,31 @@ export default function LoginPage() {
 
           <form onSubmit={handleSubmit} className="space-y-4">
             {error && (
-              <div className="p-3 text-xs bg-rose-50 border border-rose-200 text-rose-700 rounded-lg">
+              <div
+                role="alert"
+                aria-live="polite"
+                className="p-3 text-xs bg-rose-50 border border-rose-200 text-rose-700 rounded-lg"
+              >
                 {error}
               </div>
             )}
             <Input
               label="Email address"
               type="email"
-              placeholder="name@company.com"
+              placeholder="Enter your email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+              disabled={isLoading || isGuestLoading}
               required
             />
 
             <Input
               label="Password"
               type="password"
-              placeholder="••••••••"
+              placeholder="Enter your password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              disabled={isLoading || isGuestLoading}
               required
             />
 
@@ -115,6 +141,7 @@ export default function LoginPage() {
                 <input
                   type="checkbox"
                   defaultChecked
+                  disabled={isLoading || isGuestLoading}
                   className="rounded border-border text-brand-orange focus:ring-brand-orange"
                 />
                 <span>Remember me</span>
@@ -124,10 +151,46 @@ export default function LoginPage() {
               </a>
             </div>
 
-            <Button type="submit" className="w-full h-11 text-sm font-semibold" isLoading={isLoading}>
+            <Button
+              type="submit"
+              className="w-full h-11 text-sm font-semibold"
+              isLoading={isLoading}
+              disabled={isLoading || isGuestLoading}
+            >
               Sign In
             </Button>
           </form>
+
+          {/* Divider */}
+          <div className="relative my-4 flex items-center justify-center">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-border" />
+            </div>
+            <div className="relative bg-white px-3 text-xs text-muted-text font-medium uppercase tracking-wider">
+              or
+            </div>
+          </div>
+
+          {/* Guest Demo Action */}
+          <div className="space-y-2">
+            <Button
+              type="button"
+              variant="outline"
+              aria-label="Continue as Guest"
+              className="w-full h-11 text-sm font-semibold border-border hover:border-brand-orange/40 hover:bg-brand-light-orange/20 text-primary-text transition-all"
+              onClick={handleGuestLogin}
+              isLoading={isGuestLoading}
+              loadingText="Opening demo..."
+              disabled={isLoading || isGuestLoading}
+            >
+              <Compass className="w-4 h-4 text-brand-orange mr-1" />
+              Continue as Guest
+            </Button>
+
+            <p className="text-[11px] text-center text-muted-text leading-tight px-2">
+              Guest access opens a demonstration workspace with sample sustainability project data.
+            </p>
+          </div>
 
           <div className="text-center text-xs text-secondary-text pt-4 border-t border-border">
             Need access to an enterprise workspace?{' '}

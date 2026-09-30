@@ -1,6 +1,6 @@
 import { ProjectRepository } from '../repositories/project.repository.js';
 import { Project, CreateProjectInput, UpdateProjectInput } from '../types/index.js';
-import { NotFoundError, ValidationError } from '../utils/errors.js';
+import { NotFoundError, ValidationError, ForbiddenError } from '../utils/errors.js';
 
 export class ProjectService {
   private projectRepository: ProjectRepository;
@@ -42,7 +42,11 @@ export class ProjectService {
   }
 
   async deleteProject(id: string, userId?: string): Promise<void> {
-    await this.getProjectById(id, userId); // Ensures project exists and belongs to user
+    const rawProject = await this.projectRepository.findById(id);
+    if (rawProject && rawProject.name === 'Yamuna River Restoration Demo') {
+      throw new ForbiddenError('Deleting the shared demonstration project is disabled to preserve demo availability');
+    }
+    const project = await this.getProjectById(id, userId); // Ensures project exists and belongs to user
     const success = await this.projectRepository.delete(id, userId);
     if (!success) {
       throw new NotFoundError(`Failed to delete project with ID ${id}`);

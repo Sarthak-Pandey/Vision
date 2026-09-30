@@ -9,6 +9,7 @@ import { Select } from '@/components/ui/Select';
 import { Toast } from '@/components/ui/Toast';
 import { getProjects, uploadMediaFile, createAsset } from '@/lib/api/client';
 import { Project, MediaAsset } from '@/types';
+import { useAuth } from '@/lib/auth/AuthContext';
 
 export interface UploadMediaModalProps {
   isOpen: boolean;
@@ -30,7 +31,8 @@ export const UploadMediaModal: React.FC<UploadMediaModalProps> = ({
   const [captureDate, setCaptureDate] = useState<string>(new Date().toISOString().split('T')[0]);
   const [latitude, setLatitude] = useState<string>('');
   const [longitude, setLongitude] = useState<string>('');
-  const [uploadedBy, setUploadedBy] = useState<string>('Sarthak Pandey');
+  const { user } = useAuth();
+  const [uploadedBy, setUploadedBy] = useState<string>(user?.isGuest ? 'Field Analyst' : (user?.name || 'Field Lead'));
 
   const [isDragging, setIsDragging] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
@@ -368,7 +370,7 @@ export const UploadMediaModal: React.FC<UploadMediaModalProps> = ({
                   Uploaded By
                 </label>
                 <Input
-                  placeholder="e.g. Sarthak Pandey"
+                  placeholder="e.g. Field Analyst"
                   value={uploadedBy}
                   onChange={(e) => setUploadedBy(e.target.value)}
                   disabled={isUploading}

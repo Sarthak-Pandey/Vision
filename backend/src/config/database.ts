@@ -13,7 +13,12 @@ const isConfigured =
   );
 
 export const supabase = isConfigured
-  ? createClient(config.supabaseUrl, config.supabaseServiceRoleKey)
+  ? createClient(config.supabaseUrl, config.supabaseServiceRoleKey, {
+      auth: {
+        persistSession: false,
+        autoRefreshToken: false,
+      },
+    })
   : null;
 
 export const isSupabaseConfigured = (): boolean =>

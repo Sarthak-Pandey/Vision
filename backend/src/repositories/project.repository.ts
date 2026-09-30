@@ -127,6 +127,9 @@ export class ProjectRepository {
         error = retry.error;
       }
 
+      if (error) {
+        console.error('[ProjectRepository] findById error:', error.message);
+      }
       if (error || !data) return null;
       const { assets, ...projectData } = data as any;
       const count = Array.isArray(assets) && assets.length > 0 ? Number(assets[0].count || 0) : 0;
