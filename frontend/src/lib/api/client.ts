@@ -23,7 +23,14 @@ import {
   ImpactReport,
 } from '@/types';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
+const rawApiUrl = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api').trim();
+const normalizedUrl = rawApiUrl.replace(/\/+$/, '');
+const API_BASE_URL = normalizedUrl.endsWith('/api') ? normalizedUrl : `${normalizedUrl}/api`;
+
+function buildUrl(endpoint: string): string {
+  const cleanEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
+  return `${API_BASE_URL}${cleanEndpoint}`;
+}
 
 async function request<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
   const token = typeof window !== 'undefined' ? localStorage.getItem('impact_access_token') : null;
@@ -33,7 +40,7 @@ async function request<T>(endpoint: string, options: RequestInit = {}): Promise<
     ...(options.headers as Record<string, string> || {}),
   };
 
-  const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+  const response = await fetch(buildUrl(endpoint), {
     ...options,
     headers,
   });
@@ -52,7 +59,7 @@ export async function loginApi(
   email: string,
   password: string
 ): Promise<{ token: string; user: any }> {
-  const response = await fetch(`${API_BASE_URL}/auth/login`, {
+  const response = await fetch(buildUrl('/auth/login'), {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ email, password }),
@@ -111,7 +118,7 @@ export async function uploadMediaFile(file: File): Promise<UploadMediaResponse> 
     ...(token ? { Authorization: `Bearer ${token}` } : {}),
   };
 
-  const response = await fetch(`${API_BASE_URL}/assets/upload`, {
+  const response = await fetch(buildUrl('/assets/upload'), {
     method: 'POST',
     headers,
     body: formData,

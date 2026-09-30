@@ -47,14 +47,18 @@ app.use(
   })
 );
 app.use(express.json({ limit: '25mb' }));
-app.use(express.urlencoded({ extended: true, limit: '25mb' }));
+// Normalize multiple slashes (e.g. //assets -> /assets)
+app.use((req, _res, next) => {
+  req.url = req.url.replace(/\/+/g, '/');
+  next();
+});
 
-// API Routes
-app.use('/api', healthRoutes);
-app.use('/api/auth', authRoutes);
-app.use('/api/projects', projectRoutes);
-app.use('/api/assets', assetRoutes);
-app.use('/api/search', searchRoutes);
+// API Routes (mounted at /api and fallback /)
+app.use(['/api', '/'], healthRoutes);
+app.use(['/api/auth', '/auth'], authRoutes);
+app.use(['/api/projects', '/projects'], projectRoutes);
+app.use(['/api/assets', '/assets'], assetRoutes);
+app.use(['/api/search', '/search'], searchRoutes);
 
 // 404 handler
 app.use((req, res) => {
