@@ -3,7 +3,7 @@ import { Project, CreateProjectInput, UpdateProjectInput } from '../types/index.
 import { randomUUID } from 'crypto';
 import { AssetRepository } from './asset.repository.js';
 
-// In-memory fallback store for development when Supabase URL/Key is not set
+// In-memory fallback store for offline tests and development when Supabase is not active
 const mockProjectsStore: Project[] = [
   {
     id: 'proj-1',

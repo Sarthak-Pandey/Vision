@@ -26,10 +26,11 @@ import {
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
 
 async function request<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
-  const headers = {
+  const token = typeof window !== 'undefined' ? localStorage.getItem('impact_access_token') : null;
+  const headers: Record<string, string> = {
     'Content-Type': 'application/json',
-    'x-demo-user': 'true',
-    ...(options.headers || {}),
+    ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    ...(options.headers as Record<string, string> || {}),
   };
 
   const response = await fetch(`${API_BASE_URL}${endpoint}`, {
@@ -45,6 +46,23 @@ async function request<T>(endpoint: string, options: RequestInit = {}): Promise<
   }
 
   return json.data as T;
+}
+
+export async function loginApi(
+  email: string,
+  password: string
+): Promise<{ token: string; user: any }> {
+  const response = await fetch(`${API_BASE_URL}/auth/login`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email, password }),
+  });
+
+  const json = await response.json();
+  if (!response.ok || !json.success) {
+    throw new Error(json.error?.message || 'Authentication failed');
+  }
+  return json.data;
 }
 
 export async function getHealth(): Promise<{ success: boolean; message: string }> {
@@ -88,11 +106,14 @@ export async function uploadMediaFile(file: File): Promise<UploadMediaResponse> 
   const formData = new FormData();
   formData.append('file', file);
 
+  const token = typeof window !== 'undefined' ? localStorage.getItem('impact_access_token') : null;
+  const headers: Record<string, string> = {
+    ...(token ? { Authorization: `Bearer ${token}` } : {}),
+  };
+
   const response = await fetch(`${API_BASE_URL}/assets/upload`, {
     method: 'POST',
-    headers: {
-      'x-demo-user': 'true',
-    },
+    headers,
     body: formData,
   });
 
