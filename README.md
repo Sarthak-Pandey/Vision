@@ -67,11 +67,31 @@ graph TD
 | **Phase 5** | **Before / After Intelligence** | Observable visual change comparison, duplicate prevention, chronological validation, side-by-side evidence UI | Completed |
 | **Phase 6** | **Evidence & Traceability** | Observable AI claims linked to verified original media, dual-source extraction (Phase 2 & Phase 5), deterministic deduplication, RLS/IDOR protection, Audit & Traceability UI | Completed |
 | **Phase 7** | **Evidence Gap Detection** | Rule-based expectation taxonomy, mathematical gap calculation (expected - available), project-type requirements, coverage telemetry, actionable collection suggestions | Completed |
-| **Phase 8** | **ESG Impact Reports** | Metric aggregation, PDF report generation, public verification share links | Planned |
+| **Phase 8** | **Evidence Confidence System** | Deterministic 5-signal composite heuristic score (Vision 40%, Metadata 20%, Image Quality 15%, Cross-Asset 15%, Temporal 10%), weight normalization, explainable breakdown UI | Completed |
+| **Phase 9** | **ESG Impact Reports** | Metric aggregation, PDF report generation, public verification share links | Planned |
 
 ---
 
 ## Key Features
+
+### Phase 8: Evidence Confidence System
+
+- **Deterministic Multi-Signal Composite Engine**: Computes an explainable MVP composite score evaluating evidence signal strength without invoking additional AI models or uncalibrated probabilities:
+  $$\text{Final Confidence} = \frac{\sum (\text{signal}_i \times \text{weight}_i)}{\sum \text{available weights}}$$
+- **Centralized MVP Heuristic Weight Configuration**:
+  - **Vision Confidence (40%)**: Extracted from Phase 2 multimodal image analyses and Phase 5 Before/After visual change scores.
+  - **Metadata Consistency (20%)**: Verifies internal coherence across geographic GPS coordinate site boundaries, valid media types, and project ownership bounds.
+  - **Image Quality (15%)**: Evaluates asset readability, resolution indicators, secure CDN delivery, and format suitability.
+  - **Cross-Asset Agreement (15%)**: Corroborates directional consistency across multiple project evidence assets and comparisons without penalizing single-photo claims.
+  - **Temporal Consistency (10%)**: Strictly validates chronological progression (`before <= after`) and intervention timeline alignment.
+- **Robust Missing-Signal Normalization**: Missing metadata or single-photo records do not score as zero or false; instead, weights are normalized over available signals to prevent penalizing incomplete records.
+- **Deterministic 3-Tier Classification**:
+  - `score < 40` $\rightarrow$ **LOW** (*Review source evidence before relying on this observation*)
+  - `40 <= score < 70` $\rightarrow$ **MEDIUM** (*Some evidence signals are mixed or limited*)
+  - `score >= 70` $\rightarrow$ **HIGH** (*Strong agreement across currently available evidence signals*)
+- **Explainable Multi-Signal Breakdown UI**: Compact pill badges and expandable 5-signal telemetry cards displaying component percentages, evaluated weights sum, and clear contextual guidance.
+- **Mandatory MVP Heuristic Transparency Disclaimer**:
+  > *"Composite MVP heuristic based on available evidence signals. Not a scientifically validated probability."*
 
 ### Phase 7: Evidence Gap Detection
 
@@ -225,6 +245,8 @@ npm run dev
 | `POST` | `/api/projects/:projectId/claims` | Create a verified evidence-backed claim | `{ claim, confidence, sourceType, evidenceAssetIds }` |
 | `POST` | `/api/projects/:projectId/claims/sync` | Extract and sync claims from all project media & comparisons | `projectId: UUID` |
 | `GET` | `/api/projects/:projectId/evidence-gaps` | Evaluate expected vs available evidence and detect gaps | `projectId: UUID` |
+| `GET` | `/api/projects/:projectId/confidence` | Get project-level composite confidence telemetry and breakdown | `projectId: UUID` |
+| `POST` | `/api/projects/:projectId/confidence/calculate` | Test composite confidence calculation from custom signals | `{ signals: ConfidenceSignals }` |
 
 ---
 

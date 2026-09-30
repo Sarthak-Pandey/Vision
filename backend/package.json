@@ -10,7 +10,7 @@
     "start": "tsx watch src/server.ts",
     "start:prod": "node dist/server.js",
     "typecheck": "tsc --noEmit",
-    "test": "tsx test-phase-5.ts && tsx test-phase-6.ts && tsx test-phase-7.ts && tsx test-regression.ts"
+    "test": "tsx test-phase-5.ts && tsx test-phase-6.ts && tsx test-phase-7.ts && tsx test-phase-8.ts && tsx test-regression.ts"
   },
 
   "dependencies": {
