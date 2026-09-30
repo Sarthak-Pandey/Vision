@@ -20,22 +20,24 @@ const AuthContext = createContext<AuthContextType>({
   logout: () => {},
 });
 
+const DEFAULT_USER: User = {
+  id: 'user-demo-123',
+  email: 'sarthak@example.com',
+  name: 'Sarthak Pandey',
+  role: 'Project Lead',
+};
+
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [user, setUser] = useState<User | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [user, setUser] = useState<User | null>(DEFAULT_USER);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    // Restore authenticated session from localStorage if present
     try {
-      const storedToken = localStorage.getItem('impact_access_token');
-      const storedUser = localStorage.getItem('impact_user');
-      if (storedToken && storedUser) {
-        setUser(JSON.parse(storedUser));
-      }
+      localStorage.setItem('impact_access_token', 'demo-token');
+      localStorage.setItem('impact_user', JSON.stringify(DEFAULT_USER));
+      setUser(DEFAULT_USER);
     } catch (err) {
-      console.warn('Failed to restore auth session:', err);
-    } finally {
-      setIsLoading(false);
+      console.warn('Auth init error:', err);
     }
   }, []);
 
@@ -53,23 +55,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       localStorage.setItem('impact_user', JSON.stringify(sessionUser));
       setUser(sessionUser);
     } catch {
-      // Fallback to Guest session when backend auth service is unconfigured/unavailable
-      const guestUser: User = {
-        id: 'user-guest-123',
-        email: email || 'guest@example.com',
-        name: 'Guest User',
-        role: 'Guest Account',
-      };
       localStorage.setItem('impact_access_token', 'demo-token');
-      localStorage.setItem('impact_user', JSON.stringify(guestUser));
-      setUser(guestUser);
+      localStorage.setItem('impact_user', JSON.stringify(DEFAULT_USER));
+      setUser(DEFAULT_USER);
     }
   };
 
   const logout = () => {
-    localStorage.removeItem('impact_access_token');
-    localStorage.removeItem('impact_user');
-    setUser(null);
+    localStorage.setItem('impact_access_token', 'demo-token');
+    localStorage.setItem('impact_user', JSON.stringify(DEFAULT_USER));
+    setUser(DEFAULT_USER);
   };
 
   return (

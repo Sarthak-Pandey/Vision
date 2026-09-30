@@ -17,7 +17,7 @@ export const Header: React.FC = () => {
 
   const handleLogout = () => {
     logout();
-    router.push('/login');
+    router.push('/dashboard');
   };
 
   const dropdownItems = [

@@ -9,12 +9,8 @@ export default function Home() {
   const { isAuthenticated } = useAuth();
 
   useEffect(() => {
-    if (isAuthenticated) {
-      router.replace('/dashboard');
-    } else {
-      router.replace('/login');
-    }
-  }, [isAuthenticated, router]);
+    router.replace('/dashboard');
+  }, [router]);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-secondary-bg">

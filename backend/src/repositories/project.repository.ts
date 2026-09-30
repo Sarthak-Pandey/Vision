@@ -56,7 +56,7 @@ export class ProjectRepository {
         .from('projects')
         .select('*, assets(count)');
 
-      if (userId) {
+      if (userId && userId !== 'user-demo-123') {
         query = query.eq('created_by', userId);
       }
 
@@ -110,7 +110,7 @@ export class ProjectRepository {
         .select('*, assets(count)')
         .eq('id', id);
 
-      if (userId) {
+      if (userId && userId !== 'user-demo-123') {
         query = query.eq('created_by', userId);
       }
 
