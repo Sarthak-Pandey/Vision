@@ -8,9 +8,6 @@ export class AuthService {
       throw new UnauthorizedError('No authentication token provided');
     }
 
-    const allowDemo =
-      process.env.ALLOW_DEMO_MODE === 'true' && process.env.NODE_ENV !== 'production';
-
     if (token === 'demo-token' || token.startsWith('user-demo-') || token.startsWith('demo-')) {
       const demoId = token.startsWith('user-demo-') || token.startsWith('demo-')
         ? token
