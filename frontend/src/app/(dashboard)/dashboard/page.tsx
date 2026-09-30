@@ -260,9 +260,9 @@ export default function DashboardPage() {
             ))}
           </div>
         ) : recentMedia.length === 0 ? (
-          <div className="p-8 text-center bg-white border border-border rounded-xl space-y-2">
-            <Images className="w-8 h-8 text-muted-text/50 mx-auto" />
-            <p className="text-xs text-secondary-text">No media assets uploaded yet.</p>
+          <div className="p-8 text-center bg-card text-card-foreground border border-border rounded-xl space-y-2 shadow-2xs">
+            <Images className="w-8 h-8 text-muted-foreground/50 mx-auto" />
+            <p className="text-xs text-muted-foreground">No media assets uploaded yet.</p>
             <Link href="/media">
               <Button size="sm" variant="secondary" className="mt-2 text-xs">
                 Upload Media
@@ -274,9 +274,9 @@ export default function DashboardPage() {
             {recentMedia.map((item) => (
               <div
                 key={item.id}
-                className="bg-white border border-border rounded-xl overflow-hidden group hover:border-gray-300 transition-all duration-200"
+                className="bg-card text-card-foreground border border-border rounded-xl overflow-hidden group hover:border-border/80 transition-all duration-200 shadow-2xs"
               >
-                <div className="aspect-square bg-secondary-bg relative overflow-hidden">
+                <div className="aspect-square bg-muted relative overflow-hidden">
                   <img
                     src={item.url}
                     alt={item.ai_analysis?.scene || 'Field evidence'}

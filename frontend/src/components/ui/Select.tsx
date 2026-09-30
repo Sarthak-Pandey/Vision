@@ -17,15 +17,15 @@ export const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
     return (
       <div className="w-full flex flex-col gap-1.5">
         {label && (
-          <label className="text-xs font-semibold text-primary-text tracking-wide">
+          <label className="text-xs font-semibold text-foreground tracking-wide select-none">
             {label}
           </label>
         )}
         <select
           ref={ref}
           className={cn(
-            'w-full h-10 px-3.5 py-2 text-sm bg-white border border-border rounded-lg text-primary-text focus:outline-none focus:border-brand-orange focus:ring-1 focus:ring-brand-orange transition-colors cursor-pointer',
-            error && 'border-status-error focus:border-status-error',
+            'flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-2xs transition-all duration-150 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer',
+            error && 'border-destructive focus-visible:ring-destructive',
             className
           )}
           {...props}
@@ -36,7 +36,7 @@ export const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
             </option>
           ))}
         </select>
-        {error && <p className="text-xs text-status-error">{error}</p>}
+        {error && <p className="text-xs text-destructive font-medium mt-0.5">{error}</p>}
       </div>
     );
   }

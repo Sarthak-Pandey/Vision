@@ -61,7 +61,7 @@ export default function ProjectsPage() {
       </div>
 
       {/* Controls Bar */}
-      <div className="flex flex-col sm:flex-row items-center justify-between gap-3 bg-white p-3 rounded-xl border border-border">
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-3 bg-card p-3 rounded-xl border border-border shadow-2xs">
         <div className="w-full sm:w-80">
           <SearchInput
             placeholder="Search projects by name or location..."
@@ -71,13 +71,13 @@ export default function ProjectsPage() {
         </div>
 
         <div className="flex items-center gap-2 self-end sm:self-auto">
-          <div className="flex items-center bg-secondary-bg p-1 rounded-lg border border-border">
+          <div className="flex items-center bg-muted p-1 rounded-lg border border-border">
             <button
               onClick={() => setViewMode('grid')}
               className={`p-1.5 rounded-md transition-colors ${
                 viewMode === 'grid'
-                  ? 'bg-white text-brand-dark-orange shadow-xs'
-                  : 'text-secondary-text hover:text-primary-text'
+                  ? 'bg-background text-foreground shadow-2xs font-semibold'
+                  : 'text-muted-foreground hover:text-foreground'
               }`}
               aria-label="Grid View"
             >
@@ -87,8 +87,8 @@ export default function ProjectsPage() {
               onClick={() => setViewMode('list')}
               className={`p-1.5 rounded-md transition-colors ${
                 viewMode === 'list'
-                  ? 'bg-white text-brand-dark-orange shadow-xs'
-                  : 'text-secondary-text hover:text-primary-text'
+                  ? 'bg-background text-foreground shadow-2xs font-semibold'
+                  : 'text-muted-foreground hover:text-foreground'
               }`}
               aria-label="List View"
             >
@@ -128,7 +128,7 @@ export default function ProjectsPage() {
           ))}
         </div>
       ) : (
-        <div className="bg-white border border-border rounded-xl divide-y divide-border overflow-hidden">
+        <div className="bg-card border border-border rounded-xl divide-y divide-border overflow-hidden shadow-2xs">
           {filteredProjects.map((project) => (
             <Link
               key={project.id}

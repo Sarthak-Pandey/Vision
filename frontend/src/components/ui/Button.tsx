@@ -3,7 +3,7 @@ import { cn } from '@/lib/utils/cn';
 
 export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: 'primary' | 'secondary' | 'outline' | 'ghost' | 'danger';
-  size?: 'sm' | 'md' | 'lg';
+  size?: 'sm' | 'md' | 'lg' | 'icon';
   isLoading?: boolean;
 }
 
@@ -16,20 +16,27 @@ export const Button: React.FC<ButtonProps> = ({
   disabled,
   ...props
 }) => {
-  const baseStyles = 'inline-flex items-center justify-center font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-brand-orange/40 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed';
+  const baseStyles =
+    'inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-all focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 active:scale-[0.98] select-none';
 
   const variants = {
-    primary: 'bg-brand-orange text-white hover:bg-brand-dark-orange active:bg-brand-dark-orange shadow-sm',
-    secondary: 'bg-secondary-bg text-primary-text hover:bg-border border border-border',
-    outline: 'bg-white text-primary-text border border-border hover:bg-secondary-bg',
-    ghost: 'bg-transparent text-secondary-text hover:text-primary-text hover:bg-secondary-bg',
-    danger: 'bg-status-error text-white hover:bg-red-700 shadow-sm',
+    primary:
+      'bg-primary text-primary-foreground hover:bg-primary/90 shadow-2xs font-medium',
+    secondary:
+      'bg-secondary text-secondary-foreground hover:bg-secondary/80 border border-border/40 shadow-2xs',
+    outline:
+      'border border-input bg-background hover:bg-accent hover:text-accent-foreground shadow-2xs',
+    ghost:
+      'hover:bg-accent hover:text-accent-foreground',
+    danger:
+      'bg-destructive text-destructive-foreground hover:bg-destructive/90 shadow-2xs font-medium',
   };
 
   const sizes = {
-    sm: 'text-xs px-3 py-1.5 h-8',
-    md: 'text-sm px-4 py-2 h-10',
-    lg: 'text-base px-5 py-2.5 h-11',
+    sm: 'h-8 rounded-md px-3 text-xs gap-1.5',
+    md: 'h-9 px-4 py-2 text-sm gap-2',
+    lg: 'h-10 rounded-md px-6 text-base gap-2',
+    icon: 'h-9 w-9 p-0',
   };
 
   return (

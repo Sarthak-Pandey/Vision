@@ -10,13 +10,13 @@ export default function ReportsPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-primary-text tracking-tight">Reports</h1>
-        <p className="text-sm text-secondary-text mt-0.5">
+        <h1 className="text-2xl font-bold text-foreground tracking-tight">Reports</h1>
+        <p className="text-sm text-muted-foreground mt-0.5">
           Generate and manage project impact reports.
         </p>
       </div>
 
-      <div className="bg-white border border-border rounded-xl p-8">
+      <div className="bg-card text-card-foreground border border-border rounded-xl p-8 shadow-2xs">
         <EmptyState
           icon={<FileText className="w-10 h-10 text-muted-text" />}
           title="No reports yet"
