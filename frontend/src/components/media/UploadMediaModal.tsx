@@ -30,7 +30,7 @@ export const UploadMediaModal: React.FC<UploadMediaModalProps> = ({
   const [captureDate, setCaptureDate] = useState<string>(new Date().toISOString().split('T')[0]);
   const [latitude, setLatitude] = useState<string>('');
   const [longitude, setLongitude] = useState<string>('');
-  const [uploadedBy, setUploadedBy] = useState<string>('Sarthak Pandey');
+  const [uploadedBy, setUploadedBy] = useState<string>('Guest User');
 
   const [isDragging, setIsDragging] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
@@ -368,7 +368,7 @@ export const UploadMediaModal: React.FC<UploadMediaModalProps> = ({
                   Uploaded By
                 </label>
                 <Input
-                  placeholder="e.g. Sarthak Pandey"
+                  placeholder="e.g. Guest User"
                   value={uploadedBy}
                   onChange={(e) => setUploadedBy(e.target.value)}
                   disabled={isUploading}

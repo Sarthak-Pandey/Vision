@@ -1,19 +1,19 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import Link from 'next/link';
-import { Plus, FolderKanban, Images, Activity, ShieldCheck, ArrowRight, MapPin } from 'lucide-react';
+import { Plus, FolderKanban, Images, Activity, ShieldCheck, ArrowRight, MapPin, UploadCloud } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { StatCard } from '@/components/ui/StatCard';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
 import { CreateProjectModal } from '@/components/projects/CreateProjectModal';
 import { getProjects, getAssets } from '@/lib/api/client';
-import { Project, MediaAsset } from '@/types';
+import { Project, MediaAssetWithAnalysis } from '@/types';
 
 export default function DashboardPage() {
   const [projects, setProjects] = useState<Project[]>([]);
-  const [assets, setAssets] = useState<MediaAsset[]>([]);
+  const [assets, setAssets] = useState<MediaAssetWithAnalysis[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -37,38 +37,40 @@ export default function DashboardPage() {
     fetchDashboardData();
   }, []);
 
-  const sampleRecentMedia = [
-    {
-      id: 'm1',
-      url: 'https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?w=600&auto=format&fit=crop&q=60',
-      title: 'Riverbank Clean Up',
-      date: 'Feb 10, 2025',
-    },
-    {
-      id: 'm2',
-      url: 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=600&auto=format&fit=crop&q=60',
-      title: 'Solar Array Inspection',
-      date: 'Feb 15, 2025',
-    },
-    {
-      id: 'm3',
-      url: 'https://images.unsplash.com/photo-1509391365360-2e959784a276?w=600&auto=format&fit=crop&q=60',
-      title: 'Solar Panel Grid',
-      date: 'Jan 20, 2025',
-    },
-    {
-      id: 'm4',
-      url: 'https://images.unsplash.com/photo-1532996122724-e3c354a0b15b?w=600&auto=format&fit=crop&q=60',
-      title: 'Waste Sorting Station',
-      date: 'Jan 12, 2025',
-    },
-    {
-      id: 'm5',
-      url: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=600&auto=format&fit=crop&q=60',
-      title: 'Afforestation Site B',
-      date: 'Dec 05, 2024',
-    },
-  ];
+  // Compute distinct activities from AI analysis
+  const distinctActivities = useMemo(() => {
+    const set = new Set<string>();
+    assets.forEach((a) => {
+      (a.ai_analysis?.activities || []).forEach((act) => set.add(act));
+    });
+    return Array.from(set);
+  }, [assets]);
+
+  // Compute verified evidence count
+  const evidenceCount = useMemo(() => {
+    return assets.filter((a) => !!a.ai_analysis).length;
+  }, [assets]);
+
+  // Compute activity distribution dynamically
+  const activityDistribution = useMemo(() => {
+    const counts = new Map<string, number>();
+    assets.forEach((a) => {
+      (a.ai_analysis?.activities || []).forEach((act) => {
+        counts.set(act, (counts.get(act) || 0) + 1);
+      });
+    });
+    const total = Array.from(counts.values()).reduce((sum, n) => sum + n, 0);
+    return Array.from(counts.entries())
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 4)
+      .map(([name, count]) => ({
+        name,
+        count,
+        percent: total > 0 ? Math.round((count / total) * 100) : 0,
+      }));
+  }, [assets]);
+
+  const recentMedia = assets.slice(0, 5);
 
   return (
     <div className="space-y-8">
@@ -90,27 +92,23 @@ export default function DashboardPage() {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard
           title="Projects"
-          value={projects.length || 12}
+          value={projects.length}
           icon={<FolderKanban className="w-4 h-4 text-brand-orange" />}
-          trend={{ value: '12%', positive: true }}
         />
         <StatCard
           title="Media Assets"
-          value={248}
+          value={assets.length}
           icon={<Images className="w-4 h-4 text-brand-orange" />}
-          trend={{ value: '18%', positive: true }}
         />
         <StatCard
           title="Activities"
-          value={34}
+          value={distinctActivities.length}
           icon={<Activity className="w-4 h-4 text-brand-orange" />}
-          trend={{ value: '5%', positive: true }}
         />
         <StatCard
-          title="Evidence"
-          value={186}
+          title="Evidence Records"
+          value={evidenceCount}
           icon={<ShieldCheck className="w-4 h-4 text-brand-orange" />}
-          trend={{ value: '24%', positive: true }}
         />
       </div>
 
@@ -140,7 +138,19 @@ export default function DashboardPage() {
                   <div className="h-14 bg-secondary-bg animate-pulse rounded-lg" />
                 </div>
               ) : projects.length === 0 ? (
-                <div className="py-8 text-center text-xs text-secondary-text">No projects available yet.</div>
+                <div className="py-12 text-center space-y-3">
+                  <div className="w-12 h-12 rounded-full bg-brand-light-orange text-brand-dark-orange flex items-center justify-center mx-auto">
+                    <FolderKanban className="w-6 h-6" />
+                  </div>
+                  <div>
+                    <h4 className="text-sm font-semibold text-primary-text">No projects yet</h4>
+                    <p className="text-xs text-secondary-text mt-1">Get started by creating your first field impact project.</p>
+                  </div>
+                  <Button size="sm" onClick={() => setIsModalOpen(true)} className="gap-2">
+                    <Plus className="w-3.5 h-3.5" />
+                    <span>Create Project</span>
+                  </Button>
+                </div>
               ) : (
                 <div className="divide-y divide-border">
                   {projects.slice(0, 4).map((proj) => (
@@ -165,7 +175,7 @@ export default function DashboardPage() {
                           )}
                         </div>
                       </div>
-                      <Badge variant="orange">37 media</Badge>
+                      <Badge variant="orange">{proj.media_count || 0} media</Badge>
                     </Link>
                   ))}
                 </div>
@@ -184,50 +194,47 @@ export default function DashboardPage() {
               </div>
             </CardHeader>
             <CardContent className="space-y-4 pt-2">
-              <div className="space-y-3">
-                <div>
-                  <div className="flex justify-between text-xs font-medium mb-1">
-                    <span className="text-primary-text">River Cleaning</span>
-                    <span className="text-secondary-text">42 assets</span>
-                  </div>
-                  <div className="w-full h-2 bg-secondary-bg rounded-full overflow-hidden">
-                    <div className="h-full bg-brand-orange rounded-full" style={{ width: '85%' }} />
-                  </div>
+              {isLoading ? (
+                <div className="space-y-3 py-4">
+                  <div className="h-8 bg-secondary-bg animate-pulse rounded-lg" />
+                  <div className="h-8 bg-secondary-bg animate-pulse rounded-lg" />
                 </div>
-
-                <div>
-                  <div className="flex justify-between text-xs font-medium mb-1">
-                    <span className="text-primary-text">Plantation & Reforestation</span>
-                    <span className="text-secondary-text">28 assets</span>
-                  </div>
-                  <div className="w-full h-2 bg-secondary-bg rounded-full overflow-hidden">
-                    <div className="h-full bg-brand-orange/80 rounded-full" style={{ width: '60%' }} />
-                  </div>
+              ) : activityDistribution.length === 0 ? (
+                <div className="py-8 text-center space-y-2">
+                  <Activity className="w-8 h-8 text-muted-text/50 mx-auto" />
+                  <p className="text-xs text-secondary-text">
+                    No field activities detected yet. Upload project media to automatically extract evidence activities.
+                  </p>
                 </div>
-
-                <div>
-                  <div className="flex justify-between text-xs font-medium mb-1">
-                    <span className="text-primary-text">Solar Panel Setup</span>
-                    <span className="text-secondary-text">19 assets</span>
-                  </div>
-                  <div className="w-full h-2 bg-secondary-bg rounded-full overflow-hidden">
-                    <div className="h-full bg-brand-orange/60 rounded-full" style={{ width: '40%' }} />
-                  </div>
+              ) : (
+                <div className="space-y-3">
+                  {activityDistribution.map((item, idx) => (
+                    <div key={item.name}>
+                      <div className="flex justify-between text-xs font-medium mb-1">
+                        <span className="text-primary-text capitalize">{item.name}</span>
+                        <span className="text-secondary-text">{item.count} asset{item.count === 1 ? '' : 's'}</span>
+                      </div>
+                      <div className="w-full h-2 bg-secondary-bg rounded-full overflow-hidden">
+                        <div
+                          className={`h-full rounded-full ${
+                            idx === 0
+                              ? 'bg-brand-orange'
+                              : idx === 1
+                              ? 'bg-brand-orange/80'
+                              : idx === 2
+                              ? 'bg-brand-orange/60'
+                              : 'bg-brand-orange/40'
+                          }`}
+                          style={{ width: `${Math.max(item.percent, 8)}%` }}
+                        />
+                      </div>
+                    </div>
+                  ))}
                 </div>
-
-                <div>
-                  <div className="flex justify-between text-xs font-medium mb-1">
-                    <span className="text-primary-text">Waste Audit</span>
-                    <span className="text-secondary-text">12 assets</span>
-                  </div>
-                  <div className="w-full h-2 bg-secondary-bg rounded-full overflow-hidden">
-                    <div className="h-full bg-brand-orange/40 rounded-full" style={{ width: '25%' }} />
-                  </div>
-                </div>
-              </div>
+              )}
 
               <div className="p-3 bg-secondary-bg rounded-lg border border-border text-xs text-secondary-text">
-                <span className="font-semibold text-primary-text">34 total activities</span> indexed across active field zones this month.
+                <span className="font-semibold text-primary-text">{distinctActivities.length} total activities</span> indexed across active field zones.
               </div>
             </CardContent>
           </Card>
@@ -246,26 +253,54 @@ export default function DashboardPage() {
           </Link>
         </div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
-          {sampleRecentMedia.map((item) => (
-            <div
-              key={item.id}
-              className="bg-white border border-border rounded-xl overflow-hidden group hover:border-gray-300 transition-all duration-200"
-            >
-              <div className="aspect-square bg-secondary-bg relative overflow-hidden">
-                <img
-                  src={item.url}
-                  alt={item.title}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                />
+        {isLoading ? (
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
+            {[1, 2, 3, 4, 5].map((i) => (
+              <div key={i} className="aspect-square bg-secondary-bg animate-pulse rounded-xl" />
+            ))}
+          </div>
+        ) : recentMedia.length === 0 ? (
+          <div className="p-8 text-center bg-card text-card-foreground border border-border rounded-xl space-y-2 shadow-2xs">
+            <Images className="w-8 h-8 text-muted-foreground/50 mx-auto" />
+            <p className="text-xs text-muted-foreground">No media assets uploaded yet.</p>
+            <Link href="/media">
+              <Button size="sm" variant="secondary" className="mt-2 text-xs">
+                Upload Media
+              </Button>
+            </Link>
+          </div>
+        ) : (
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
+            {recentMedia.map((item) => (
+              <div
+                key={item.id}
+                className="bg-card text-card-foreground border border-border rounded-xl overflow-hidden group hover:border-border/80 transition-all duration-200 shadow-2xs"
+              >
+                <div className="aspect-square bg-muted relative overflow-hidden">
+                  <img
+                    src={item.url}
+                    alt={item.ai_analysis?.scene || 'Field evidence'}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                  />
+                </div>
+                <div className="p-2.5">
+                  <p className="text-xs font-semibold text-primary-text truncate">
+                    {item.ai_analysis?.activities?.[0] || item.ai_analysis?.scene || 'Evidence Asset'}
+                  </p>
+                  <p className="text-[11px] text-muted-text mt-0.5">
+                    {item.capture_date
+                      ? new Date(item.capture_date).toLocaleDateString('en-US', {
+                          month: 'short',
+                          day: 'numeric',
+                          year: 'numeric',
+                        })
+                      : 'Undated'}
+                  </p>
+                </div>
               </div>
-              <div className="p-2.5">
-                <p className="text-xs font-semibold text-primary-text truncate">{item.title}</p>
-                <p className="text-[11px] text-muted-text mt-0.5">{item.date}</p>
-              </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Create Project Modal */}

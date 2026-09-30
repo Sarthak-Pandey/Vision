@@ -199,5 +199,129 @@ CREATE TABLE IF NOT EXISTS reports (
 
 CREATE INDEX IF NOT EXISTS reports_project_id_idx ON reports(project_id);
 
+-- ============================================================================
+-- Row Level Security (RLS) & Multi-Tenant Isolation Policies
+-- ============================================================================
+
+ALTER TABLE "public"."projects" ENABLE ROW LEVEL SECURITY;
+ALTER TABLE "public"."assets" ENABLE ROW LEVEL SECURITY;
+ALTER TABLE "public"."ai_analysis" ENABLE ROW LEVEL SECURITY;
+ALTER TABLE "public"."embeddings" ENABLE ROW LEVEL SECURITY;
+ALTER TABLE "public"."comparisons" ENABLE ROW LEVEL SECURITY;
+ALTER TABLE "public"."evidence_claims" ENABLE ROW LEVEL SECURITY;
+ALTER TABLE "public"."claim_evidence" ENABLE ROW LEVEL SECURITY;
+ALTER TABLE "public"."reports" ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Users can manage own projects" ON public.projects;
+CREATE POLICY "Users can manage own projects" ON public.projects
+  FOR ALL TO authenticated
+  USING (created_by = auth.uid()::text)
+  WITH CHECK (created_by = auth.uid()::text);
+
+DROP POLICY IF EXISTS "Users can access assets of own projects" ON public.assets;
+CREATE POLICY "Users can access assets of own projects" ON public.assets
+  FOR ALL TO authenticated
+  USING (
+    EXISTS (
+      SELECT 1 FROM public.projects p
+      WHERE p.id = assets.project_id AND p.created_by = auth.uid()::text
+    )
+  )
+  WITH CHECK (
+    EXISTS (
+      SELECT 1 FROM public.projects p
+      WHERE p.id = assets.project_id AND p.created_by = auth.uid()::text
+    )
+  );
+
+DROP POLICY IF EXISTS "Users can access ai_analysis of own assets" ON public.ai_analysis;
+CREATE POLICY "Users can access ai_analysis of own assets" ON public.ai_analysis
+  FOR ALL TO authenticated
+  USING (
+    EXISTS (
+      SELECT 1 FROM public.assets a
+      JOIN public.projects p ON a.project_id = p.id
+      WHERE a.id = ai_analysis.asset_id AND p.created_by = auth.uid()::text
+    )
+  );
+
+DROP POLICY IF EXISTS "Users can access embeddings of own assets" ON public.embeddings;
+CREATE POLICY "Users can access embeddings of own assets" ON public.embeddings
+  FOR ALL TO authenticated
+  USING (
+    EXISTS (
+      SELECT 1 FROM public.assets a
+      JOIN public.projects p ON a.project_id = p.id
+      WHERE a.id = embeddings.asset_id AND p.created_by = auth.uid()::text
+    )
+  );
+
+DROP POLICY IF EXISTS "Users can manage comparisons of own projects" ON public.comparisons;
+CREATE POLICY "Users can manage comparisons of own projects" ON public.comparisons
+  FOR ALL TO authenticated
+  USING (
+    EXISTS (
+      SELECT 1 FROM public.projects p
+      WHERE p.id = comparisons.project_id AND p.created_by = auth.uid()::text
+    )
+  )
+  WITH CHECK (
+    EXISTS (
+      SELECT 1 FROM public.projects p
+      WHERE p.id = comparisons.project_id AND p.created_by = auth.uid()::text
+    )
+  );
+
+DROP POLICY IF EXISTS "Users can manage claims of own projects" ON public.evidence_claims;
+CREATE POLICY "Users can manage claims of own projects" ON public.evidence_claims
+  FOR ALL TO authenticated
+  USING (
+    EXISTS (
+      SELECT 1 FROM public.projects p
+      WHERE p.id = evidence_claims.project_id AND p.created_by = auth.uid()::text
+    )
+  )
+  WITH CHECK (
+    EXISTS (
+      SELECT 1 FROM public.projects p
+      WHERE p.id = evidence_claims.project_id AND p.created_by = auth.uid()::text
+    )
+  );
+
+DROP POLICY IF EXISTS "Users can manage claim_evidence of own projects" ON public.claim_evidence;
+CREATE POLICY "Users can manage claim_evidence of own projects" ON public.claim_evidence
+  FOR ALL TO authenticated
+  USING (
+    EXISTS (
+      SELECT 1 FROM public.evidence_claims ec
+      JOIN public.projects p ON ec.project_id = p.id
+      WHERE ec.id = claim_evidence.claim_id AND p.created_by = auth.uid()::text
+    )
+  )
+  WITH CHECK (
+    EXISTS (
+      SELECT 1 FROM public.evidence_claims ec
+      JOIN public.projects p ON ec.project_id = p.id
+      WHERE ec.id = claim_evidence.claim_id AND p.created_by = auth.uid()::text
+    )
+  );
+
+DROP POLICY IF EXISTS "Users can manage reports of own projects" ON public.reports;
+CREATE POLICY "Users can manage reports of own projects" ON public.reports
+  FOR ALL TO authenticated
+  USING (
+    EXISTS (
+      SELECT 1 FROM public.projects p
+      WHERE p.id = reports.project_id AND p.created_by = auth.uid()::text
+    )
+  )
+  WITH CHECK (
+    EXISTS (
+      SELECT 1 FROM public.projects p
+      WHERE p.id = reports.project_id AND p.created_by = auth.uid()::text
+    )
+  );
+
+
 
 

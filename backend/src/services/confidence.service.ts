@@ -78,10 +78,12 @@ export class ConfidenceService {
     if (score === null || score === undefined) {
       return 'UNAVAILABLE';
     }
-    if (score < 0.40) {
+    // Round to 4 decimal places to eliminate IEEE 754 floating-point drift (e.g. 0.6999999999999997 -> 0.70)
+    const normalized = Math.round(score * 10000) / 10000;
+    if (normalized < 0.40) {
       return 'LOW';
     }
-    if (score < 0.70) {
+    if (normalized < 0.70) {
       return 'MEDIUM';
     }
     return 'HIGH';
@@ -233,11 +235,12 @@ export class ConfidenceService {
     // Normalized score over available weights
     const rawScore = weightedSum / availableWeightsSum;
     const clampedScore = Math.min(Math.max(rawScore, 0), 1);
-    const percentage = Math.round(clampedScore * 100);
-    const level = this.classify(clampedScore);
+    const roundedScore = Math.round(clampedScore * 1000000) / 1000000;
+    const percentage = Math.round(roundedScore * 100);
+    const level = this.classify(roundedScore);
 
     return {
-      score: clampedScore,
+      score: roundedScore,
       percentage,
       level,
       available: true,

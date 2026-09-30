@@ -8,6 +8,19 @@ export class AuthController {
     this.authService = new AuthService();
   }
 
+  login = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const { email, password } = req.body || {};
+      const result = await this.authService.signIn(email, password);
+      res.status(200).json({
+        success: true,
+        data: result,
+      });
+    } catch (error) {
+      next(error);
+    }
+  };
+
   me = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       const user = (req as any).user;

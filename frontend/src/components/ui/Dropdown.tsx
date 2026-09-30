@@ -36,7 +36,7 @@ export const Dropdown: React.FC<DropdownProps> = ({ trigger, items, align = 'rig
       {isOpen && (
         <div
           className={cn(
-            'absolute z-50 mt-2 w-48 rounded-xl bg-white border border-border shadow-lg py-1 text-sm animate-in fade-in slide-in-from-top-2 duration-150',
+            'absolute z-50 mt-1.5 min-w-[10rem] overflow-hidden rounded-md border border-border bg-popover text-popover-foreground shadow-md p-1 text-sm animate-in fade-in-80 zoom-in-95 duration-100',
             align === 'right' ? 'right-0' : 'left-0'
           )}
         >
@@ -48,12 +48,12 @@ export const Dropdown: React.FC<DropdownProps> = ({ trigger, items, align = 'rig
                 setIsOpen(false);
               }}
               className={cn(
-                'w-full flex items-center gap-2.5 px-4 py-2 text-xs font-medium text-left hover:bg-secondary-bg transition-colors',
-                item.danger ? 'text-status-error hover:bg-red-50' : 'text-primary-text'
+                'relative flex w-full cursor-pointer select-none items-center gap-2 rounded-sm px-2.5 py-1.5 text-xs font-medium outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground',
+                item.danger && 'text-destructive hover:bg-destructive/10 hover:text-destructive focus:bg-destructive/10'
               )}
             >
-              {item.icon && <span className="w-4 h-4">{item.icon}</span>}
-              {item.label}
+              {item.icon && <span className="w-4 h-4 shrink-0 text-muted-foreground">{item.icon}</span>}
+              <span>{item.label}</span>
             </button>
           ))}
         </div>

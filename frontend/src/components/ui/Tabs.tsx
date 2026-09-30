@@ -18,7 +18,7 @@ export interface TabsProps {
 
 export const Tabs: React.FC<TabsProps> = ({ tabs, activeTab, onChange, className }) => {
   return (
-    <div className={cn('flex items-center gap-1 border-b border-border', className)}>
+    <div className={cn('inline-flex h-9 items-center justify-center rounded-lg bg-muted p-1 text-muted-foreground select-none', className)}>
       {tabs.map((tab) => {
         const isActive = activeTab === tab.id;
         return (
@@ -26,18 +26,18 @@ export const Tabs: React.FC<TabsProps> = ({ tabs, activeTab, onChange, className
             key={tab.id}
             onClick={() => onChange(tab.id)}
             className={cn(
-              'flex items-center gap-2 px-4 py-2.5 text-sm font-medium border-b-2 transition-all cursor-pointer -mb-px',
+              'inline-flex items-center justify-center whitespace-nowrap rounded-md px-3 py-1 text-xs font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 cursor-pointer gap-1.5',
               isActive
-                ? 'border-brand-dark-orange text-brand-dark-orange font-semibold'
-                : 'border-transparent text-secondary-text hover:text-primary-text hover:border-border'
+                ? 'bg-background text-foreground shadow-2xs font-semibold'
+                : 'hover:bg-background/50 hover:text-foreground'
             )}
           >
             <span>{tab.label}</span>
             {tab.count !== undefined && (
               <span
                 className={cn(
-                  'px-2 py-0.5 rounded-full text-xs font-medium',
-                  isActive ? 'bg-brand-light-orange text-brand-dark-orange' : 'bg-secondary-bg text-muted-text'
+                  'rounded-full px-1.5 py-0.2 text-[10px] font-semibold',
+                  isActive ? 'bg-muted text-foreground' : 'bg-muted/60 text-muted-foreground'
                 )}
               >
                 {tab.count}

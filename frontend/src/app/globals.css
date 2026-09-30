@@ -4,12 +4,88 @@
 @tailwind components;
 @tailwind utilities;
 
-body {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-  background-color: #FFFFFF;
-  color: #1F1F1F;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+@layer base {
+  :root {
+    /* Shadcn Light Theme: Page off-white (#FAFAFA), Card crisp white (#FFFFFF) */
+    --background: 240 4.8% 98%;
+    --foreground: 240 10% 3.9%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 240 10% 3.9%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 240 10% 3.9%;
+
+    --primary: 240 5.9% 10%;
+    --primary-foreground: 0 0% 98%;
+
+    --secondary: 240 4.8% 95.9%;
+    --secondary-foreground: 240 5.9% 10%;
+
+    --muted: 240 4.8% 95.9%;
+    --muted-foreground: 240 3.8% 46.1%;
+
+    --accent: 240 4.8% 95.9%;
+    --accent-foreground: 240 5.9% 10%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+
+    --border: 240 5.9% 90%;
+    --input: 240 5.9% 90%;
+    --ring: 240 5.9% 10%;
+
+    --radius: 0.75rem;
+
+    --brand-orange: 240 5.9% 10%;
+    --brand-dark-orange: 240 5.9% 10%;
+    --brand-light-orange: 240 4.8% 95.9%;
+  }
+
+  .dark {
+    /* Shadcn Dark Theme: Page dark black (#09090B), Card exact charcoal gray (#171717 = 0 0% 9%) */
+    --background: 0 0% 3.9%;
+    --foreground: 0 0% 98%;
+
+    --card: 0 0% 9%; /* #171717 exact card charcoal gray */
+    --card-foreground: 0 0% 98%;
+
+    --popover: 0 0% 9%; /* #171717 */
+    --popover-foreground: 0 0% 98%;
+
+    --primary: 0 0% 98%;
+    --primary-foreground: 0 0% 9%;
+
+    --secondary: 0 0% 14.9%; /* #262626 */
+    --secondary-foreground: 0 0% 98%;
+
+    --muted: 0 0% 14.9%; /* #262626 */
+    --muted-foreground: 0 0% 63.9%;
+
+    --accent: 0 0% 14.9%;
+    --accent-foreground: 0 0% 98%;
+
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
+
+    --border: 0 0% 14.9%; /* #262626 */
+    --input: 0 0% 14.9%;
+    --ring: 0 0% 83.1%;
+
+    --brand-orange: 0 0% 98%;
+    --brand-dark-orange: 0 0% 98%;
+    --brand-light-orange: 0 0% 14.9%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  }
 }
 
 @keyframes fadeIn {
@@ -24,5 +100,21 @@ body {
 }
 
 .animate-fade-in {
-  animation: fadeIn 0.15s ease-out forwards;
+  animation: fadeIn 0.15s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Custom Shadcn Scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: hsl(var(--border));
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--muted-foreground) / 0.5);
 }

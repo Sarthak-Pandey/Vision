@@ -42,7 +42,7 @@ export const errorHandler = (
   } else if (err instanceof multer.MulterError) {
     statusCode = 400;
     if (err.code === 'LIMIT_FILE_SIZE') {
-      message = 'File size exceeds the 15MB limit';
+      message = 'File size exceeds the 20MB limit';
     } else {
       message = `File upload error: ${err.message}`;
     }

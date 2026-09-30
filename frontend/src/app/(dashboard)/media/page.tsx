@@ -166,11 +166,11 @@ export default function MediaPage() {
       {isLoading ? (
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
           {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
-            <div key={i} className="animate-pulse bg-white border border-border rounded-xl overflow-hidden p-0">
-              <div className="aspect-4/3 w-full bg-slate-200" />
+            <div key={i} className="animate-pulse bg-card border border-border rounded-xl overflow-hidden p-0 shadow-2xs">
+              <div className="aspect-4/3 w-full bg-muted" />
               <div className="p-3 space-y-2">
-                <div className="h-3 bg-slate-200 rounded-md w-3/4" />
-                <div className="h-2.5 bg-slate-100 rounded-md w-1/2" />
+                <div className="h-3 bg-muted rounded-md w-3/4" />
+                <div className="h-2.5 bg-muted/60 rounded-md w-1/2" />
               </div>
             </div>
           ))}

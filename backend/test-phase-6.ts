@@ -1,3 +1,5 @@
+process.env.ALLOW_DEMO_MODE = 'true';
+process.env.USE_TEST_STORE = 'true';
 import app from './src/app.js';
 import { Server } from 'http';
 import { AddressInfo } from 'net';

@@ -64,7 +64,7 @@ export const ProjectTimeline: React.FC<ProjectTimelineProps> = ({
                   {yearGroup.year}
                 </CardTitle>
               </div>
-              <span className="text-xs font-semibold bg-white border border-border px-2.5 py-1 rounded-lg text-secondary-text shadow-2xs">
+              <span className="text-xs font-semibold bg-card border border-border px-2.5 py-1 rounded-lg text-muted-foreground shadow-2xs">
                 {yearGroup.totalAssets} {yearGroup.totalAssets === 1 ? 'asset' : 'assets'} total
               </span>
             </div>
@@ -76,7 +76,7 @@ export const ProjectTimeline: React.FC<ProjectTimelineProps> = ({
               return (
                 <div
                   key={monthGroup.monthKey}
-                  className="border border-border rounded-xl bg-white overflow-hidden transition-colors"
+                  className="border border-border rounded-xl bg-card overflow-hidden transition-colors"
                 >
                   <button
                     type="button"

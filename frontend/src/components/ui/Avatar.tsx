@@ -18,15 +18,15 @@ export const Avatar: React.FC<AvatarProps> = ({ name, size = 'md', className }) 
   };
 
   const sizes = {
-    sm: 'w-7 h-7 text-xs',
-    md: 'w-9 h-9 text-sm',
-    lg: 'w-11 h-11 text-base',
+    sm: 'w-7 h-7 text-[11px]',
+    md: 'w-9 h-9 text-xs',
+    lg: 'w-10 h-10 text-sm',
   };
 
   return (
     <div
       className={cn(
-        'rounded-full bg-brand-light-orange border border-orange-200 text-brand-dark-orange font-semibold flex items-center justify-center select-none shrink-0',
+        'rounded-full bg-muted border border-border text-foreground font-semibold flex items-center justify-center select-none shrink-0 shadow-2xs',
         sizes[size],
         className
       )}

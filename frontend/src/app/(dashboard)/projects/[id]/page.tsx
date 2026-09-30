@@ -501,18 +501,18 @@ function ProjectReportTabContent({ projectId }: { projectId: string }) {
 
   if (isLoading) {
     return (
-      <div className="p-12 text-center space-y-3 bg-white rounded-2xl border border-slate-200">
-        <div className="inline-block animate-spin text-brand-primary">
+      <div className="p-12 text-center space-y-3 bg-card text-card-foreground rounded-2xl border border-border shadow-2xs">
+        <div className="inline-block animate-spin text-foreground">
           <Sparkles className="w-6 h-6" />
         </div>
-        <p className="text-sm font-semibold text-slate-700">Composing project impact report...</p>
+        <p className="text-sm font-semibold text-foreground">Composing project impact report...</p>
       </div>
     );
   }
 
   if (error || !report) {
     return (
-      <div className="p-8 text-center text-sm text-rose-600 bg-white rounded-2xl border border-rose-200 space-y-3">
+      <div className="p-8 text-center text-sm text-destructive bg-card rounded-2xl border border-destructive/20 space-y-3 shadow-2xs">
         <p>{error || 'Failed to generate report.'}</p>
         <Button variant="outline" size="sm" onClick={loadReport}>
           Retry

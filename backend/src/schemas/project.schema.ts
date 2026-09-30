@@ -11,6 +11,7 @@ export const createProjectSchema = z
     location: z.string().trim().max(200, 'Location must not exceed 200 characters').optional().nullable(),
     start_date: z.string().optional().nullable(),
     end_date: z.string().optional().nullable(),
+    project_type: z.string().trim().max(50).optional().nullable(),
     created_by: z.string().optional().nullable(),
   })
   .refine(
@@ -42,6 +43,7 @@ export const updateProjectSchema = z
     location: z.string().trim().max(200, 'Location must not exceed 200 characters').optional().nullable(),
     start_date: z.string().optional().nullable(),
     end_date: z.string().optional().nullable(),
+    project_type: z.string().trim().max(50).optional().nullable(),
     created_by: z.string().optional().nullable(),
     updated_at: z.string().optional(),
   })
