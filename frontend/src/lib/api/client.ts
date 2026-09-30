@@ -23,7 +23,12 @@ import {
   ImpactReport,
 } from '@/types';
 
-const rawApiUrl = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api').trim();
+const rawApiUrl = (
+  process.env.NEXT_PUBLIC_API_URL ||
+  (typeof window !== 'undefined' && window.location.hostname !== 'localhost'
+    ? 'https://vision-ep3p.onrender.com/api'
+    : 'http://localhost:5000/api')
+).trim();
 const normalizedUrl = rawApiUrl.replace(/\/+$/, '');
 const API_BASE_URL = normalizedUrl.endsWith('/api') ? normalizedUrl : `${normalizedUrl}/api`;
 
