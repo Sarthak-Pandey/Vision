@@ -33,7 +33,7 @@ export const SearchResultCard: React.FC<SearchResultCardProps> = ({
   return (
     <div
       onClick={onClick}
-      className="liquid-glass rounded-2xl overflow-hidden group hover:-translate-y-1 transition-all duration-300 flex flex-col cursor-pointer text-left"
+      className="liquid-glass rounded-xl overflow-hidden group transition-colors duration-200 flex flex-col cursor-pointer text-left"
     >
       {/* Media Thumbnail Container */}
       <div className="relative aspect-video w-full bg-black/60 overflow-hidden flex items-center justify-center">
@@ -88,7 +88,7 @@ export const SearchResultCard: React.FC<SearchResultCardProps> = ({
           <div className="flex items-center gap-1 truncate">
             {result.latitude && result.longitude ? (
               <>
-                <MapPin className="w-3 h-3 text-[#00d2ff] shrink-0" />
+                <MapPin className="w-3 h-3 text-white/40 shrink-0" />
                 <span className="truncate">
                   {result.latitude.toFixed(3)}, {result.longitude.toFixed(3)}
                 </span>

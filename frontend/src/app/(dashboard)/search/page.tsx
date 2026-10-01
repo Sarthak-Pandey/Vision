@@ -89,26 +89,22 @@ export default function SearchPage() {
       >
         <div>
           <div className="flex items-center gap-2">
-            <span className="w-1.5 h-1.5 rounded-full bg-[#00d2ff] shadow-[0_0_8px_#00d2ff]" />
-            <span className="text-[11px] font-medium text-white/50 tracking-wider uppercase">
-              Semantic Discovery
-            </span>
-            <span className="px-2 py-0.5 rounded-full border border-white/10 text-white/40 text-[10px] font-mono">
+            <h1 className="text-xl sm:text-2xl font-semibold tracking-tight text-white">
+              Evidence Search
+            </h1>
+            <span className="px-2 py-0.5 rounded-full border border-white/10 text-white/50 text-[11px] font-mono">
               pgvector 1536-dim
             </span>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-semibold tracking-tight text-white mt-1">
-            Search Evidence
-          </h1>
           <p className="text-xs text-white/50 mt-1 max-w-lg">
             Query field media across projects using high-dimensional cosine similarity embeddings and multimodal visual ground-truth.
           </p>
         </div>
 
         <div className="flex items-center gap-2">
-          <div className="px-3 py-1.5 rounded-full bg-white/[0.04] border border-white/10 text-[11px] text-white/60 flex items-center gap-2">
-            <Zap className="w-3.5 h-3.5 text-[#00d2ff]" />
-            <span>Sub-millisecond Vector Index</span>
+          <div className="px-3 py-1.5 rounded-lg bg-white/[0.04] border border-white/10 text-[11px] text-white/60 flex items-center gap-2">
+            <Zap className="w-3.5 h-3.5 text-white/50" />
+            <span>Vector Index Active</span>
           </div>
         </div>
       </motion.div>
@@ -121,47 +117,47 @@ export default function SearchPage() {
         className="grid grid-cols-2 md:grid-cols-4 gap-3"
       >
         <div className="liquid-glass rounded-xl p-4 flex flex-col justify-between">
-          <span className="text-[11px] font-medium text-white/40 uppercase tracking-wider">Embedding Engine</span>
+          <span className="text-xs font-medium text-white/50">Embedding Engine</span>
           <div className="flex items-baseline gap-2 mt-2">
             <span className="text-sm font-semibold text-white tracking-tight">Gemini Vector v2</span>
-            <span className="text-[11px] text-[#00d2ff] font-medium">1536d</span>
+            <span className="text-[11px] text-white/40 font-mono">1536d</span>
           </div>
         </div>
 
         <div className="liquid-glass rounded-xl p-4 flex flex-col justify-between">
-          <span className="text-[11px] font-medium text-white/40 uppercase tracking-wider">Similarity Metric</span>
+          <span className="text-xs font-medium text-white/50">Similarity Metric</span>
           <div className="flex items-baseline gap-2 mt-2">
             <span className="text-sm font-semibold text-white tracking-tight">Cosine Distance</span>
-            <span className="text-[11px] text-[#28c840] font-medium">pgvector</span>
+            <span className="text-[11px] text-emerald-400 font-medium">pgvector</span>
           </div>
         </div>
 
         <div className="liquid-glass rounded-xl p-4 flex flex-col justify-between">
-          <span className="text-[11px] font-medium text-white/40 uppercase tracking-wider">Target Scope</span>
+          <span className="text-xs font-medium text-white/50">Target Scope</span>
           <div className="flex items-baseline gap-2 mt-2">
             <span className="text-sm font-semibold text-white tracking-tight">
               {selectedProjectId === 'all' ? 'All Projects' : 'Selected Project'}
             </span>
-            <span className="text-[11px] text-[#A4F4FD] font-medium">Scoped</span>
+            <span className="text-[11px] text-sky-300 font-medium">Scoped</span>
           </div>
         </div>
 
         <div className="liquid-glass rounded-xl p-4 flex flex-col justify-between">
-          <span className="text-[11px] font-medium text-white/40 uppercase tracking-wider">Search Latency</span>
+          <span className="text-xs font-medium text-white/50">Search Latency</span>
           <div className="flex items-baseline gap-2 mt-2">
             <span className="text-sm font-semibold text-white tracking-tight">~28ms avg</span>
-            <span className="w-2 h-2 rounded-full bg-[#28c840] shadow-[0_0_6px_#28c840]" />
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
           </div>
         </div>
       </motion.div>
 
-      {/* Big Search Input */}
+      {/* Search Input Form */}
       <motion.form
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
         onSubmit={handleSearch}
-        className="liquid-glass rounded-2xl p-4 space-y-4"
+        className="liquid-glass rounded-xl p-4 space-y-4"
       >
         <div className="flex flex-col sm:flex-row gap-3">
           <div className="relative flex-1">
@@ -171,7 +167,7 @@ export default function SearchPage() {
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Describe visual evidence (e.g. saplings, cleared riverbank, solar microgrid)..."
-              className="w-full h-11 pl-11 pr-4 text-xs bg-white/[0.04] border border-white/[0.08] rounded-xl text-white placeholder:text-white/30 focus:outline-none focus:border-white/30 focus:bg-white/[0.07] transition-all"
+              className="w-full h-10 pl-11 pr-4 text-xs bg-white/[0.04] border border-white/[0.08] rounded-lg text-white placeholder:text-white/30 focus:outline-none focus:border-white/30 focus:bg-white/[0.07] transition-all"
             />
           </div>
 
@@ -179,7 +175,7 @@ export default function SearchPage() {
             <select
               value={selectedProjectId}
               onChange={(e) => setSelectedProjectId(e.target.value)}
-              className="w-full h-11 bg-white/[0.04] text-white text-xs rounded-xl px-3 border border-white/[0.08] focus:outline-none focus:border-white/30 focus:bg-white/[0.07] transition-all cursor-pointer"
+              className="w-full h-10 bg-white/[0.04] text-white text-xs rounded-lg px-3 border border-white/[0.08] focus:outline-none focus:border-white/30 focus:bg-white/[0.07] transition-all cursor-pointer"
             >
               <option value="all" className="bg-[#0c0c0c] text-white">All Projects</option>
               {projects.map((p) => (
@@ -193,9 +189,9 @@ export default function SearchPage() {
           <Button
             type="submit"
             disabled={isLoading}
-            className="group h-11 px-6 shrink-0 inline-flex items-center justify-center gap-2 rounded-xl bg-white text-black font-semibold text-xs transition-all hover:bg-white/90 active:scale-[0.98] shadow-[0_0_20px_rgba(255,255,255,0.2)]"
+            className="group h-10 px-5 shrink-0 inline-flex items-center justify-center gap-2 rounded-lg bg-white text-black font-semibold text-xs transition-all hover:bg-white/90 active:scale-[0.98] shadow-sm cursor-pointer"
           >
-            {isLoading ? <Loader2 className="w-4 h-4 animate-spin text-black" /> : <Sparkles className="w-4 h-4 text-black" />}
+            {isLoading ? <Loader2 className="w-4 h-4 animate-spin text-black" /> : <Search className="w-4 h-4 text-black" />}
             <span>Vector Search</span>
           </Button>
         </div>
@@ -203,7 +199,7 @@ export default function SearchPage() {
         {/* Suggestion Chips */}
         <div className="flex flex-wrap items-center gap-2 pt-1 text-xs text-white/40">
           <span className="font-medium text-white/50 flex items-center gap-1.5 text-[11px]">
-            <Sparkles className="w-3 h-3 text-[#00d2ff]" />
+            <Search className="w-3 h-3 text-white/40" />
             Suggestions:
           </span>
           {SAMPLE_QUERIES.map((sample) => (
@@ -211,7 +207,7 @@ export default function SearchPage() {
               key={sample}
               type="button"
               onClick={() => handleSearch(undefined, sample)}
-              className="px-3 py-1 rounded-full bg-white/[0.04] hover:bg-white/[0.08] text-white/60 hover:text-white transition-all border border-white/10 text-[11px] cursor-pointer"
+              className="px-2.5 py-1 rounded-md bg-white/[0.04] hover:bg-white/[0.08] text-white/60 hover:text-white transition-all border border-white/10 text-[11px] cursor-pointer"
             >
               {sample}
             </button>
@@ -221,7 +217,7 @@ export default function SearchPage() {
 
       {/* Error state */}
       {error && (
-        <div className="p-4 liquid-glass bg-rose-500/10 border border-rose-500/20 rounded-2xl flex items-center gap-3 text-xs text-rose-300">
+        <div className="p-4 liquid-glass bg-rose-500/10 border border-rose-500/20 rounded-xl flex items-center gap-3 text-xs text-rose-300">
           <AlertCircle className="w-4 h-4 shrink-0 text-rose-400" />
           <span>{error}</span>
         </div>
@@ -229,8 +225,8 @@ export default function SearchPage() {
 
       {/* Results Section */}
       {isLoading ? (
-        <div className="py-20 text-center space-y-3 liquid-glass rounded-2xl">
-          <Loader2 className="w-8 h-8 text-[#00d2ff] animate-spin mx-auto" />
+        <div className="py-20 text-center space-y-3 liquid-glass rounded-xl">
+          <Loader2 className="w-8 h-8 text-white/70 animate-spin mx-auto" />
           <p className="text-xs font-medium text-white/60">
             Computing vector cosine similarity across pgvector embeddings...
           </p>
@@ -243,7 +239,7 @@ export default function SearchPage() {
           </div>
 
           {results.length === 0 ? (
-            <div className="py-20 text-center liquid-glass rounded-2xl space-y-3">
+            <div className="py-20 text-center liquid-glass rounded-xl space-y-3">
               <Database className="w-10 h-10 text-white/20 mx-auto" />
               <div className="space-y-1">
                 <h4 className="text-sm font-semibold text-white">No matching evidence found</h4>
@@ -297,9 +293,9 @@ export default function SearchPage() {
           )}
         </div>
       ) : (
-        <div className="py-20 text-center liquid-glass rounded-2xl border border-white/10 bg-[#0e1014]/60 space-y-4">
-          <div className="w-12 h-12 rounded-2xl bg-white/[0.06] border border-white/10 text-white flex items-center justify-center mx-auto shadow-inner">
-            <Sparkles className="w-6 h-6 text-[#00d2ff]" />
+        <div className="py-20 text-center liquid-glass rounded-xl border border-white/10 space-y-4">
+          <div className="w-11 h-11 rounded-xl bg-white/[0.06] border border-white/10 text-white flex items-center justify-center mx-auto">
+            <Search className="w-5 h-5 text-white/60" />
           </div>
           <div className="space-y-1.5">
             <h3 className="text-base font-semibold text-white">Natural Language Semantic Discovery</h3>

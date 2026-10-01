@@ -109,17 +109,13 @@ export default function MediaPage() {
       >
         <div>
           <div className="flex items-center gap-2">
-            <span className="w-1.5 h-1.5 rounded-full bg-[#00d2ff] shadow-[0_0_8px_#00d2ff]" />
-            <span className="text-[11px] font-medium text-white/50 tracking-wider uppercase">
-              Evidence Vault
-            </span>
-            <span className="px-2 py-0.5 rounded-full border border-white/10 text-white/40 text-[10px] font-mono">
-              {assets.length} Ingested
+            <h1 className="text-xl sm:text-2xl font-semibold tracking-tight text-white">
+              Media Intelligence
+            </h1>
+            <span className="px-2 py-0.5 rounded-full border border-white/10 text-white/50 text-[11px] font-mono">
+              {assets.length}
             </span>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-semibold tracking-tight text-white mt-1">
-            Visual Ground Truth
-          </h1>
           <p className="text-xs text-white/50 mt-1 max-w-lg">
             High-resolution visual evidence repository with automated spatial analysis, activity detection, and verification logs.
           </p>
@@ -129,7 +125,7 @@ export default function MediaPage() {
           <button
             onClick={fetchData}
             disabled={isLoading}
-            className="p-2.5 rounded-full border border-white/10 bg-white/[0.04] text-white/70 hover:text-white hover:bg-white/[0.08] transition-colors"
+            className="p-2 rounded-lg border border-white/10 bg-white/[0.04] text-white/70 hover:text-white hover:bg-white/[0.08] transition-colors cursor-pointer"
             title="Refresh assets"
           >
             <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
@@ -137,11 +133,10 @@ export default function MediaPage() {
 
           <Button
             onClick={() => setIsUploadModalOpen(true)}
-            className="group inline-flex items-center justify-center gap-2 rounded-full bg-white text-black font-semibold text-xs px-5 py-2.5 transition-all hover:bg-white/90 active:scale-[0.98] shadow-[0_0_20px_rgba(255,255,255,0.2)]"
+            className="group inline-flex items-center justify-center gap-2 rounded-lg bg-white text-black font-semibold text-xs px-4 py-2 transition-all hover:bg-white/90 active:scale-[0.98] shadow-sm cursor-pointer"
           >
             <UploadCloud className="w-4 h-4 text-black" />
             <span>Upload Media</span>
-            <ChevronRight className="w-3.5 h-3.5 text-black/60 transition-transform group-hover:translate-x-0.5" />
           </Button>
         </div>
       </motion.div>
@@ -154,36 +149,36 @@ export default function MediaPage() {
         className="grid grid-cols-2 md:grid-cols-4 gap-3"
       >
         <div className="liquid-glass rounded-xl p-4 flex flex-col justify-between">
-          <span className="text-[11px] font-medium text-white/40 uppercase tracking-wider">Total Assets</span>
+          <span className="text-xs font-medium text-white/50">Total Assets</span>
           <div className="flex items-baseline gap-2 mt-2">
-            <span className="text-2xl font-bold text-white tracking-tight">{assets.length}</span>
-            <span className="text-[11px] text-[#00d2ff] font-medium">In Vault</span>
+            <span className="text-2xl font-semibold text-white tracking-tight">{assets.length}</span>
+            <span className="text-[11px] text-white/40 font-mono">In Vault</span>
           </div>
         </div>
 
         <div className="liquid-glass rounded-xl p-4 flex flex-col justify-between">
-          <span className="text-[11px] font-medium text-white/40 uppercase tracking-wider">AI Verified</span>
+          <span className="text-xs font-medium text-white/50">AI Verified</span>
           <div className="flex items-baseline gap-2 mt-2">
-            <span className="text-2xl font-bold text-white tracking-tight">{verifiedCount}</span>
-            <span className="text-[11px] text-[#28c840] font-medium">
+            <span className="text-2xl font-semibold text-white tracking-tight">{verifiedCount}</span>
+            <span className="text-[11px] text-emerald-400 font-medium">
               {assets.length > 0 ? `${Math.round((verifiedCount / assets.length) * 100)}%` : '0%'}
             </span>
           </div>
         </div>
 
         <div className="liquid-glass rounded-xl p-4 flex flex-col justify-between">
-          <span className="text-[11px] font-medium text-white/40 uppercase tracking-wider">Geotagged GPS</span>
+          <span className="text-xs font-medium text-white/50">Geotagged GPS</span>
           <div className="flex items-baseline gap-2 mt-2">
-            <span className="text-2xl font-bold text-white tracking-tight">{geotaggedCount}</span>
-            <span className="text-[11px] text-[#A4F4FD] font-medium">Coordinates</span>
+            <span className="text-2xl font-semibold text-white tracking-tight">{geotaggedCount}</span>
+            <span className="text-[11px] text-sky-300 font-medium">Logged</span>
           </div>
         </div>
 
         <div className="liquid-glass rounded-xl p-4 flex flex-col justify-between">
-          <span className="text-[11px] font-medium text-white/40 uppercase tracking-wider">Vector Index</span>
+          <span className="text-xs font-medium text-white/50">Vector Index</span>
           <div className="flex items-baseline gap-2 mt-2">
             <span className="text-sm font-semibold text-white tracking-tight">1536-dim Active</span>
-            <span className="w-2 h-2 rounded-full bg-[#28c840] shadow-[0_0_6px_#28c840]" />
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
           </div>
         </div>
       </motion.div>
@@ -193,7 +188,7 @@ export default function MediaPage() {
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
-        className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 liquid-glass p-2.5 rounded-2xl"
+        className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 liquid-glass p-2.5 rounded-xl"
       >
         <div className="relative flex-1 max-w-md">
           <Search className="w-4 h-4 text-white/40 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
@@ -202,7 +197,7 @@ export default function MediaPage() {
             placeholder="Search by project, uploader, activity, scene..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full bg-white/[0.04] text-white text-xs rounded-xl pl-9 pr-4 py-2 border border-white/[0.08] placeholder:text-white/30 focus:outline-none focus:border-white/30 focus:bg-white/[0.07] transition-all"
+            className="w-full bg-white/[0.04] text-white text-xs rounded-lg pl-9 pr-4 py-2 border border-white/[0.08] placeholder:text-white/30 focus:outline-none focus:border-white/30 focus:bg-white/[0.07] transition-all"
           />
         </div>
 
@@ -211,7 +206,7 @@ export default function MediaPage() {
             <select
               value={selectedProjectId}
               onChange={(e) => setSelectedProjectId(e.target.value)}
-              className="w-full bg-white/[0.04] text-white text-xs rounded-xl px-3 py-2 border border-white/[0.08] focus:outline-none focus:border-white/30 focus:bg-white/[0.07] transition-all cursor-pointer"
+              className="w-full bg-white/[0.04] text-white text-xs rounded-lg px-3 py-2 border border-white/[0.08] focus:outline-none focus:border-white/30 focus:bg-white/[0.07] transition-all cursor-pointer"
             >
               <option value="all" className="bg-[#0c0c0c] text-white">All Projects</option>
               {projects.map((p) => (

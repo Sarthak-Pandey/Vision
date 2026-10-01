@@ -94,16 +94,10 @@ export default function DashboardPage() {
         className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-white/[0.06]"
       >
         <div>
-          <div className="flex items-center gap-2">
-            <span className="w-1.5 h-1.5 rounded-full bg-[#00d2ff] shadow-[0_0_8px_#00d2ff]" />
-            <span className="text-[11px] font-medium text-white/50 tracking-wider uppercase">
-              Mission Control
-            </span>
-          </div>
-          <h1 className="text-2xl font-semibold text-white tracking-tight mt-1">
-            Ground-Truth Overview
+          <h1 className="text-xl sm:text-2xl font-semibold text-white tracking-tight">
+            Dashboard Overview
           </h1>
-          <p className="text-xs text-white/50 mt-0.5 leading-relaxed">
+          <p className="text-xs text-white/50 mt-1 leading-relaxed">
             Multi-project photographic provenance, observable change tracking, and heuristic confidence telemetry.
           </p>
         </div>
@@ -111,7 +105,7 @@ export default function DashboardPage() {
         <div className="flex items-center gap-3">
           <Link
             href="/media"
-            className="group inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] hover:bg-white/[0.08] text-white/80 hover:text-white text-xs font-medium px-4 py-2.5 transition-all active:scale-[0.98]"
+            className="group inline-flex items-center gap-2 rounded-lg border border-white/10 bg-white/[0.03] hover:bg-white/[0.08] text-white/80 hover:text-white text-xs font-medium px-3.5 py-2 transition-colors"
           >
             <Upload className="w-3.5 h-3.5 text-white/60 group-hover:text-white transition-colors" />
             <span>Upload Media</span>
@@ -119,7 +113,7 @@ export default function DashboardPage() {
 
           <button
             onClick={() => setIsModalOpen(true)}
-            className="group inline-flex items-center justify-center gap-2 rounded-full bg-white text-black font-semibold text-xs px-4 py-2.5 transition-all hover:bg-white/90 active:scale-[0.98] shadow-sm cursor-pointer"
+            className="group inline-flex items-center justify-center gap-2 rounded-lg bg-white text-black font-semibold text-xs px-3.5 py-2 transition-all hover:bg-white/90 active:scale-[0.98] shadow-sm cursor-pointer"
           >
             <Plus className="w-3.5 h-3.5" />
             <span>New Project</span>
@@ -127,7 +121,7 @@ export default function DashboardPage() {
         </div>
       </motion.div>
 
-      {/* 4 Liquid-Glass Telemetry Cards */}
+      {/* 4 Telemetry Cards */}
       <motion.div
         initial={{ opacity: 0, y: 15 }}
         animate={{ opacity: 1, y: 0 }}
@@ -135,20 +129,20 @@ export default function DashboardPage() {
         className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4"
       >
         {/* Card 1: Projects */}
-        <div className="liquid-glass rounded-2xl p-5 hover:bg-white/[0.03] transition-all group">
+        <div className="liquid-glass rounded-xl p-5 hover:bg-white/[0.02] transition-colors group">
           <div className="flex items-center justify-between">
             <span className="text-xs font-medium text-white/50">Active Projects</span>
-            <div className="w-7 h-7 rounded-lg bg-white/[0.04] border border-white/[0.08] flex items-center justify-center text-white/60 group-hover:text-white transition-colors">
+            <div className="w-7 h-7 rounded-md bg-white/[0.04] border border-white/[0.08] flex items-center justify-center text-white/60 group-hover:text-white transition-colors">
               <FolderKanban className="w-3.5 h-3.5" />
             </div>
           </div>
           <div className="mt-4">
             <div className="flex items-baseline justify-between">
-              <span className="text-3xl font-semibold tracking-tight text-white">
+              <span className="text-2xl font-semibold tracking-tight text-white">
                 {projects.length}
               </span>
-              <span className="flex items-center gap-1.5 text-[11px] text-[#00d2ff] bg-[#00d2ff]/10 px-2 py-0.5 rounded-full border border-[#00d2ff]/20">
-                <span className="w-1.5 h-1.5 rounded-full bg-[#00d2ff]" />
+              <span className="flex items-center gap-1.5 text-[11px] text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
                 Online
               </span>
             </div>
@@ -159,16 +153,16 @@ export default function DashboardPage() {
         </div>
 
         {/* Card 2: Assets */}
-        <div className="liquid-glass rounded-2xl p-5 hover:bg-white/[0.03] transition-all group">
+        <div className="liquid-glass rounded-xl p-5 hover:bg-white/[0.02] transition-colors group">
           <div className="flex items-center justify-between">
             <span className="text-xs font-medium text-white/50">Ingested Assets</span>
-            <div className="w-7 h-7 rounded-lg bg-white/[0.04] border border-white/[0.08] flex items-center justify-center text-white/60 group-hover:text-white transition-colors">
+            <div className="w-7 h-7 rounded-md bg-white/[0.04] border border-white/[0.08] flex items-center justify-center text-white/60 group-hover:text-white transition-colors">
               <Images className="w-3.5 h-3.5" />
             </div>
           </div>
           <div className="mt-4">
             <div className="flex items-baseline justify-between">
-              <span className="text-3xl font-semibold tracking-tight text-white">
+              <span className="text-2xl font-semibold tracking-tight text-white">
                 {assets.length}
               </span>
               <span className="text-[11px] text-white/40 font-mono">
@@ -182,19 +176,19 @@ export default function DashboardPage() {
         </div>
 
         {/* Card 3: Activity Classes */}
-        <div className="liquid-glass rounded-2xl p-5 hover:bg-white/[0.03] transition-all group">
+        <div className="liquid-glass rounded-xl p-5 hover:bg-white/[0.02] transition-colors group">
           <div className="flex items-center justify-between">
             <span className="text-xs font-medium text-white/50">Activity Classes</span>
-            <div className="w-7 h-7 rounded-lg bg-white/[0.04] border border-white/[0.08] flex items-center justify-center text-white/60 group-hover:text-white transition-colors">
+            <div className="w-7 h-7 rounded-md bg-white/[0.04] border border-white/[0.08] flex items-center justify-center text-white/60 group-hover:text-white transition-colors">
               <Activity className="w-3.5 h-3.5" />
             </div>
           </div>
           <div className="mt-4">
             <div className="flex items-baseline justify-between">
-              <span className="text-3xl font-semibold tracking-tight text-white">
+              <span className="text-2xl font-semibold tracking-tight text-white">
                 {distinctActivities.length}
               </span>
-              <span className="flex items-center gap-1.5 text-[11px] text-[#A4F4FD] bg-[#A4F4FD]/10 px-2 py-0.5 rounded-full border border-[#A4F4FD]/20">
+              <span className="flex items-center gap-1.5 text-[11px] text-sky-300 bg-sky-500/10 px-2 py-0.5 rounded border border-sky-500/20">
                 Indexed
               </span>
             </div>
@@ -205,19 +199,19 @@ export default function DashboardPage() {
         </div>
 
         {/* Card 4: Verified Evidence */}
-        <div className="liquid-glass rounded-2xl p-5 hover:bg-white/[0.03] transition-all group">
+        <div className="liquid-glass rounded-xl p-5 hover:bg-white/[0.02] transition-colors group">
           <div className="flex items-center justify-between">
             <span className="text-xs font-medium text-white/50">Verified Evidence</span>
-            <div className="w-7 h-7 rounded-lg bg-white/[0.04] border border-white/[0.08] flex items-center justify-center text-white/60 group-hover:text-white transition-colors">
+            <div className="w-7 h-7 rounded-md bg-white/[0.04] border border-white/[0.08] flex items-center justify-center text-white/60 group-hover:text-white transition-colors">
               <ShieldCheck className="w-3.5 h-3.5" />
             </div>
           </div>
           <div className="mt-4">
             <div className="flex items-baseline justify-between">
-              <span className="text-3xl font-semibold tracking-tight text-white">
+              <span className="text-2xl font-semibold tracking-tight text-white">
                 {evidenceCount}
               </span>
-              <span className="text-[11px] text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20 font-mono">
+              <span className="text-[11px] text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20 font-mono">
                 {assets.length > 0 ? `${Math.round((evidenceCount / assets.length) * 100)}%` : '0%'}
               </span>
             </div>
@@ -228,32 +222,30 @@ export default function DashboardPage() {
         </div>
       </motion.div>
 
-      {/* Main Console: macOS-style Window Frame */}
+      {/* Main Console */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.7, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
-        className="liquid-glass rounded-2xl overflow-hidden"
+        className="liquid-glass rounded-xl overflow-hidden"
       >
-        {/* macOS Title Bar with Traffic Lights */}
-        <div className="h-10 bg-white/[0.02] border-b border-white/[0.05] px-4 flex items-center justify-between select-none">
-          <div className="flex items-center gap-2">
-            <span className="w-3 h-3 rounded-full bg-[#ff5f57] border border-black/20" />
-            <span className="w-3 h-3 rounded-full bg-[#febc2e] border border-black/20" />
-            <span className="w-3 h-3 rounded-full bg-[#28c840] border border-black/20" />
-            <span className="text-[11px] font-medium text-white/40 ml-2">
-              Vision Console — Operational Status
+        {/* Console Header Bar */}
+        <div className="h-11 bg-white/[0.02] border-b border-white/[0.05] px-5 flex items-center justify-between select-none">
+          <div className="flex items-center gap-2.5">
+            <span className="w-2 h-2 rounded-full bg-emerald-400" />
+            <span className="text-xs font-medium text-white/70">
+              Operational Status & Activity Registry
             </span>
           </div>
 
           <div className="flex items-center gap-2">
             {/* Filter Chips */}
-            <div className="hidden sm:flex items-center gap-1.5 bg-black/30 p-0.5 rounded-full border border-white/[0.06]">
+            <div className="hidden sm:flex items-center gap-1 bg-white/[0.04] p-0.5 rounded-lg border border-white/[0.06]">
               <button
                 onClick={() => setSelectedFilter('all')}
-                className={`text-[11px] font-medium px-2.5 py-0.5 rounded-full transition-colors cursor-pointer ${
+                className={`text-[11px] font-medium px-2.5 py-1 rounded-md transition-colors cursor-pointer ${
                   selectedFilter === 'all'
-                    ? 'bg-white/15 text-white'
+                    ? 'bg-white/10 text-white'
                     : 'text-white/40 hover:text-white'
                 }`}
               >
@@ -261,9 +253,9 @@ export default function DashboardPage() {
               </button>
               <button
                 onClick={() => setSelectedFilter('verified')}
-                className={`text-[11px] font-medium px-2.5 py-0.5 rounded-full transition-colors cursor-pointer ${
+                className={`text-[11px] font-medium px-2.5 py-1 rounded-md transition-colors cursor-pointer ${
                   selectedFilter === 'verified'
-                    ? 'bg-white/15 text-white'
+                    ? 'bg-white/10 text-white'
                     : 'text-white/40 hover:text-white'
                 }`}
               >
@@ -279,6 +271,7 @@ export default function DashboardPage() {
             </Link>
           </div>
         </div>
+
 
         {/* Console Body: 2-Column Split */}
         <div className="grid grid-cols-1 lg:grid-cols-12 min-h-[380px]">
@@ -324,18 +317,18 @@ export default function DashboardPage() {
                     <Link
                       key={proj.id}
                       href={`/projects/${proj.id}`}
-                      className="group flex items-center justify-between p-3.5 rounded-xl border border-white/[0.04] bg-white/[0.01] hover:bg-white/[0.03] hover:border-white/[0.1] transition-all"
+                      className="group flex items-center justify-between p-3.5 rounded-lg border border-white/[0.04] bg-white/[0.01] hover:bg-white/[0.03] hover:border-white/[0.1] transition-colors"
                     >
                       <div className="flex items-center gap-3.5 min-w-0">
-                        <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-white/10 to-white/5 border border-white/[0.06] text-white flex items-center justify-center text-xs font-semibold shrink-0 group-hover:border-[#00d2ff]/40 transition-colors">
+                        <div className="w-9 h-9 rounded-md bg-white/[0.05] border border-white/[0.08] text-white flex items-center justify-center text-xs font-semibold shrink-0 group-hover:border-white/20 transition-colors">
                           {proj.name.slice(0, 2).toUpperCase()}
                         </div>
                         <div className="min-w-0">
                           <div className="flex items-center gap-2">
-                            <h4 className="text-sm font-medium text-white truncate group-hover:text-[#A4F4FD] transition-colors">
+                            <h4 className="text-sm font-medium text-white truncate transition-colors">
                               {proj.name}
                             </h4>
-                            <span className="w-1.5 h-1.5 rounded-full bg-[#10b981]" />
+                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
                           </div>
                           <p className="text-xs text-white/40 flex items-center gap-1.5 mt-0.5 truncate">
                             <MapPin className="w-3 h-3 text-white/30" />
@@ -396,7 +389,7 @@ export default function DashboardPage() {
                   </div>
                   <Link
                     href="/media"
-                    className="inline-flex items-center gap-1.5 text-xs text-[#00d2ff] hover:underline pt-1 transition-colors"
+                    className="inline-flex items-center gap-1.5 text-xs text-white/70 hover:text-white pt-1 transition-colors"
                   >
                     <span>Ingest Media</span>
                     <ChevronRight className="w-3 h-3" />
@@ -419,12 +412,12 @@ export default function DashboardPage() {
                             width: `${Math.max(item.percent, 8)}%`,
                             background:
                               idx === 0
-                                ? '#00d2ff'
+                                ? 'rgba(255,255,255,0.85)'
                                 : idx === 1
-                                ? '#A4F4FD'
+                                ? 'rgba(255,255,255,0.6)'
                                 : idx === 2
-                                ? '#3D81E3'
-                                : 'rgba(255,255,255,0.4)',
+                                ? 'rgba(255,255,255,0.4)'
+                                : 'rgba(255,255,255,0.2)',
                           }}
                         />
                       </div>
@@ -434,24 +427,24 @@ export default function DashboardPage() {
               )}
             </div>
 
-            {/* Quick Actions Card */}
-            <div className="p-4 rounded-xl border border-white/[0.08] bg-white/[0.02] mt-6 space-y-2">
-              <span className="text-[11px] font-semibold text-white/50 uppercase tracking-wider block">
-                Direct Navigation
+            {/* Quick Shortcuts */}
+            <div className="pt-5 border-t border-white/[0.06] mt-6 space-y-2">
+              <span className="text-xs font-medium text-white/50 block">
+                Quick Shortcuts
               </span>
-              <div className="grid grid-cols-2 gap-2 pt-1">
+              <div className="grid grid-cols-2 gap-2">
                 <Link
                   href="/search"
-                  className="flex items-center gap-2 p-2 rounded-lg bg-white/[0.03] hover:bg-white/[0.06] border border-white/[0.06] text-xs text-white/80 hover:text-white transition-colors"
+                  className="flex items-center gap-2 p-2.5 rounded-lg bg-white/[0.02] hover:bg-white/[0.05] border border-white/[0.06] text-xs text-white/80 hover:text-white transition-colors"
                 >
-                  <Search className="w-3.5 h-3.5 text-[#00d2ff]" />
+                  <Search className="w-3.5 h-3.5 text-white/50" />
                   <span>Evidence Search</span>
                 </Link>
                 <Link
                   href="/reports"
-                  className="flex items-center gap-2 p-2 rounded-lg bg-white/[0.03] hover:bg-white/[0.06] border border-white/[0.06] text-xs text-white/80 hover:text-white transition-colors"
+                  className="flex items-center gap-2 p-2.5 rounded-lg bg-white/[0.02] hover:bg-white/[0.05] border border-white/[0.06] text-xs text-white/80 hover:text-white transition-colors"
                 >
-                  <ShieldCheck className="w-3.5 h-3.5 text-[#10b981]" />
+                  <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
                   <span>Impact Reports</span>
                 </Link>
               </div>
@@ -465,7 +458,7 @@ export default function DashboardPage() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.7, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
-        className="liquid-glass rounded-2xl p-6"
+        className="liquid-glass rounded-xl p-6"
       >
         <div className="flex items-center justify-between pb-4 border-b border-white/[0.05]">
           <div>
@@ -545,7 +538,7 @@ export default function DashboardPage() {
                           : 'Undated'}
                       </span>
                       {item.latitude && (
-                        <span className="text-[10px] text-[#00d2ff] font-mono">GPS</span>
+                        <span className="text-[10px] text-white/60 bg-white/[0.06] px-1.5 py-0.5 rounded border border-white/10 font-mono">GPS</span>
                       )}
                     </p>
                   </div>

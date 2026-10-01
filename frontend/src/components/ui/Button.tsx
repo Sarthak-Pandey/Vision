@@ -21,9 +21,9 @@ export const Button: React.FC<ButtonProps> = ({
 
   const variants = {
     primary:
-      'bg-gradient-to-b from-white via-[#f0f0f0] to-[#d6d6d6] text-black border border-white hover:from-white hover:via-[#f5f8ff] hover:to-[#dce6f8] shadow-[0_0_18px_rgba(255,255,255,0.18)] hover:shadow-[0_0_24px_rgba(255,255,255,0.3)] font-medium',
+      'bg-white text-black font-semibold hover:bg-white/90 border border-white/20 shadow-xs',
     secondary:
-      'bg-white/[0.06] text-white hover:bg-white/[0.12] border border-white/[0.12] hover:border-white/[0.22] backdrop-blur-sm shadow-xs',
+      'bg-white/[0.06] text-white hover:bg-white/[0.12] border border-white/[0.1] shadow-xs',
     outline:
       'border border-white/[0.16] bg-transparent text-white/90 hover:bg-white/[0.08] hover:text-white hover:border-white/[0.3] shadow-xs',
     ghost:

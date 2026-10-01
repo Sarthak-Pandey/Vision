@@ -25,15 +25,15 @@ export const MediaCard: React.FC<MediaCardProps> = ({ asset, projectName, onClic
   return (
     <div
       onClick={onClick}
-      className="liquid-glass rounded-2xl overflow-hidden group cursor-pointer hover:-translate-y-1 transition-all duration-300 flex flex-col"
+      className="liquid-glass rounded-xl overflow-hidden group cursor-pointer transition-colors duration-200 flex flex-col"
     >
       <div className="aspect-4/3 w-full bg-black/60 relative overflow-hidden flex items-center justify-center">
         {asset.type === 'video' ? (
           <div className="w-full h-full bg-black/90 flex items-center justify-center relative">
             <video src={asset.url} className="w-full h-full object-cover opacity-80" />
             <div className="absolute inset-0 flex items-center justify-center">
-              <div className="w-10 h-10 rounded-full bg-black/70 text-white flex items-center justify-center border border-white/20 shadow-lg group-hover:scale-110 transition-transform">
-                <VideoIcon className="w-4 h-4 text-[#00d2ff]" />
+              <div className="w-9 h-9 rounded-full bg-black/80 text-white flex items-center justify-center border border-white/20">
+                <VideoIcon className="w-4 h-4 text-white" />
               </div>
             </div>
           </div>
@@ -41,7 +41,7 @@ export const MediaCard: React.FC<MediaCardProps> = ({ asset, projectName, onClic
           <img
             src={asset.url}
             alt={`Evidence ${asset.id}`}
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+            className="w-full h-full object-cover"
             onError={(e) => {
               (e.target as HTMLElement).style.display = 'none';
             }}
@@ -49,7 +49,7 @@ export const MediaCard: React.FC<MediaCardProps> = ({ asset, projectName, onClic
         )}
 
         {/* Media Type Pill */}
-        <div className="absolute top-2.5 right-2.5 bg-black/70 backdrop-blur-md text-white/80 p-1.5 rounded-lg border border-white/10 shadow-sm">
+        <div className="absolute top-2.5 right-2.5 bg-black/80 text-white/80 p-1.5 rounded-md border border-white/10">
           {asset.type === 'video' ? <VideoIcon className="w-3.5 h-3.5" /> : <ImageIcon className="w-3.5 h-3.5" />}
         </div>
 
@@ -57,19 +57,17 @@ export const MediaCard: React.FC<MediaCardProps> = ({ asset, projectName, onClic
         <div className="absolute top-2.5 left-2.5">
           {asset.ai_analysis ? (
             asset.ai_analysis.source === 'simulated' ? (
-              <span className="bg-black/75 backdrop-blur-md text-[#A4F4FD] text-[10px] font-semibold px-2.5 py-1 rounded-full flex items-center gap-1.5 border border-[#00d2ff]/30 shadow-sm">
-                <Sparkles className="w-3 h-3 text-[#00d2ff]" />
+              <span className="bg-black/80 text-sky-300 text-[10px] font-medium px-2 py-0.5 rounded border border-sky-400/20">
                 Simulated
               </span>
             ) : (
-              <span className="bg-black/75 backdrop-blur-md text-[#28c840] text-[10px] font-semibold px-2.5 py-1 rounded-full flex items-center gap-1.5 border border-[#28c840]/30 shadow-sm">
-                <CheckCircle2 className="w-3 h-3 text-[#28c840]" />
+              <span className="bg-black/80 text-emerald-400 text-[10px] font-medium px-2 py-0.5 rounded flex items-center gap-1 border border-emerald-400/20">
+                <CheckCircle2 className="w-3 h-3 text-emerald-400" />
                 {confidence}% Verified
               </span>
             )
           ) : (
-            <span className="bg-black/75 backdrop-blur-md text-white/50 text-[10px] font-medium px-2.5 py-1 rounded-full flex items-center gap-1.5 border border-white/10 shadow-sm">
-              <Sparkles className="w-3 h-3 text-white/40" />
+            <span className="bg-black/80 text-white/50 text-[10px] font-medium px-2 py-0.5 rounded border border-white/10">
               Pending
             </span>
           )}
@@ -79,14 +77,14 @@ export const MediaCard: React.FC<MediaCardProps> = ({ asset, projectName, onClic
       <div className="p-3.5 border-t border-white/[0.05] flex-1 flex flex-col justify-between">
         <div>
           {projectName && (
-            <p className="text-[11px] font-semibold text-white/50 uppercase tracking-wider truncate">
+            <p className="text-[11px] font-medium text-white/50 truncate">
               {projectName}
             </p>
           )}
 
           {/* Activity Tag if analyzed */}
           {asset.ai_analysis?.activities && asset.ai_analysis.activities.length > 0 ? (
-            <p className="text-sm font-medium text-white group-hover:text-[#A4F4FD] transition-colors mt-0.5 truncate capitalize">
+            <p className="text-xs font-medium text-white mt-0.5 truncate capitalize">
               {asset.ai_analysis.activities[0]}
             </p>
           ) : (
@@ -107,7 +105,7 @@ export const MediaCard: React.FC<MediaCardProps> = ({ asset, projectName, onClic
           )}
           {asset.latitude && asset.longitude && (
             <span className="flex items-center gap-1 text-white/60 bg-white/[0.06] px-1.5 py-0.5 rounded border border-white/10 text-[10px]">
-              <MapPin className="w-2.5 h-2.5 text-[#00d2ff]" />
+              <MapPin className="w-2.5 h-2.5 text-white/40" />
               GPS
             </span>
           )}

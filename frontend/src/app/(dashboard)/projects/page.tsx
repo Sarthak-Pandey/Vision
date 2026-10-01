@@ -60,30 +60,25 @@ export default function ProjectsPage() {
       >
         <div>
           <div className="flex items-center gap-2">
-            <span className="w-1.5 h-1.5 rounded-full bg-[#00d2ff] shadow-[0_0_8px_#00d2ff]" />
-            <span className="text-[11px] font-medium text-white/50 tracking-wider uppercase">
-              Field Workspaces
-            </span>
-            <span className="px-2 py-0.5 rounded-full border border-white/10 text-white/40 text-[10px] font-mono">
-              {projects.length} Total
+            <h1 className="text-xl sm:text-2xl font-semibold tracking-tight text-white">
+              Projects
+            </h1>
+            <span className="px-2 py-0.5 rounded-full border border-white/10 text-white/50 text-[11px] font-mono">
+              {projects.length}
             </span>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-semibold tracking-tight text-white mt-1">
-            Projects Portfolio
-          </h1>
           <p className="text-xs text-white/50 mt-1 max-w-lg">
-            Manage field impact initiatives, verify ground-truth media, and track automated AI audit logs.
+            Manage field impact initiatives, verify ground-truth media, and review audit records.
           </p>
         </div>
 
         <div className="flex items-center gap-3">
           <Button
             onClick={() => setIsModalOpen(true)}
-            className="group inline-flex items-center justify-center gap-2 rounded-full bg-white text-black font-semibold text-xs px-5 py-2.5 transition-all hover:bg-white/90 active:scale-[0.98] shadow-[0_0_20px_rgba(255,255,255,0.2)]"
+            className="group inline-flex items-center justify-center gap-2 rounded-lg bg-white text-black font-semibold text-xs px-4 py-2 transition-all hover:bg-white/90 active:scale-[0.98] shadow-sm"
           >
             <Plus className="w-4 h-4 text-black" />
             <span>New Project</span>
-            <ChevronRight className="w-3.5 h-3.5 text-black/60 transition-transform group-hover:translate-x-0.5" />
           </Button>
         </div>
       </motion.div>
@@ -96,34 +91,34 @@ export default function ProjectsPage() {
         className="grid grid-cols-2 md:grid-cols-4 gap-3"
       >
         <div className="liquid-glass rounded-xl p-4 flex flex-col justify-between">
-          <span className="text-[11px] font-medium text-white/40 uppercase tracking-wider">Active Workspaces</span>
+          <span className="text-xs font-medium text-white/50">Active Workspaces</span>
           <div className="flex items-baseline gap-2 mt-2">
-            <span className="text-2xl font-bold text-white tracking-tight">{projects.length}</span>
-            <span className="text-[11px] text-[#28c840] font-medium">Online</span>
+            <span className="text-2xl font-semibold text-white tracking-tight">{projects.length}</span>
+            <span className="text-[11px] text-emerald-400 font-medium">Online</span>
           </div>
         </div>
 
         <div className="liquid-glass rounded-xl p-4 flex flex-col justify-between">
-          <span className="text-[11px] font-medium text-white/40 uppercase tracking-wider">Ingested Evidence</span>
+          <span className="text-xs font-medium text-white/50">Ingested Evidence</span>
           <div className="flex items-baseline gap-2 mt-2">
-            <span className="text-2xl font-bold text-white tracking-tight">{totalAssets}</span>
-            <span className="text-[11px] text-[#00d2ff] font-medium">Assets</span>
+            <span className="text-2xl font-semibold text-white tracking-tight">{totalAssets}</span>
+            <span className="text-[11px] text-white/40 font-mono">Assets</span>
           </div>
         </div>
 
         <div className="liquid-glass rounded-xl p-4 flex flex-col justify-between">
-          <span className="text-[11px] font-medium text-white/40 uppercase tracking-wider">Verification Rate</span>
+          <span className="text-xs font-medium text-white/50">Verification Rate</span>
           <div className="flex items-baseline gap-2 mt-2">
-            <span className="text-2xl font-bold text-white tracking-tight">100%</span>
-            <span className="text-[11px] text-[#A4F4FD] font-medium">Deterministic</span>
+            <span className="text-2xl font-semibold text-white tracking-tight">100%</span>
+            <span className="text-[11px] text-sky-300 font-medium">Verified</span>
           </div>
         </div>
 
         <div className="liquid-glass rounded-xl p-4 flex flex-col justify-between">
-          <span className="text-[11px] font-medium text-white/40 uppercase tracking-wider">Telemetry Engine</span>
+          <span className="text-xs font-medium text-white/50">Engine Version</span>
           <div className="flex items-baseline gap-2 mt-2">
-            <span className="text-sm font-semibold text-white tracking-tight">Aura Vision v2.5</span>
-            <span className="w-2 h-2 rounded-full bg-[#00d2ff] shadow-[0_0_6px_#00d2ff]" />
+            <span className="text-sm font-semibold text-white tracking-tight">Vision Core v2.5</span>
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
           </div>
         </div>
       </motion.div>
@@ -133,7 +128,7 @@ export default function ProjectsPage() {
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
-        className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 liquid-glass p-2.5 rounded-2xl"
+        className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 liquid-glass p-2.5 rounded-xl"
       >
         <div className="relative flex-1 max-w-md">
           <Search className="w-4 h-4 text-white/40 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
@@ -142,7 +137,7 @@ export default function ProjectsPage() {
             placeholder="Search projects by name, location, or tag..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full bg-white/[0.04] text-white text-xs rounded-xl pl-9 pr-4 py-2 border border-white/[0.08] placeholder:text-white/30 focus:outline-none focus:border-white/30 focus:bg-white/[0.07] transition-all"
+            className="w-full bg-white/[0.04] text-white text-xs rounded-lg pl-9 pr-4 py-2 border border-white/[0.08] placeholder:text-white/30 focus:outline-none focus:border-white/30 focus:bg-white/[0.07] transition-all"
           />
         </div>
 
@@ -242,15 +237,15 @@ export default function ProjectsPage() {
               className="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:bg-white/[0.04] transition-all group"
             >
               <div className="flex items-center gap-4">
-                <div className="w-10 h-10 rounded-xl bg-white/[0.06] border border-white/15 text-white flex items-center justify-center font-bold text-xs shrink-0 group-hover:border-[#00d2ff]/40 transition-colors">
+                <div className="w-10 h-10 rounded-lg bg-white/[0.06] border border-white/10 text-white flex items-center justify-center font-semibold text-xs shrink-0 group-hover:border-white/25 transition-colors">
                   {project.name.slice(0, 2).toUpperCase()}
                 </div>
                 <div>
                   <div className="flex items-center gap-2">
-                    <h3 className="text-sm font-semibold text-white group-hover:text-[#A4F4FD] transition-colors">
+                    <h3 className="text-sm font-medium text-white transition-colors">
                       {project.name}
                     </h3>
-                    <span className="text-[10px] uppercase font-semibold text-white/40 px-2 py-0.5 rounded-full bg-white/[0.04] border border-white/[0.08]">
+                    <span className="text-[10px] font-medium text-white/50 px-2 py-0.5 rounded bg-white/[0.04] border border-white/[0.08]">
                       {(project.project_type || 'Field').replace('_', ' ')}
                     </span>
                   </div>
@@ -265,7 +260,7 @@ export default function ProjectsPage() {
 
               <div className="flex items-center gap-6 text-xs text-white/50">
                 <div className="flex items-center gap-1.5">
-                  <ImageIcon className="w-3.5 h-3.5 text-[#00d2ff]" />
+                  <ImageIcon className="w-3.5 h-3.5 text-white/40" />
                   <span>{project.media_count ?? 0} media</span>
                 </div>
                 <div className="flex items-center gap-1.5">

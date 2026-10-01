@@ -85,7 +85,7 @@ export const Sidebar: React.FC = () => {
       <div className="p-3 border-t border-white/[0.06]">
         <div className="flex items-center justify-between px-2.5 py-1.5 text-[11px] text-white/40">
           <div className="flex items-center gap-2">
-            <span className="w-1.5 h-1.5 rounded-full bg-[#00d2ff] shadow-[0_0_6px_#00d2ff]" />
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
             <span className="font-medium text-white/60">System Ready</span>
           </div>
           <span className="font-mono text-[10px] text-white/30">v2.5</span>
