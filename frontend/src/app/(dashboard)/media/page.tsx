@@ -178,7 +178,6 @@ export default function MediaPage() {
           <span className="text-xs font-medium text-white/50">Vector Index</span>
           <div className="flex items-baseline gap-2 mt-2">
             <span className="text-sm font-semibold text-white tracking-tight">1536-dim Active</span>
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
           </div>
         </div>
       </motion.div>

@@ -137,41 +137,22 @@ export const Sidebar: React.FC = () => {
           </div>
         </div>
 
-        {/* Professional Telemetry Widget: Cryptographic Ground-Truth Engine */}
+        {/* Storage & Assets Quota — Zero Slop */}
         <div className="mt-auto px-3 py-2.5">
-          <div className="p-3 rounded-xl bg-gradient-to-b from-white/[0.04] to-transparent border border-white/[0.07] shadow-sm space-y-2.5">
-            {/* Header with high-tech badge */}
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-1.5">
-                <div className="w-1.5 h-1.5 rounded-full bg-[#3D81E3]" />
-                <span className="text-[11px] font-semibold text-white/85 tracking-tight">
-                  Proof Pipeline
-                </span>
-              </div>
-              <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-[10px] font-mono text-emerald-400">
-                <span className="w-1 h-1 rounded-full bg-emerald-400 animate-pulse" />
-                <span className="tracking-wide">SYNCED</span>
-              </div>
+          <div className="p-3 rounded-lg bg-white/[0.02] border border-white/[0.06] space-y-2">
+            <div className="flex items-center justify-between text-xs text-white/70">
+              <span className="font-medium">Evidence Storage</span>
+              <span className="font-mono text-white/40 text-[10px]">Cloud Quota</span>
             </div>
-
-            {/* Glowing Dual-Tone Progress Track */}
-            <div className="space-y-1.5">
-              <div className="w-full bg-white/[0.06] h-1.5 rounded-full overflow-hidden p-[1px]">
-                <div
-                  className="bg-gradient-to-r from-[#3D81E3] via-[#5B9BF3] to-emerald-400 h-full rounded-full shadow-[0_0_8px_rgba(61,129,227,0.5)] transition-all duration-700"
-                  style={{ width: '84%' }}
-                />
-              </div>
-              <div className="flex items-center justify-between text-[10px] font-mono">
-                <span className="text-white/45">Integrity Index</span>
-                <span className="text-white/80 font-medium">84.2% Verified</span>
-              </div>
+            <div className="w-full bg-white/[0.06] h-1 rounded-full overflow-hidden">
+              <div
+                className="bg-white/35 h-full rounded-full transition-all duration-500"
+                style={{ width: '42%' }}
+              />
             </div>
-
-            {/* Micro-telemetry details */}
-            <div className="pt-1.5 border-t border-white/[0.05] flex items-center justify-between text-[9px] font-mono text-white/35">
-              <span>LATENCY 14ms</span>
-              <span>SHA-256 VALID</span>
+            <div className="flex items-center justify-between text-[10px] text-white/40">
+              <span>Platform Registry</span>
+              <span>4.2 / 10 GB</span>
             </div>
           </div>
         </div>

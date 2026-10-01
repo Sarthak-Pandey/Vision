@@ -23,6 +23,7 @@ import { Button } from '@/components/ui/Button';
 import { Tabs } from '@/components/ui/Tabs';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { MediaCard } from '@/components/ui/MediaCard';
+import ParticleLoader from '@/components/ui/ParticleLoader';
 import { UploadMediaModal } from '@/components/media/UploadMediaModal';
 import { MediaDetailModal } from '@/components/media/MediaDetailModal';
 import { EditProjectModal } from '@/components/projects/EditProjectModal';
@@ -223,7 +224,6 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <div className="flex items-center gap-2">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
               <span className="text-xs font-medium text-white/50">
                 {(project.project_type || 'Field Project').replace('_', ' ')}
               </span>
@@ -479,11 +479,9 @@ function ProjectReportTabContent({ projectId }: { projectId: string }) {
 
   if (isLoading) {
     return (
-      <div className="p-12 text-center space-y-3 bg-card text-card-foreground rounded-2xl border border-border shadow-2xs">
-        <div className="inline-block animate-spin text-foreground">
-          <Sparkles className="w-6 h-6" />
-        </div>
-        <p className="text-sm font-semibold text-foreground">Composing project impact report...</p>
+      <div className="p-12 text-center space-y-3 bg-white/[0.02] text-white rounded-2xl border border-white/[0.08] flex flex-col items-center justify-center">
+        <ParticleLoader width={80} height={80} dotColor="#3D81E3" />
+        <p className="text-sm font-semibold text-white/80">Composing project impact report...</p>
       </div>
     );
   }

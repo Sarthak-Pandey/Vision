@@ -35,8 +35,7 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project, mediaCount })
               <span className="text-[11px] font-medium text-white/50 block">
                 {(project.project_type || 'Field Project').replace('_', ' ')}
               </span>
-              <span className="inline-flex items-center gap-1 text-[11px] text-emerald-400 font-medium mt-0.5">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+              <span className="inline-flex items-center text-[11px] text-emerald-400 font-medium mt-0.5">
                 Active Site
               </span>
             </div>

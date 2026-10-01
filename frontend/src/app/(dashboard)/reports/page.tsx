@@ -97,7 +97,6 @@ export default function ReportsPage() {
           <span className="text-xs font-medium text-white/50">Ledger Integrity</span>
           <div className="flex items-baseline gap-2 mt-2">
             <span className="text-sm font-semibold text-white tracking-tight">Cryptographic Checksum</span>
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
           </div>
         </div>
       </motion.div>

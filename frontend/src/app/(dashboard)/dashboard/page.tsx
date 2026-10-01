@@ -141,8 +141,7 @@ export default function DashboardPage() {
               <span className="text-2xl font-semibold tracking-tight text-white">
                 {projects.length}
               </span>
-              <span className="flex items-center gap-1.5 text-[11px] text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+              <span className="text-[11px] text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20 font-medium">
                 Online
               </span>
             </div>
@@ -232,8 +231,7 @@ export default function DashboardPage() {
         {/* Console Header Bar */}
         <div className="h-11 bg-white/[0.02] border-b border-white/[0.05] px-5 flex items-center justify-between select-none">
           <div className="flex items-center gap-2.5">
-            <span className="w-2 h-2 rounded-full bg-emerald-400" />
-            <span className="text-xs font-medium text-white/70">
+            <span className="text-xs font-medium text-white/80">
               Operational Status & Activity Registry
             </span>
           </div>
@@ -328,7 +326,6 @@ export default function DashboardPage() {
                             <h4 className="text-sm font-medium text-white truncate transition-colors">
                               {proj.name}
                             </h4>
-                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
                           </div>
                           <p className="text-xs text-white/40 flex items-center gap-1.5 mt-0.5 truncate">
                             <MapPin className="w-3 h-3 text-white/30" />
@@ -352,7 +349,6 @@ export default function DashboardPage() {
             {/* Bottom Status Ticker */}
             <div className="pt-4 border-t border-white/[0.06] mt-4 flex items-center justify-between text-xs text-white/40">
               <div className="flex items-center gap-2">
-                <span className="w-1.5 h-1.5 rounded-full bg-[#10b981]" />
                 <span>Deterministic Heuristic Engine Active</span>
               </div>
               <span>v1.0.0</span>

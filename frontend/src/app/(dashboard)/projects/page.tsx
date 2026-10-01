@@ -118,7 +118,6 @@ export default function ProjectsPage() {
           <span className="text-xs font-medium text-white/50">Engine Version</span>
           <div className="flex items-baseline gap-2 mt-2">
             <span className="text-sm font-semibold text-white tracking-tight">Vision Core v2.5</span>
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
           </div>
         </div>
       </motion.div>
@@ -219,14 +218,9 @@ export default function ProjectsPage() {
           transition={{ duration: 0.4 }}
           className="liquid-glass rounded-2xl divide-y divide-white/[0.05] overflow-hidden"
         >
-          {/* macOS titlebar style header */}
+          {/* Header */}
           <div className="px-5 py-3 bg-white/[0.02] border-b border-white/[0.05] flex items-center justify-between text-xs text-white/50 font-medium">
-            <div className="flex items-center gap-2">
-              <span className="w-2.5 h-2.5 rounded-full bg-[#ff5f57]/80" />
-              <span className="w-2.5 h-2.5 rounded-full bg-[#febc2e]/80" />
-              <span className="w-2.5 h-2.5 rounded-full bg-[#28c840]/80" />
-              <span className="ml-2">Workspace Registry</span>
-            </div>
+            <span className="font-semibold text-white/70">Workspace Registry</span>
             <span>Showing {filteredProjects.length} items</span>
           </div>
 
