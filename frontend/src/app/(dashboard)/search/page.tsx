@@ -9,7 +9,6 @@ import { SearchResultCard } from '@/components/search/SearchResultCard';
 import { MediaDetailModal } from '@/components/media/MediaDetailModal';
 import { semanticSearch, getProjects } from '@/lib/api/client';
 import { SearchResult, Project, MediaAssetWithAnalysis } from '@/types';
-import ParticleLoader from '@/components/ui/ParticleLoader';
 
 const SAMPLE_QUERIES = [
   'river restoration and embankment stabilization',
@@ -225,8 +224,8 @@ export default function SearchPage() {
 
       {/* Results Section */}
       {isLoading ? (
-        <div className="py-16 text-center space-y-3 liquid-glass rounded-xl flex flex-col items-center justify-center">
-          <ParticleLoader width={80} height={80} dotColor="#3D81E3" />
+        <div className="py-20 text-center space-y-3 liquid-glass rounded-xl">
+          <Loader2 className="w-8 h-8 text-white/70 animate-spin mx-auto" />
           <p className="text-xs font-medium text-white/60">
             Computing vector cosine similarity across pgvector embeddings...
           </p>

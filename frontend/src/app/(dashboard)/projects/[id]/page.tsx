@@ -23,7 +23,6 @@ import { Button } from '@/components/ui/Button';
 import { Tabs } from '@/components/ui/Tabs';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { MediaCard } from '@/components/ui/MediaCard';
-import ParticleLoader from '@/components/ui/ParticleLoader';
 import { UploadMediaModal } from '@/components/media/UploadMediaModal';
 import { MediaDetailModal } from '@/components/media/MediaDetailModal';
 import { EditProjectModal } from '@/components/projects/EditProjectModal';
@@ -480,7 +479,7 @@ function ProjectReportTabContent({ projectId }: { projectId: string }) {
   if (isLoading) {
     return (
       <div className="p-12 text-center space-y-3 bg-white/[0.02] text-white rounded-2xl border border-white/[0.08] flex flex-col items-center justify-center">
-        <ParticleLoader width={80} height={80} dotColor="#3D81E3" />
+        <div className="w-6 h-6 border-2 border-white/40 border-t-white rounded-full animate-spin" />
         <p className="text-sm font-semibold text-white/80">Composing project impact report...</p>
       </div>
     );

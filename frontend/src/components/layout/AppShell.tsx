@@ -5,7 +5,6 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/auth/AuthContext';
 import { Sidebar } from './Sidebar';
 import { Header } from './Header';
-import ParticleLoader from '@/components/ui/ParticleLoader';
 
 export interface AppShellProps {
   children: React.ReactNode;
@@ -19,7 +18,7 @@ export const AppShell: React.FC<AppShellProps> = ({ children }) => {
   if (isLoading) {
     return (
       <div className="h-screen flex items-center justify-center bg-[#0c0c0c]">
-        <ParticleLoader width={100} height={100} dotColor="#3D81E3" />
+        <div className="w-6 h-6 border-2 border-white/40 border-t-white rounded-full animate-spin" />
       </div>
     );
   }
