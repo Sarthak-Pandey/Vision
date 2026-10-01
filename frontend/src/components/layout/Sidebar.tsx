@@ -1,6 +1,5 @@
 'use client';
-
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
@@ -19,6 +18,7 @@ import {
 import { cn } from '@/lib/utils/cn';
 import PieBurst from '@/components/ui/PieBurst';
 import CrystalGlow from '@/components/ui/CrystalGlow';
+import { getProjects, getAssets } from '@/lib/api/client';
 
 const mainNavItems = [
   { label: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
@@ -37,6 +37,32 @@ const protocolNavItems = [
 
 export const Sidebar: React.FC = () => {
   const pathname = usePathname();
+  const [projectCount, setProjectCount] = useState<number>(0);
+  const [assetCount, setAssetCount] = useState<number>(0);
+  const [isLoaded, setIsLoaded] = useState<boolean>(false);
+
+  useEffect(() => {
+    let isMounted = true;
+    async function loadStats() {
+      try {
+        const [projects, assets] = await Promise.all([
+          getProjects().catch(() => []),
+          getAssets().catch(() => []),
+        ]);
+        if (isMounted) {
+          setProjectCount(projects.length);
+          setAssetCount(assets.length);
+          setIsLoaded(true);
+        }
+      } catch (err) {
+        if (isMounted) setIsLoaded(true);
+      }
+    }
+    loadStats();
+    return () => {
+      isMounted = false;
+    };
+  }, [pathname]);
 
   return (
     <aside className="w-[240px] h-full bg-[#070709] border-r border-white/[0.08] flex flex-col justify-between shrink-0 select-none z-30">
@@ -137,22 +163,30 @@ export const Sidebar: React.FC = () => {
           </div>
         </div>
 
-        {/* Storage & Assets Quota — Zero Slop */}
+        {/* Workspace Registry Metrics — Real Database Data */}
         <div className="mt-auto px-3 py-2.5">
           <div className="p-3 rounded-lg bg-white/[0.02] border border-white/[0.06] space-y-2">
             <div className="flex items-center justify-between text-xs text-white/70">
-              <span className="font-medium">Evidence Storage</span>
-              <span className="font-mono text-white/40 text-[10px]">Cloud Quota</span>
+              <span className="font-medium">Active Registry</span>
+              <span className="font-mono text-white/40 text-[10px]">
+                {isLoaded ? `${projectCount} ${projectCount === 1 ? 'Project' : 'Projects'}` : 'Syncing...'}
+              </span>
             </div>
             <div className="w-full bg-white/[0.06] h-1 rounded-full overflow-hidden">
               <div
-                className="bg-white/35 h-full rounded-full transition-all duration-500"
-                style={{ width: '42%' }}
+                className="bg-white/40 h-full rounded-full transition-all duration-500"
+                style={{
+                  width: isLoaded && (projectCount > 0 || assetCount > 0)
+                    ? `${Math.min(100, Math.max(12, ((assetCount + projectCount) / 25) * 100))}%`
+                    : '0%',
+                }}
               />
             </div>
             <div className="flex items-center justify-between text-[10px] text-white/40">
-              <span>Platform Registry</span>
-              <span>4.2 / 10 GB</span>
+              <span>Ingested Evidence</span>
+              <span className="font-mono text-white/60">
+                {isLoaded ? `${assetCount} ${assetCount === 1 ? 'Asset' : 'Assets'}` : '0 Assets'}
+              </span>
             </div>
           </div>
         </div>
