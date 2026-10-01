@@ -24,7 +24,7 @@ export const Sidebar: React.FC = () => {
   const pathname = usePathname();
 
   return (
-    <aside className="w-[240px] h-screen sticky top-0 bg-[#070709] border-r border-white/[0.08] flex flex-col justify-between shrink-0 select-none z-30">
+    <aside className="w-[240px] h-full bg-[#070709] border-r border-white/[0.08] flex flex-col justify-between shrink-0 select-none z-30">
       <div>
         {/* Logo / Branding with Alien Head Logo */}
         <Link

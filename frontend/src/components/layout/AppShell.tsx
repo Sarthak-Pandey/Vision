@@ -24,7 +24,7 @@ export const AppShell: React.FC<AppShellProps> = ({ children }) => {
   }
 
   return (
-    <div className="min-h-screen bg-[#0c0c0c] text-white flex relative overflow-x-hidden selection:bg-[#3D81E3]/30">
+    <div className="h-screen bg-[#0c0c0c] text-white flex overflow-hidden relative selection:bg-[#3D81E3]/30">
       {/* Global SVG Noise Filter */}
       <svg className="absolute w-0 h-0 pointer-events-none opacity-0" aria-hidden="true">
         <filter id="c3-noise">
@@ -52,14 +52,16 @@ export const AppShell: React.FC<AppShellProps> = ({ children }) => {
       <div className="hidden md:block pointer-events-none fixed inset-y-0 left-1/2 -translate-x-[calc(50%+36rem)] w-px bg-white/[0.04] z-[5]" />
       <div className="hidden md:block pointer-events-none fixed inset-y-0 left-1/2 translate-x-[calc(-50%+36rem)] w-px bg-white/[0.04] z-[5]" />
 
-      {/* Fixed Sidebar */}
+      {/* Pinned Fixed Sidebar */}
       <Sidebar />
 
-      {/* Main Container */}
-      <div className="flex-1 flex flex-col min-w-0 relative z-10">
+      {/* Main Container with pinned Header and scrollable Main Content */}
+      <div className="flex-1 flex flex-col min-w-0 h-screen overflow-hidden relative z-10">
         <Header />
-        <main className="flex-1 p-6 md:p-8 max-w-[1400px] w-full mx-auto">
-          {children}
+        <main className="flex-1 overflow-y-auto p-6 md:p-8">
+          <div className="max-w-[1400px] w-full mx-auto">
+            {children}
+          </div>
         </main>
       </div>
     </div>
