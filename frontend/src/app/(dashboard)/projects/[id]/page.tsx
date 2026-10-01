@@ -171,10 +171,10 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
   return (
     <div className="space-y-6">
       {/* Navigation & Header */}
-      <div className="flex items-center justify-between pb-2 border-b border-white/[0.06]">
+      <div className="flex items-center justify-between pb-2 border-b border-black/[0.06] dark:border-white/[0.06]">
         <Link
           href="/projects"
-          className="inline-flex items-center gap-1.5 text-xs font-semibold text-white/50 hover:text-white transition-colors"
+          className="inline-flex items-center gap-1.5 text-xs font-semibold text-zinc-500 hover:text-zinc-950 dark:text-white/50 dark:hover:text-white transition-colors"
         >
           <ArrowLeft className="w-4 h-4" />
           <span>Back to Workspaces</span>
@@ -184,7 +184,7 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
           <Button
             variant="outline"
             onClick={() => setIsEditModalOpen(true)}
-            className="gap-1.5 text-xs text-white/70 hover:text-white border-white/10 hover:border-white/20"
+            className="gap-1.5 text-xs text-zinc-700 hover:text-zinc-950 dark:text-white/70 dark:hover:text-white border-black/10 dark:border-white/10 hover:border-black/20 dark:hover:border-white/20"
           >
             <Edit className="w-3.5 h-3.5" />
             <span>Edit</span>
@@ -193,7 +193,7 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
           <Button
             variant="outline"
             onClick={() => setIsDeleteModalOpen(true)}
-            className="gap-1.5 text-xs text-rose-400 border-rose-500/20 hover:bg-rose-500/10 hover:border-rose-500/40"
+            className="gap-1.5 text-xs text-rose-600 dark:text-rose-400 border-rose-500/20 hover:bg-rose-500/10 hover:border-rose-500/40"
           >
             <Trash2 className="w-3.5 h-3.5" />
             <span>Delete</span>
@@ -202,18 +202,18 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
           <Link href={`/projects/${project.id}/report`}>
             <Button
               variant="outline"
-              className="gap-1.5 text-xs text-white/80 hover:text-white border-white/10 hover:border-white/20"
+              className="gap-1.5 text-xs text-zinc-800 hover:text-zinc-950 dark:text-white/80 dark:hover:text-white border-black/10 dark:border-white/10 hover:border-black/20 dark:hover:border-white/20"
             >
-              <FileText className="w-3.5 h-3.5 text-white/40" />
+              <FileText className="w-3.5 h-3.5 text-zinc-500 dark:text-white/40" />
               <span>Audit Dossier</span>
             </Button>
           </Link>
 
           <Button
             onClick={() => setIsUploadModalOpen(true)}
-            className="group inline-flex items-center justify-center gap-2 rounded-lg bg-white text-black font-semibold text-xs px-4 py-2 transition-all hover:bg-white/90 active:scale-[0.98] shadow-sm cursor-pointer"
+            className="group inline-flex items-center justify-center gap-2 rounded-lg bg-zinc-950 text-white dark:bg-white dark:text-black font-semibold text-xs px-4 py-2 transition-all hover:bg-zinc-800 dark:hover:bg-white/90 active:scale-[0.98] shadow-sm cursor-pointer"
           >
-            <UploadCloud className="w-4 h-4 text-black" />
+            <UploadCloud className="w-4 h-4" />
             <span>Upload Media</span>
           </Button>
         </div>
@@ -223,28 +223,28 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <div className="flex items-center gap-2">
-              <span className="text-xs font-medium text-white/50">
+              <span className="text-xs font-medium text-zinc-500 dark:text-white/50">
                 {(project.project_type || 'Field Project').replace('_', ' ')}
               </span>
             </div>
 
-            <h1 className="text-2xl sm:text-3xl font-semibold text-white tracking-tight mt-1.5">
+            <h1 className="text-2xl sm:text-3xl font-semibold text-zinc-950 dark:text-white tracking-tight mt-1.5">
               {project.name}
             </h1>
 
-            <div className="flex flex-wrap items-center gap-4 text-xs text-white/50 mt-2 font-medium">
+            <div className="flex flex-wrap items-center gap-4 text-xs text-zinc-500 dark:text-white/50 mt-2 font-medium">
               {project.location && (
                 <span className="flex items-center gap-1.5">
-                  <MapPin className="w-3.5 h-3.5 text-white/40" />
+                  <MapPin className="w-3.5 h-3.5 text-zinc-400 dark:text-white/40" />
                   <span>{project.location}</span>
                 </span>
               )}
               <span className="flex items-center gap-1.5">
-                <Calendar className="w-3.5 h-3.5 text-white/40" />
+                <Calendar className="w-3.5 h-3.5 text-zinc-400 dark:text-white/40" />
                 <span>{formatDateRange(project.start_date, project.end_date)}</span>
               </span>
-              <span className="flex items-center gap-1.5 text-emerald-400">
-                <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
+              <span className="flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400">
+                <ShieldCheck className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
                 <span>{stats.mediaCount} Ingested Assets</span>
               </span>
             </div>

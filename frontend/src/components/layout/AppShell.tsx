@@ -24,7 +24,7 @@ export const AppShell: React.FC<AppShellProps> = ({ children }) => {
   }
 
   return (
-    <div className="h-screen bg-[#0c0c0c] text-white flex overflow-hidden relative selection:bg-[#3D81E3]/30">
+    <div className="h-screen bg-[#F8F9FA] dark:bg-[#0c0c0c] text-zinc-900 dark:text-white flex overflow-hidden relative selection:bg-[#3D81E3]/30 transition-colors duration-200">
       {/* Global SVG Noise Filter */}
       <svg className="absolute w-0 h-0 pointer-events-none opacity-0" aria-hidden="true">
         <filter id="c3-noise">
@@ -35,8 +35,8 @@ export const AppShell: React.FC<AppShellProps> = ({ children }) => {
         </filter>
       </svg>
 
-      {/* Global Cinematic Looping Background Video */}
-      <div className="fixed inset-0 z-0 pointer-events-none overflow-hidden">
+      {/* Global Background Video (Visible in Dark mode) */}
+      <div className="fixed inset-0 z-0 pointer-events-none overflow-hidden hidden dark:block">
         <video
           autoPlay
           loop
@@ -49,8 +49,8 @@ export const AppShell: React.FC<AppShellProps> = ({ children }) => {
       </div>
 
       {/* Fixed Vertical Guide Lines at 36rem Container Edges */}
-      <div className="hidden md:block pointer-events-none fixed inset-y-0 left-1/2 -translate-x-[calc(50%+36rem)] w-px bg-white/[0.04] z-[5]" />
-      <div className="hidden md:block pointer-events-none fixed inset-y-0 left-1/2 translate-x-[calc(-50%+36rem)] w-px bg-white/[0.04] z-[5]" />
+      <div className="hidden md:block pointer-events-none fixed inset-y-0 left-1/2 -translate-x-[calc(50%+36rem)] w-px bg-black/[0.04] dark:bg-white/[0.04] z-[5]" />
+      <div className="hidden md:block pointer-events-none fixed inset-y-0 left-1/2 translate-x-[calc(-50%+36rem)] w-px bg-black/[0.04] dark:bg-white/[0.04] z-[5]" />
 
       {/* Pinned Fixed Sidebar */}
       <Sidebar />

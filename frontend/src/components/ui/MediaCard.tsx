@@ -74,38 +74,38 @@ export const MediaCard: React.FC<MediaCardProps> = ({ asset, projectName, onClic
         </div>
       </div>
 
-      <div className="p-3.5 border-t border-white/[0.05] flex-1 flex flex-col justify-between">
+      <div className="p-3.5 border-t border-black/[0.06] dark:border-white/[0.05] flex-1 flex flex-col justify-between">
         <div>
           {projectName && (
-            <p className="text-[11px] font-medium text-white/50 truncate">
+            <p className="text-[11px] font-medium text-zinc-500 dark:text-white/50 truncate">
               {projectName}
             </p>
           )}
 
           {/* Activity Tag if analyzed */}
           {asset.ai_analysis?.activities && asset.ai_analysis.activities.length > 0 ? (
-            <p className="text-xs font-medium text-white mt-0.5 truncate capitalize">
+            <p className="text-xs font-medium text-zinc-950 dark:text-white mt-0.5 truncate capitalize">
               {asset.ai_analysis.activities[0]}
             </p>
           ) : (
-            <p className="text-xs text-white/40 mt-0.5 truncate">
+            <p className="text-xs text-zinc-400 dark:text-white/40 mt-0.5 truncate">
               Field evidence asset
             </p>
           )}
         </div>
 
-        <div className="flex items-center justify-between mt-3 pt-2.5 border-t border-white/[0.04] text-[11px] text-white/50 font-medium">
+        <div className="flex items-center justify-between mt-3 pt-2.5 border-t border-black/[0.06] dark:border-white/[0.04] text-[11px] text-zinc-500 dark:text-white/50 font-medium">
           {asset.capture_date ? (
             <span className="flex items-center gap-1">
-              <Calendar className="w-3 h-3 text-white/40" />
+              <Calendar className="w-3 h-3 text-zinc-400 dark:text-white/40" />
               {formatDate(asset.capture_date)}
             </span>
           ) : (
-            <span className="text-white/30">No date</span>
+            <span className="text-zinc-400 dark:text-white/30">No date</span>
           )}
           {asset.latitude && asset.longitude && (
-            <span className="flex items-center gap-1 text-white/60 bg-white/[0.06] px-1.5 py-0.5 rounded border border-white/10 text-[10px]">
-              <MapPin className="w-2.5 h-2.5 text-white/40" />
+            <span className="flex items-center gap-1 text-zinc-600 dark:text-white/60 bg-black/[0.04] dark:bg-white/[0.06] px-1.5 py-0.5 rounded border border-black/[0.08] dark:border-white/10 text-[10px]">
+              <MapPin className="w-2.5 h-2.5 text-zinc-400 dark:text-white/40" />
               GPS
             </span>
           )}

@@ -105,18 +105,18 @@ export default function MediaPage() {
         initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-        className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-white/[0.06]"
+        className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-black/[0.06] dark:border-white/[0.06]"
       >
         <div>
           <div className="flex items-center gap-2">
-            <h1 className="text-xl sm:text-2xl font-semibold tracking-tight text-white">
+            <h1 className="text-xl sm:text-2xl font-semibold tracking-tight text-zinc-950 dark:text-white">
               Media Intelligence
             </h1>
-            <span className="px-2 py-0.5 rounded-full border border-white/10 text-white/50 text-[11px] font-mono">
+            <span className="px-2 py-0.5 rounded-full border border-black/10 dark:border-white/10 text-zinc-500 dark:text-white/50 text-[11px] font-mono">
               {assets.length}
             </span>
           </div>
-          <p className="text-xs text-white/50 mt-1 max-w-lg">
+          <p className="text-xs text-zinc-500 dark:text-white/50 mt-1 max-w-lg">
             High-resolution visual evidence repository with automated spatial analysis, activity detection, and verification logs.
           </p>
         </div>
@@ -125,7 +125,7 @@ export default function MediaPage() {
           <button
             onClick={fetchData}
             disabled={isLoading}
-            className="p-2 rounded-lg border border-white/10 bg-white/[0.04] text-white/70 hover:text-white hover:bg-white/[0.08] transition-colors cursor-pointer"
+            className="p-2 rounded-lg border border-black/10 dark:border-white/10 bg-black/[0.03] dark:bg-white/[0.04] text-zinc-600 dark:text-white/70 hover:text-zinc-950 dark:hover:text-white hover:bg-black/[0.06] dark:hover:bg-white/[0.08] transition-colors cursor-pointer"
             title="Refresh assets"
           >
             <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
@@ -133,9 +133,9 @@ export default function MediaPage() {
 
           <Button
             onClick={() => setIsUploadModalOpen(true)}
-            className="group inline-flex items-center justify-center gap-2 rounded-lg bg-white text-black font-semibold text-xs px-4 py-2 transition-all hover:bg-white/90 active:scale-[0.98] shadow-sm cursor-pointer"
+            className="group inline-flex items-center justify-center gap-2 rounded-lg bg-zinc-950 text-white dark:bg-white dark:text-black font-semibold text-xs px-4 py-2 transition-all hover:bg-zinc-800 dark:hover:bg-white/90 active:scale-[0.98] shadow-sm cursor-pointer"
           >
-            <UploadCloud className="w-4 h-4 text-black" />
+            <UploadCloud className="w-4 h-4" />
             <span>Upload Media</span>
           </Button>
         </div>
@@ -149,35 +149,35 @@ export default function MediaPage() {
         className="grid grid-cols-2 md:grid-cols-4 gap-3"
       >
         <div className="liquid-glass rounded-xl p-4 flex flex-col justify-between">
-          <span className="text-xs font-medium text-white/50">Total Assets</span>
+          <span className="text-xs font-medium text-zinc-500 dark:text-white/50">Total Assets</span>
           <div className="flex items-baseline gap-2 mt-2">
-            <span className="text-2xl font-semibold text-white tracking-tight">{assets.length}</span>
-            <span className="text-[11px] text-white/40 font-mono">In Vault</span>
+            <span className="text-2xl font-semibold text-zinc-950 dark:text-white tracking-tight">{assets.length}</span>
+            <span className="text-[11px] text-zinc-500 dark:text-white/40 font-mono">In Vault</span>
           </div>
         </div>
 
         <div className="liquid-glass rounded-xl p-4 flex flex-col justify-between">
-          <span className="text-xs font-medium text-white/50">AI Verified</span>
+          <span className="text-xs font-medium text-zinc-500 dark:text-white/50">AI Verified</span>
           <div className="flex items-baseline gap-2 mt-2">
-            <span className="text-2xl font-semibold text-white tracking-tight">{verifiedCount}</span>
-            <span className="text-[11px] text-emerald-400 font-medium">
+            <span className="text-2xl font-semibold text-zinc-950 dark:text-white tracking-tight">{verifiedCount}</span>
+            <span className="text-[11px] text-emerald-600 dark:text-emerald-400 font-medium">
               {assets.length > 0 ? `${Math.round((verifiedCount / assets.length) * 100)}%` : '0%'}
             </span>
           </div>
         </div>
 
         <div className="liquid-glass rounded-xl p-4 flex flex-col justify-between">
-          <span className="text-xs font-medium text-white/50">Geotagged GPS</span>
+          <span className="text-xs font-medium text-zinc-500 dark:text-white/50">Geotagged GPS</span>
           <div className="flex items-baseline gap-2 mt-2">
-            <span className="text-2xl font-semibold text-white tracking-tight">{geotaggedCount}</span>
-            <span className="text-[11px] text-sky-300 font-medium">Logged</span>
+            <span className="text-2xl font-semibold text-zinc-950 dark:text-white tracking-tight">{geotaggedCount}</span>
+            <span className="text-[11px] text-sky-600 dark:text-sky-300 font-medium">Logged</span>
           </div>
         </div>
 
         <div className="liquid-glass rounded-xl p-4 flex flex-col justify-between">
-          <span className="text-xs font-medium text-white/50">Vector Index</span>
+          <span className="text-xs font-medium text-zinc-500 dark:text-white/50">Vector Index</span>
           <div className="flex items-baseline gap-2 mt-2">
-            <span className="text-sm font-semibold text-white tracking-tight">1536-dim Active</span>
+            <span className="text-sm font-semibold text-zinc-950 dark:text-white tracking-tight">1536-dim Active</span>
           </div>
         </div>
       </motion.div>
@@ -190,13 +190,13 @@ export default function MediaPage() {
         className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 liquid-glass p-2.5 rounded-xl"
       >
         <div className="relative flex-1 max-w-md">
-          <Search className="w-4 h-4 text-white/40 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+          <Search className="w-4 h-4 text-zinc-400 dark:text-white/40 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
           <input
             type="text"
             placeholder="Search by project, uploader, activity, scene..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full bg-white/[0.04] text-white text-xs rounded-lg pl-9 pr-4 py-2 border border-white/[0.08] placeholder:text-white/30 focus:outline-none focus:border-white/30 focus:bg-white/[0.07] transition-all"
+            className="w-full bg-black/[0.03] dark:bg-white/[0.04] text-zinc-950 dark:text-white text-xs rounded-lg pl-9 pr-4 py-2 border border-black/[0.08] dark:border-white/[0.08] placeholder:text-zinc-400 dark:placeholder:text-white/30 focus:outline-none focus:border-blue-500/50 dark:focus:border-white/30 focus:bg-black/[0.05] dark:focus:bg-white/[0.07] transition-all"
           />
         </div>
 
@@ -205,18 +205,18 @@ export default function MediaPage() {
             <select
               value={selectedProjectId}
               onChange={(e) => setSelectedProjectId(e.target.value)}
-              className="w-full bg-white/[0.04] text-white text-xs rounded-lg px-3 py-2 border border-white/[0.08] focus:outline-none focus:border-white/30 focus:bg-white/[0.07] transition-all cursor-pointer"
+              className="w-full bg-black/[0.03] dark:bg-white/[0.04] text-zinc-950 dark:text-white text-xs rounded-lg px-3 py-2 border border-black/[0.08] dark:border-white/[0.08] focus:outline-none focus:border-blue-500/50 dark:focus:border-white/30 focus:bg-black/[0.05] dark:focus:bg-white/[0.07] transition-all cursor-pointer"
             >
-              <option value="all" className="bg-[#0c0c0c] text-white">All Projects</option>
+              <option value="all" className="bg-white dark:bg-[#0c0c0c] text-zinc-900 dark:text-white">All Projects</option>
               {projects.map((p) => (
-                <option key={p.id} value={p.id} className="bg-[#0c0c0c] text-white">
+                <option key={p.id} value={p.id} className="bg-white dark:bg-[#0c0c0c] text-zinc-900 dark:text-white">
                   {p.name}
                 </option>
               ))}
             </select>
           </div>
 
-          <div className="text-[11px] text-white/50 font-medium px-2 whitespace-nowrap hidden sm:block">
+          <div className="text-[11px] text-zinc-500 dark:text-white/50 font-medium px-2 whitespace-nowrap hidden sm:block">
             {filteredAssets.length} {filteredAssets.length === 1 ? 'asset' : 'assets'}
           </div>
         </div>
@@ -224,9 +224,9 @@ export default function MediaPage() {
 
       {/* Error state */}
       {error && (
-        <div className="p-4 liquid-glass bg-rose-500/10 border border-rose-500/20 rounded-2xl text-xs text-rose-300 flex items-center justify-between">
+        <div className="p-4 liquid-glass bg-rose-500/10 border border-rose-500/20 rounded-2xl text-xs text-rose-500 dark:text-rose-300 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <AlertCircle className="w-4 h-4 shrink-0 text-rose-400" />
+            <AlertCircle className="w-4 h-4 shrink-0 text-rose-500 dark:text-rose-400" />
             <span>{error}</span>
           </div>
           <Button variant="outline" size="sm" onClick={fetchData} className="text-xs">
@@ -239,19 +239,19 @@ export default function MediaPage() {
       {isLoading ? (
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
           {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
-            <div key={i} className="liquid-glass rounded-2xl border border-white/10 bg-[#0e1014]/60 animate-pulse overflow-hidden">
-              <div className="aspect-4/3 w-full bg-white/[0.04]" />
+            <div key={i} className="liquid-glass rounded-2xl border border-black/10 dark:border-white/10 animate-pulse overflow-hidden">
+              <div className="aspect-4/3 w-full bg-black/[0.04] dark:bg-white/[0.04]" />
               <div className="p-3.5 space-y-2">
-                <div className="h-3 bg-white/[0.06] rounded w-3/4" />
-                <div className="h-2.5 bg-white/[0.04] rounded w-1/2" />
+                <div className="h-3 bg-black/[0.06] dark:bg-white/[0.06] rounded w-3/4" />
+                <div className="h-2.5 bg-black/[0.04] dark:bg-white/[0.04] rounded w-1/2" />
               </div>
             </div>
           ))}
         </div>
       ) : filteredAssets.length === 0 ? (
-        <div className="liquid-glass rounded-2xl border border-white/10 bg-[#0e1014]/60 p-12 text-center">
+        <div className="liquid-glass rounded-2xl border border-black/10 dark:border-white/10 p-12 text-center">
           <EmptyState
-            icon={<Images className="w-8 h-8 text-white/30" />}
+            icon={<Images className="w-8 h-8 text-zinc-400 dark:text-white/30" />}
             title="No media evidence found"
             description={
               searchTerm || selectedProjectId !== 'all'
@@ -261,7 +261,7 @@ export default function MediaPage() {
             action={
               <Button
                 onClick={() => setIsUploadModalOpen(true)}
-                className="mt-4 rounded-full bg-white text-black font-semibold text-xs px-5 py-2.5 hover:bg-white/90"
+                className="mt-4 rounded-full bg-zinc-950 text-white dark:bg-white dark:text-black font-semibold text-xs px-5 py-2.5 hover:bg-zinc-800 dark:hover:bg-white/90"
               >
                 <UploadCloud className="w-4 h-4 mr-2" />
                 <span>Upload First Asset</span>

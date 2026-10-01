@@ -36,7 +36,7 @@ export const SearchResultCard: React.FC<SearchResultCardProps> = ({
       className="liquid-glass rounded-xl overflow-hidden group transition-colors duration-200 flex flex-col cursor-pointer text-left"
     >
       {/* Media Thumbnail Container */}
-      <div className="relative aspect-video w-full bg-black/60 overflow-hidden flex items-center justify-center">
+      <div className="relative aspect-video w-full bg-black/10 dark:bg-black/60 overflow-hidden flex items-center justify-center">
         {result.url ? (
           <img
             src={result.url}
@@ -48,7 +48,7 @@ export const SearchResultCard: React.FC<SearchResultCardProps> = ({
             }}
           />
         ) : (
-          <div className="w-full h-full flex items-center justify-center text-white/30">
+          <div className="w-full h-full flex items-center justify-center text-zinc-400 dark:text-white/30">
             <ImageIcon className="w-8 h-8 opacity-40" />
           </div>
         )}
@@ -75,31 +75,31 @@ export const SearchResultCard: React.FC<SearchResultCardProps> = ({
       <div className="p-4 flex flex-col flex-1 justify-between gap-3">
         <div>
           {result.description ? (
-            <p className="text-xs text-white/80 font-medium line-clamp-2 leading-relaxed">
+            <p className="text-xs text-zinc-900 dark:text-white/80 font-medium line-clamp-2 leading-relaxed">
               {result.description}
             </p>
           ) : (
-            <p className="text-xs text-white/40 italic">Visual evidence match</p>
+            <p className="text-xs text-zinc-400 dark:text-white/40 italic">Visual evidence match</p>
           )}
         </div>
 
         {/* Location & Date Footer */}
-        <div className="flex items-center justify-between text-[11px] text-white/50 pt-2.5 border-t border-white/[0.06]">
+        <div className="flex items-center justify-between text-[11px] text-zinc-500 dark:text-white/50 pt-2.5 border-t border-black/[0.06] dark:border-white/[0.06]">
           <div className="flex items-center gap-1 truncate">
             {result.latitude && result.longitude ? (
               <>
-                <MapPin className="w-3 h-3 text-white/40 shrink-0" />
+                <MapPin className="w-3 h-3 text-zinc-400 dark:text-white/40 shrink-0" />
                 <span className="truncate">
                   {result.latitude.toFixed(3)}, {result.longitude.toFixed(3)}
                 </span>
               </>
             ) : (
-              <span className="text-white/40 truncate">{projectName || 'Project Asset'}</span>
+              <span className="text-zinc-500 dark:text-white/40 truncate">{projectName || 'Project Asset'}</span>
             )}
           </div>
 
           {formattedDate && (
-            <div className="flex items-center gap-1 shrink-0 text-white/40">
+            <div className="flex items-center gap-1 shrink-0 text-zinc-500 dark:text-white/40">
               <Calendar className="w-3 h-3" />
               <span>{formattedDate}</span>
             </div>

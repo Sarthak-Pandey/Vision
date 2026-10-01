@@ -21,15 +21,15 @@ export const Button: React.FC<ButtonProps> = ({
 
   const variants = {
     primary:
-      'bg-white text-black font-semibold hover:bg-white/90 border border-white/20 shadow-xs',
+      'bg-zinc-950 text-white hover:bg-zinc-800 border border-zinc-900/20 dark:bg-white dark:text-black dark:hover:bg-white/90 dark:border-white/20 shadow-xs',
     secondary:
-      'bg-white/[0.06] text-white hover:bg-white/[0.12] border border-white/[0.1] shadow-xs',
+      'bg-black/[0.04] text-zinc-900 hover:bg-black/[0.08] border border-black/[0.08] dark:bg-white/[0.06] dark:text-white dark:hover:bg-white/[0.12] dark:border-white/[0.1] shadow-xs',
     outline:
-      'border border-white/[0.16] bg-transparent text-white/90 hover:bg-white/[0.08] hover:text-white hover:border-white/[0.3] shadow-xs',
+      'border border-black/[0.15] bg-transparent text-zinc-900 hover:bg-black/[0.04] dark:border-white/[0.16] dark:text-white/90 dark:hover:bg-white/[0.08] dark:hover:text-white dark:hover:border-white/[0.3] shadow-xs',
     ghost:
-      'text-white/70 hover:text-white hover:bg-white/[0.06]',
+      'text-zinc-600 hover:text-zinc-950 hover:bg-black/[0.04] dark:text-white/70 dark:hover:text-white dark:hover:bg-white/[0.06]',
     danger:
-      'bg-rose-500/90 text-white hover:bg-rose-600 shadow-sm font-medium border border-rose-400/30',
+      'bg-rose-600 text-white hover:bg-rose-700 shadow-sm font-medium border border-rose-500/30',
   };
 
   const sizes = {
