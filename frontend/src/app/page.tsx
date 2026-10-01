@@ -3,6 +3,8 @@
 import React, { useEffect, useState, useRef } from 'react';
 import Link from 'next/link';
 import { AmbientWave } from '@/components/landing/AmbientWave';
+import PieBurst from '@/components/ui/PieBurst';
+import CrystalGlow from '@/components/ui/CrystalGlow';
 import './landing.css';
 
 export default function LandingPage() {
@@ -126,18 +128,33 @@ export default function LandingPage() {
           {/* Left: Logo */}
           <Link
             href="/"
-            className="logo appear appear--scale"
+            className="logo appear appear--scale flex items-center gap-2.5"
             style={{ '--d': '0.08s' } as React.CSSProperties}
             aria-label="Vision Platform"
           >
-            <img
-              src="/logo-white.png"
-              alt="Vision"
-              className="logo-mark-svg object-contain"
-            />
-            <span className="logo-wordmark">
-              Vision<span className="logo-suffix">.ai</span>
-            </span>
+            <div className="w-9 h-9 flex items-center justify-center shrink-0">
+              <PieBurst
+                background="transparent"
+                baseColor="#FFFFFF"
+                accentColor="#3D81E3"
+                speed={45}
+                distance={3.8}
+                style={{ width: '100%', height: '100%' }}
+              />
+            </div>
+            <div className="h-8 flex items-center">
+              <CrystalGlow
+                text="VISION"
+                fontSize={20}
+                fontWeight={800}
+                letterSpacing="0.06em"
+                textColor="#FFFFFF"
+                shadowColor="rgba(61, 129, 227, 0.75)"
+                glareColor="rgba(255, 255, 255, 0.95)"
+                glareSpeed={1.2}
+                padding="0px"
+              />
+            </div>
           </Link>
 
           {/* Center: Liquid-Metal Pill Navigation */}

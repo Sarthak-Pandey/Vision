@@ -18,7 +18,7 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils/cn';
 import PieBurst from '@/components/ui/PieBurst';
-import VectorWordmark from '@/components/ui/VectorWordmark';
+import CrystalGlow from '@/components/ui/CrystalGlow';
 
 const mainNavItems = [
   { label: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
@@ -41,45 +41,37 @@ export const Sidebar: React.FC = () => {
   return (
     <aside className="w-[240px] h-full bg-[#070709] border-r border-white/[0.08] flex flex-col justify-between shrink-0 select-none z-30">
       <div className="flex-1 flex flex-col min-h-0 overflow-y-auto">
-        {/* Logo / Branding: PieBurst Emblem + VectorWordmark (No .ai) */}
+        {/* Logo / Branding: Borderless Big PieBurst Emblem + CrystalGlow VISION */}
         <Link
           href="/"
-          className="h-14 px-3.5 border-b border-white/[0.08] flex items-center gap-2.5 group hover:bg-white/[0.02] transition-colors shrink-0"
+          className="h-14 px-4 border-b border-white/[0.08] flex items-center gap-3 group hover:bg-white/[0.02] transition-colors shrink-0"
           title="Return to Landing Page"
         >
-          {/* PieBurst 3D Disc Split Canvas */}
-          <div className="w-8 h-8 rounded-lg bg-white/[0.04] border border-white/[0.1] flex items-center justify-center p-0.5 overflow-hidden shrink-0 group-hover:border-white/30 transition-colors">
+          {/* PieBurst 3D Disc Split — Clear, Big, No Outline Border */}
+          <div className="w-9 h-9 flex items-center justify-center shrink-0">
             <PieBurst
               background="transparent"
               baseColor="#FFFFFF"
               accentColor="#3D81E3"
               speed={45}
-              distance={8}
+              distance={3.8}
               style={{ width: '100%', height: '100%' }}
             />
           </div>
 
-          {/* VectorWordmark Canvas Typography - NOTE: No .ai */}
-          <div className="flex-1 h-7 min-w-0 overflow-hidden relative">
-            <VectorWordmark
+          {/* CrystalGlow Interactive Typography — VISION */}
+          <div className="flex-1 h-8 min-w-0 flex items-center">
+            <CrystalGlow
               text="VISION"
-              background="transparent"
+              fontSize={19}
+              fontWeight={800}
+              letterSpacing="0.06em"
               textColor="#FFFFFF"
-              shade="#71717A"
-              accent="#3D81E3"
-              refWidth={140}
-              font={{
-                fontFamily: "Inter, system-ui, sans-serif",
-                fontWeight: 800,
-                fontSize: "18px",
-                letterSpacing: "0.08em",
-              }}
-              handles={{
-                size: 16,
-                spread: 22,
-                labels: false,
-              }}
-              style={{ width: '100%', height: '100%' }}
+              shadowColor="rgba(61, 129, 227, 0.75)"
+              glareColor="rgba(255, 255, 255, 0.95)"
+              glareSpeed={1.2}
+              padding="0px"
+              style={{ justifyContent: 'flex-start', width: 'auto' }}
             />
           </div>
         </Link>
@@ -145,25 +137,41 @@ export const Sidebar: React.FC = () => {
           </div>
         </div>
 
-        {/* Dynamic Telemetry Meter */}
-        <div className="mt-auto px-3 py-2">
-          <div className="p-3 rounded-lg bg-white/[0.02] border border-white/[0.06] space-y-2">
-            <div className="flex items-center justify-between text-[11px]">
-              <span className="text-white/60 font-medium">Proof Pipeline</span>
-              <span className="font-mono text-emerald-400 text-[10px] flex items-center gap-1">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-                Synchronized
-              </span>
+        {/* Professional Telemetry Widget: Cryptographic Ground-Truth Engine */}
+        <div className="mt-auto px-3 py-2.5">
+          <div className="p-3 rounded-xl bg-gradient-to-b from-white/[0.04] to-transparent border border-white/[0.07] shadow-sm space-y-2.5">
+            {/* Header with high-tech badge */}
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-1.5">
+                <div className="w-1.5 h-1.5 rounded-full bg-[#3D81E3]" />
+                <span className="text-[11px] font-semibold text-white/85 tracking-tight">
+                  Proof Pipeline
+                </span>
+              </div>
+              <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-[10px] font-mono text-emerald-400">
+                <span className="w-1 h-1 rounded-full bg-emerald-400 animate-pulse" />
+                <span className="tracking-wide">SYNCED</span>
+              </div>
             </div>
-            <div className="w-full bg-white/[0.06] h-1 rounded-full overflow-hidden">
-              <div
-                className="bg-[#3D81E3] h-full rounded-full transition-all duration-500"
-                style={{ width: '84%' }}
-              />
+
+            {/* Glowing Dual-Tone Progress Track */}
+            <div className="space-y-1.5">
+              <div className="w-full bg-white/[0.06] h-1.5 rounded-full overflow-hidden p-[1px]">
+                <div
+                  className="bg-gradient-to-r from-[#3D81E3] via-[#5B9BF3] to-emerald-400 h-full rounded-full shadow-[0_0_8px_rgba(61,129,227,0.5)] transition-all duration-700"
+                  style={{ width: '84%' }}
+                />
+              </div>
+              <div className="flex items-center justify-between text-[10px] font-mono">
+                <span className="text-white/45">Integrity Index</span>
+                <span className="text-white/80 font-medium">84.2% Verified</span>
+              </div>
             </div>
-            <div className="flex items-center justify-between text-[10px] text-white/40 font-mono">
-              <span>Integrity Index</span>
-              <span>84% Verified</span>
+
+            {/* Micro-telemetry details */}
+            <div className="pt-1.5 border-t border-white/[0.05] flex items-center justify-between text-[9px] font-mono text-white/35">
+              <span>LATENCY 14ms</span>
+              <span>SHA-256 VALID</span>
             </div>
           </div>
         </div>
