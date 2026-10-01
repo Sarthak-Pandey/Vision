@@ -49,9 +49,10 @@ const config: Config = {
         "secondary-text": "hsl(var(--muted-foreground))",
         "muted-text": "hsl(var(--muted-foreground) / 0.7)",
         brand: {
-          primary: "#059669",
-          "primary-hover": "#047857",
-          "primary-light": "#ECFDF5",
+          DEFAULT: "#3D81E3",
+          primary: "#3D81E3",
+          "primary-hover": "#2B6CB0",
+          "primary-light": "#EBF8FF",
           orange: "hsl(var(--brand-orange))",
           "dark-orange": "hsl(var(--brand-dark-orange))",
           "light-orange": "hsl(var(--brand-light-orange))",
