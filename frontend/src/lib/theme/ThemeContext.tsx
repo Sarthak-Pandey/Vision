@@ -11,21 +11,21 @@ interface ThemeContextType {
 }
 
 const ThemeContext = createContext<ThemeContextType>({
-  theme: 'light',
+  theme: 'dark',
   toggleTheme: () => {},
   setTheme: () => {},
 });
 
 export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [theme, setThemeState] = useState<Theme>('light');
+  const [theme, setThemeState] = useState<Theme>('dark');
 
   useEffect(() => {
-    // Restore theme from localStorage or system preference
+    // Restore theme from localStorage or default to dark
     const savedTheme = localStorage.getItem('theme') as Theme | null;
     if (savedTheme === 'dark' || savedTheme === 'light') {
       setThemeState(savedTheme);
       applyTheme(savedTheme);
-    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+    } else {
       setThemeState('dark');
       applyTheme('dark');
     }

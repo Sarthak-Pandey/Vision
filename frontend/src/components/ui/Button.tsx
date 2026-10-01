@@ -17,19 +17,19 @@ export const Button: React.FC<ButtonProps> = ({
   ...props
 }) => {
   const baseStyles =
-    'inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-all focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 active:scale-[0.98] select-none';
+    'relative inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-all focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white/40 disabled:pointer-events-none disabled:opacity-50 active:scale-[0.98] select-none cursor-pointer';
 
   const variants = {
     primary:
-      'bg-primary text-primary-foreground hover:bg-primary/90 shadow-2xs font-medium',
+      'bg-gradient-to-b from-white via-[#f0f0f0] to-[#d6d6d6] text-black border border-white hover:from-white hover:via-[#f5f8ff] hover:to-[#dce6f8] shadow-[0_0_18px_rgba(255,255,255,0.18)] hover:shadow-[0_0_24px_rgba(255,255,255,0.3)] font-medium',
     secondary:
-      'bg-secondary text-secondary-foreground hover:bg-secondary/80 border border-border/40 shadow-2xs',
+      'bg-white/[0.06] text-white hover:bg-white/[0.12] border border-white/[0.12] hover:border-white/[0.22] backdrop-blur-sm shadow-xs',
     outline:
-      'border border-input bg-background hover:bg-accent hover:text-accent-foreground shadow-2xs',
+      'border border-white/[0.16] bg-transparent text-white/90 hover:bg-white/[0.08] hover:text-white hover:border-white/[0.3] shadow-xs',
     ghost:
-      'hover:bg-accent hover:text-accent-foreground',
+      'text-white/70 hover:text-white hover:bg-white/[0.06]',
     danger:
-      'bg-destructive text-destructive-foreground hover:bg-destructive/90 shadow-2xs font-medium',
+      'bg-rose-500/90 text-white hover:bg-rose-600 shadow-sm font-medium border border-rose-400/30',
   };
 
   const sizes = {

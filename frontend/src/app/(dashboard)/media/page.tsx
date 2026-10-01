@@ -1,10 +1,9 @@
 'use client';
 
 import React, { useState, useEffect, useMemo } from 'react';
-import { UploadCloud, Images, RefreshCw, AlertCircle } from 'lucide-react';
+import { UploadCloud, Images, RefreshCw, AlertCircle, Sparkles, MapPin, Filter, Search, ChevronRight } from 'lucide-react';
+import { motion } from 'motion/react';
 import { Button } from '@/components/ui/Button';
-import { SearchInput } from '@/components/ui/SearchInput';
-import { Select } from '@/components/ui/Select';
 import { MediaCard } from '@/components/ui/MediaCard';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { UploadMediaModal } from '@/components/media/UploadMediaModal';
@@ -50,6 +49,14 @@ export default function MediaPage() {
     return map;
   }, [projects]);
 
+  const verifiedCount = useMemo(() => {
+    return assets.filter((a) => !!a.ai_analysis).length;
+  }, [assets]);
+
+  const geotaggedCount = useMemo(() => {
+    return assets.filter((a) => !!a.latitude && !!a.longitude).length;
+  }, [assets]);
+
   const filteredAssets = useMemo(() => {
     return assets.filter((asset) => {
       // Filter by project
@@ -92,71 +99,143 @@ export default function MediaPage() {
   };
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+    <div className="space-y-8 max-w-7xl mx-auto pb-12">
+      {/* Header Row */}
+      <motion.div
+        initial={{ opacity: 0, y: -10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+        className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-white/[0.06]"
+      >
         <div>
-          <h1 className="text-2xl font-bold text-primary-text tracking-tight">Media Evidence</h1>
-          <p className="text-sm text-secondary-text mt-0.5">
-            Ingest, organize, and inspect visual evidence with automated AI verification.
+          <div className="flex items-center gap-2">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#00d2ff] shadow-[0_0_8px_#00d2ff]" />
+            <span className="text-[11px] font-medium text-white/50 tracking-wider uppercase">
+              Evidence Vault
+            </span>
+            <span className="px-2 py-0.5 rounded-full border border-white/10 text-white/40 text-[10px] font-mono">
+              {assets.length} Ingested
+            </span>
+          </div>
+          <h1 className="text-2xl sm:text-3xl font-semibold tracking-tight text-white mt-1">
+            Visual Ground Truth
+          </h1>
+          <p className="text-xs text-white/50 mt-1 max-w-lg">
+            High-resolution visual evidence repository with automated spatial analysis, activity detection, and verification logs.
           </p>
         </div>
-        <div className="flex items-center gap-2">
-          <Button
-            variant="outline"
+
+        <div className="flex items-center gap-3">
+          <button
             onClick={fetchData}
             disabled={isLoading}
-            className="gap-2 shrink-0"
+            className="p-2.5 rounded-full border border-white/10 bg-white/[0.04] text-white/70 hover:text-white hover:bg-white/[0.08] transition-colors"
+            title="Refresh assets"
           >
             <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
-            <span className="hidden sm:inline">Refresh</span>
-          </Button>
+          </button>
+
           <Button
             onClick={() => setIsUploadModalOpen(true)}
-            className="gap-2 shrink-0"
+            className="group inline-flex items-center justify-center gap-2 rounded-full bg-white text-black font-semibold text-xs px-5 py-2.5 transition-all hover:bg-white/90 active:scale-[0.98] shadow-[0_0_20px_rgba(255,255,255,0.2)]"
           >
-            <UploadCloud className="w-4 h-4" />
+            <UploadCloud className="w-4 h-4 text-black" />
             <span>Upload Media</span>
+            <ChevronRight className="w-3.5 h-3.5 text-black/60 transition-transform group-hover:translate-x-0.5" />
           </Button>
         </div>
-      </div>
+      </motion.div>
+
+      {/* Telemetry Strip */}
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
+        className="grid grid-cols-2 md:grid-cols-4 gap-3"
+      >
+        <div className="liquid-glass rounded-xl p-4 flex flex-col justify-between">
+          <span className="text-[11px] font-medium text-white/40 uppercase tracking-wider">Total Assets</span>
+          <div className="flex items-baseline gap-2 mt-2">
+            <span className="text-2xl font-bold text-white tracking-tight">{assets.length}</span>
+            <span className="text-[11px] text-[#00d2ff] font-medium">In Vault</span>
+          </div>
+        </div>
+
+        <div className="liquid-glass rounded-xl p-4 flex flex-col justify-between">
+          <span className="text-[11px] font-medium text-white/40 uppercase tracking-wider">AI Verified</span>
+          <div className="flex items-baseline gap-2 mt-2">
+            <span className="text-2xl font-bold text-white tracking-tight">{verifiedCount}</span>
+            <span className="text-[11px] text-[#28c840] font-medium">
+              {assets.length > 0 ? `${Math.round((verifiedCount / assets.length) * 100)}%` : '0%'}
+            </span>
+          </div>
+        </div>
+
+        <div className="liquid-glass rounded-xl p-4 flex flex-col justify-between">
+          <span className="text-[11px] font-medium text-white/40 uppercase tracking-wider">Geotagged GPS</span>
+          <div className="flex items-baseline gap-2 mt-2">
+            <span className="text-2xl font-bold text-white tracking-tight">{geotaggedCount}</span>
+            <span className="text-[11px] text-[#A4F4FD] font-medium">Coordinates</span>
+          </div>
+        </div>
+
+        <div className="liquid-glass rounded-xl p-4 flex flex-col justify-between">
+          <span className="text-[11px] font-medium text-white/40 uppercase tracking-wider">Vector Index</span>
+          <div className="flex items-baseline gap-2 mt-2">
+            <span className="text-sm font-semibold text-white tracking-tight">1536-dim Active</span>
+            <span className="w-2 h-2 rounded-full bg-[#28c840] shadow-[0_0_6px_#28c840]" />
+          </div>
+        </div>
+      </motion.div>
 
       {/* Filter and Search Bar */}
-      <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 bg-card p-3 rounded-xl border border-border">
-        <div className="w-full sm:w-80">
-          <SearchInput
-            placeholder="Search by project, uploader, activity..."
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
+        className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 liquid-glass p-2.5 rounded-2xl"
+      >
+        <div className="relative flex-1 max-w-md">
+          <Search className="w-4 h-4 text-white/40 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+          <input
+            type="text"
+            placeholder="Search by project, uploader, activity, scene..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full bg-white/[0.04] text-white text-xs rounded-xl pl-9 pr-4 py-2 border border-white/[0.08] placeholder:text-white/30 focus:outline-none focus:border-white/30 focus:bg-white/[0.07] transition-all"
           />
         </div>
 
-        <div className="flex items-center gap-2 w-full md:w-auto">
-          <div className="w-full sm:w-56">
-            <Select
+        <div className="flex items-center gap-3">
+          <div className="w-full sm:w-60">
+            <select
               value={selectedProjectId}
               onChange={(e) => setSelectedProjectId(e.target.value)}
-              options={[
-                { value: 'all', label: 'All Projects' },
-                ...projects.map((p) => ({ value: p.id, label: p.name })),
-              ]}
-            />
+              className="w-full bg-white/[0.04] text-white text-xs rounded-xl px-3 py-2 border border-white/[0.08] focus:outline-none focus:border-white/30 focus:bg-white/[0.07] transition-all cursor-pointer"
+            >
+              <option value="all" className="bg-[#0c0c0c] text-white">All Projects</option>
+              {projects.map((p) => (
+                <option key={p.id} value={p.id} className="bg-[#0c0c0c] text-white">
+                  {p.name}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div className="text-[11px] text-white/50 font-medium px-2 whitespace-nowrap hidden sm:block">
+            {filteredAssets.length} {filteredAssets.length === 1 ? 'asset' : 'assets'}
           </div>
         </div>
-
-        <div className="ml-auto text-xs text-secondary-text font-medium px-2 hidden sm:block">
-          {filteredAssets.length} {filteredAssets.length === 1 ? 'item' : 'items'}
-        </div>
-      </div>
+      </motion.div>
 
       {/* Error state */}
       {error && (
-        <div className="p-4 bg-red-50 border border-red-200 rounded-xl text-sm text-status-error flex items-center justify-between">
+        <div className="p-4 liquid-glass bg-rose-500/10 border border-rose-500/20 rounded-2xl text-xs text-rose-300 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <AlertCircle className="w-4 h-4 shrink-0" />
+            <AlertCircle className="w-4 h-4 shrink-0 text-rose-400" />
             <span>{error}</span>
           </div>
-          <Button variant="outline" size="sm" onClick={fetchData}>
+          <Button variant="outline" size="sm" onClick={fetchData} className="text-xs">
             Retry
           </Button>
         </div>
@@ -166,33 +245,43 @@ export default function MediaPage() {
       {isLoading ? (
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
           {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
-            <div key={i} className="animate-pulse bg-card border border-border rounded-xl overflow-hidden p-0 shadow-2xs">
-              <div className="aspect-4/3 w-full bg-muted" />
-              <div className="p-3 space-y-2">
-                <div className="h-3 bg-muted rounded-md w-3/4" />
-                <div className="h-2.5 bg-muted/60 rounded-md w-1/2" />
+            <div key={i} className="liquid-glass rounded-2xl border border-white/10 bg-[#0e1014]/60 animate-pulse overflow-hidden">
+              <div className="aspect-4/3 w-full bg-white/[0.04]" />
+              <div className="p-3.5 space-y-2">
+                <div className="h-3 bg-white/[0.06] rounded w-3/4" />
+                <div className="h-2.5 bg-white/[0.04] rounded w-1/2" />
               </div>
             </div>
           ))}
         </div>
       ) : filteredAssets.length === 0 ? (
-        <EmptyState
-          icon={<Images className="w-8 h-8 text-secondary-text" />}
-          title="No media evidence found"
-          description={
-            searchTerm || selectedProjectId !== 'all'
-              ? 'No media matches your search filters. Try clearing your filters or selecting a different project.'
-              : 'Start ingesting field photos and videos to build your verifiable impact portfolio.'
-          }
-          action={
-            <Button onClick={() => setIsUploadModalOpen(true)} className="gap-2">
-              <UploadCloud className="w-4 h-4" />
-              <span>Upload First Asset</span>
-            </Button>
-          }
-        />
+        <div className="liquid-glass rounded-2xl border border-white/10 bg-[#0e1014]/60 p-12 text-center">
+          <EmptyState
+            icon={<Images className="w-8 h-8 text-white/30" />}
+            title="No media evidence found"
+            description={
+              searchTerm || selectedProjectId !== 'all'
+                ? 'No media matches your search filters. Try clearing your filters or selecting a different project.'
+                : 'Start ingesting field photos and videos to build your verifiable ground-truth evidence.'
+            }
+            action={
+              <Button
+                onClick={() => setIsUploadModalOpen(true)}
+                className="mt-4 rounded-full bg-white text-black font-semibold text-xs px-5 py-2.5 hover:bg-white/90"
+              >
+                <UploadCloud className="w-4 h-4 mr-2" />
+                <span>Upload First Asset</span>
+              </Button>
+            }
+          />
+        </div>
       ) : (
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.4 }}
+          className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4"
+        >
           {filteredAssets.map((asset) => (
             <MediaCard
               key={asset.id}
@@ -201,7 +290,7 @@ export default function MediaPage() {
               onClick={() => setSelectedAssetForInspection(asset)}
             />
           ))}
-        </div>
+        </motion.div>
       )}
 
       {/* Upload Media Modal */}
@@ -227,3 +316,4 @@ export default function MediaPage() {
     </div>
   );
 }
+

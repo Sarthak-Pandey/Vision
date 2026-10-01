@@ -1,10 +1,10 @@
 import React from 'react';
-import { Card } from './Card';
 import { cn } from '@/lib/utils/cn';
 
 export interface StatCardProps {
   title: string;
   value: string | number;
+  subtitle?: string;
   icon?: React.ReactNode;
   trend?: {
     value: string;
@@ -13,29 +13,46 @@ export interface StatCardProps {
   className?: string;
 }
 
-export const StatCard: React.FC<StatCardProps> = ({ title, value, icon, trend, className }) => {
+export const StatCard: React.FC<StatCardProps> = ({
+  title,
+  value,
+  subtitle,
+  icon,
+  trend,
+  className,
+}) => {
   return (
-    <Card className={cn('flex flex-col justify-between p-5 rounded-xl border border-border bg-card text-card-foreground shadow-2xs', className)}>
+    <div
+      className={cn(
+        'relative flex flex-col justify-between p-4.5 rounded-xl border border-white/[0.05] bg-[#0e1014]/75 backdrop-blur-xl shadow-[inset_0_1px_0_0_rgba(255,255,255,0.05)] hover:border-white/[0.12] transition-all',
+        className
+      )}
+    >
       <div className="flex items-center justify-between">
-        <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">{title}</span>
-        {icon && <div className="p-2 rounded-lg bg-muted text-foreground/80">{icon}</div>}
+        <span className="text-xs font-medium text-white/50">{title}</span>
+        {icon && <div className="text-white/40">{icon}</div>}
       </div>
-      <div className="mt-4 flex items-baseline justify-between">
-        <span className="text-2xl font-bold tracking-tight text-foreground">{value}</span>
-        {trend && (
-          <span
-            className={cn(
-              'text-xs font-semibold px-2 py-0.5 rounded-md border',
-              trend.positive
-                ? 'bg-emerald-50 text-emerald-700 border-emerald-200/60 dark:bg-emerald-950/40 dark:text-emerald-400'
-                : 'bg-rose-50 text-rose-700 border-rose-200/60 dark:bg-rose-950/40 dark:text-rose-400'
-            )}
-          >
-            {trend.positive ? '+' : ''}
-            {trend.value}
-          </span>
+      <div className="mt-3">
+        <div className="flex items-baseline justify-between">
+          <span className="text-2xl font-semibold tracking-tight text-white">{value}</span>
+          {trend && (
+            <span
+              className={cn(
+                'text-[11px] font-medium px-1.5 py-0.5 rounded',
+                trend.positive
+                  ? 'bg-emerald-500/10 text-emerald-400'
+                  : 'bg-rose-500/10 text-rose-400'
+              )}
+            >
+              {trend.positive ? '+' : ''}
+              {trend.value}
+            </span>
+          )}
+        </div>
+        {subtitle && (
+          <p className="text-[11px] text-white/40 mt-1 truncate">{subtitle}</p>
         )}
       </div>
-    </Card>
+    </div>
   );
 };

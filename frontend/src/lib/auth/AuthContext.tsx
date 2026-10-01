@@ -21,10 +21,10 @@ const AuthContext = createContext<AuthContextType>({
 });
 
 const DEFAULT_USER: User = {
-  id: 'user-demo-123',
-  email: 'sarthak@example.com',
-  name: 'Sarthak Pandey',
-  role: 'Project Lead',
+  id: 'user-operator-1',
+  email: 'operator@vision.ai',
+  name: 'Operator',
+  role: 'System Administrator',
 };
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {

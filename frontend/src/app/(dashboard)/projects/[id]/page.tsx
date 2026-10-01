@@ -171,113 +171,94 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
   return (
     <div className="space-y-6">
       {/* Navigation & Header */}
-      <Link
-        href="/projects"
-        className="inline-flex items-center gap-1.5 text-xs font-semibold text-secondary-text hover:text-brand-primary transition-colors"
-      >
-        <ArrowLeft className="w-4 h-4" />
-        <span>Back to Projects</span>
-      </Link>
+      <div className="flex items-center justify-between pb-2 border-b border-white/[0.06]">
+        <Link
+          href="/projects"
+          className="inline-flex items-center gap-1.5 text-xs font-semibold text-white/50 hover:text-white transition-colors"
+        >
+          <ArrowLeft className="w-4 h-4" />
+          <span>Back to Workspaces</span>
+        </Link>
 
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-border pb-6">
-        <div>
-          <h1 className="text-2xl md:text-3xl font-bold text-primary-text tracking-tight">
-            🌊 {project.name}
-          </h1>
-          <div className="flex flex-wrap items-center gap-4 text-xs text-secondary-text mt-1.5 font-medium">
-            {project.location && (
-              <span className="flex items-center gap-1">
-                <MapPin className="w-3.5 h-3.5 text-muted-text" />
-                {project.location}
-              </span>
-            )}
-            <span className="flex items-center gap-1">
-              <Calendar className="w-3.5 h-3.5 text-muted-text" />
-              {formatDateRange(project.start_date, project.end_date)}
-            </span>
-          </div>
-        </div>
-
-        <div className="flex items-center gap-2 flex-wrap shrink-0 self-start md:self-auto">
+        <div className="flex items-center gap-2">
           <Button
             variant="outline"
             onClick={() => setIsEditModalOpen(true)}
-            className="gap-1.5 text-xs"
+            className="gap-1.5 text-xs text-white/70 hover:text-white border-white/10 hover:border-white/20"
           >
             <Edit className="w-3.5 h-3.5" />
-            <span>Edit Project</span>
+            <span>Edit</span>
           </Button>
 
           <Button
             variant="outline"
             onClick={() => setIsDeleteModalOpen(true)}
-            className="gap-1.5 text-xs text-status-error border-red-200 hover:bg-red-50"
+            className="gap-1.5 text-xs text-rose-400 border-rose-500/20 hover:bg-rose-500/10 hover:border-rose-500/40"
           >
             <Trash2 className="w-3.5 h-3.5" />
             <span>Delete</span>
           </Button>
 
-          <Button
-            variant="outline"
-            onClick={() => setActiveTab('claims')}
-            className={`gap-1.5 shrink-0 text-xs ${
-              activeTab === 'claims'
-                ? 'bg-teal-700 text-white border-teal-700'
-                : 'border-teal-300 text-teal-700 hover:bg-teal-50'
-            }`}
-          >
-            <ShieldCheck className="w-3.5 h-3.5" />
-            <span>Evidence & Claims</span>
-          </Button>
-
-          <Button
-            variant="outline"
-            onClick={() => setActiveTab('comparisons')}
-            className={`gap-1.5 shrink-0 text-xs ${
-              activeTab === 'comparisons'
-                ? 'bg-brand-dark-orange text-white border-brand-dark-orange'
-                : 'border-orange-300 text-brand-dark-orange hover:bg-orange-50'
-            }`}
-          >
-            <Layers className="w-3.5 h-3.5" />
-            <span>Before / After</span>
-          </Button>
-
-          <Button
-            variant="outline"
-            onClick={() => setActiveTab('search')}
-            className={`gap-1.5 shrink-0 text-xs ${
-              activeTab === 'search'
-                ? 'bg-primary text-primary-foreground border-primary'
-                : 'border-primary/40 text-primary hover:bg-primary/10'
-            }`}
-          >
-            <Sparkles className="w-3.5 h-3.5" />
-            <span>AI Search</span>
-          </Button>
-
           <Link href={`/projects/${project.id}/report`}>
             <Button
               variant="outline"
-              className="gap-1.5 shrink-0 text-xs border-indigo-300 text-indigo-700 hover:bg-indigo-50 font-semibold shadow-2xs"
+              className="gap-1.5 text-xs text-white/80 hover:text-white border-white/10 hover:border-white/20"
             >
-              <FileText className="w-3.5 h-3.5" />
-              <span>View Impact Report</span>
+              <FileText className="w-3.5 h-3.5 text-[#00d2ff]" />
+              <span>Audit Dossier</span>
             </Button>
           </Link>
 
           <Button
             onClick={() => setIsUploadModalOpen(true)}
-            className="gap-2 shrink-0 text-xs"
+            className="group inline-flex items-center justify-center gap-2 rounded-full bg-white text-black font-semibold text-xs px-4 py-2 transition-all hover:bg-white/90 active:scale-[0.98] shadow-[0_0_18px_rgba(255,255,255,0.2)]"
           >
-            <UploadCloud className="w-4 h-4" />
+            <UploadCloud className="w-4 h-4 text-black" />
             <span>Upload Media</span>
           </Button>
         </div>
       </div>
 
+      <div className="liquid-glass rounded-2xl p-6">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div>
+            <div className="flex items-center gap-2">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#00d2ff] shadow-[0_0_8px_#00d2ff]" />
+              <span className="text-[11px] font-medium text-white/50 tracking-wider uppercase">
+                Active Workspace
+              </span>
+              <span className="px-2 py-0.5 rounded-full border border-white/10 text-white/40 text-[10px] uppercase font-semibold">
+                {(project.project_type || 'Field Project').replace('_', ' ')}
+              </span>
+            </div>
+
+            <h1 className="text-2xl sm:text-3xl font-bold text-white tracking-tight mt-1.5">
+              {project.name}
+            </h1>
+
+            <div className="flex flex-wrap items-center gap-4 text-xs text-white/50 mt-2 font-medium">
+              {project.location && (
+                <span className="flex items-center gap-1.5">
+                  <MapPin className="w-3.5 h-3.5 text-[#00d2ff]" />
+                  <span>{project.location}</span>
+                </span>
+              )}
+              <span className="flex items-center gap-1.5">
+                <Calendar className="w-3.5 h-3.5 text-white/40" />
+                <span>{formatDateRange(project.start_date, project.end_date)}</span>
+              </span>
+              <span className="flex items-center gap-1.5 text-[#A4F4FD]">
+                <ShieldCheck className="w-3.5 h-3.5 text-[#28c840]" />
+                <span>{stats.mediaCount} Ingested Assets</span>
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* Navigation Tabs */}
       <Tabs tabs={tabs} activeTab={activeTab} onChange={setActiveTab} />
+
 
       {/* Tab: Evidence & Claims (Phase 6) */}
       {activeTab === 'claims' && (

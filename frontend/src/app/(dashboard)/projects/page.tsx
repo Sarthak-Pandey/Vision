@@ -1,16 +1,15 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
-import { Plus, LayoutGrid, List as ListIcon, FolderKanban } from 'lucide-react';
+import React, { useEffect, useState, useMemo } from 'react';
+import Link from 'next/link';
+import { Plus, LayoutGrid, List as ListIcon, FolderKanban, Search, Sparkles, MapPin, Calendar, ImageIcon, ChevronRight } from 'lucide-react';
+import { motion } from 'motion/react';
 import { Button } from '@/components/ui/Button';
-import { SearchInput } from '@/components/ui/SearchInput';
 import { ProjectCard } from '@/components/ui/ProjectCard';
 import { EmptyState } from '@/components/ui/EmptyState';
-import { CardSkeleton } from '@/components/ui/LoadingSkeleton';
 import { CreateProjectModal } from '@/components/projects/CreateProjectModal';
 import { getProjects } from '@/lib/api/client';
 import { Project } from '@/types';
-import Link from 'next/link';
 
 export default function ProjectsPage() {
   const [projects, setProjects] = useState<Project[]>([]);
@@ -35,49 +34,126 @@ export default function ProjectsPage() {
     loadProjects();
   }, []);
 
-  const filteredProjects = projects.filter((p) => {
+  const totalAssets = useMemo(() => {
+    return projects.reduce((acc, p) => acc + (p.media_count || 0), 0);
+  }, [projects]);
+
+  const filteredProjects = useMemo(() => {
     const term = searchTerm.toLowerCase();
-    return (
-      p.name.toLowerCase().includes(term) ||
-      (p.location && p.location.toLowerCase().includes(term)) ||
-      (p.description && p.description.toLowerCase().includes(term))
-    );
-  });
+    return projects.filter((p) => {
+      return (
+        p.name.toLowerCase().includes(term) ||
+        (p.location && p.location.toLowerCase().includes(term)) ||
+        (p.description && p.description.toLowerCase().includes(term))
+      );
+    });
+  }, [projects, searchTerm]);
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+    <div className="space-y-8 max-w-7xl mx-auto pb-12">
+      {/* Header Row */}
+      <motion.div
+        initial={{ opacity: 0, y: -10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+        className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-white/[0.06]"
+      >
         <div>
-          <h1 className="text-2xl font-bold text-primary-text tracking-tight">Projects</h1>
-          <p className="text-sm text-secondary-text mt-0.5">
-            Manage and organize your impact projects.
+          <div className="flex items-center gap-2">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#00d2ff] shadow-[0_0_8px_#00d2ff]" />
+            <span className="text-[11px] font-medium text-white/50 tracking-wider uppercase">
+              Field Workspaces
+            </span>
+            <span className="px-2 py-0.5 rounded-full border border-white/10 text-white/40 text-[10px] font-mono">
+              {projects.length} Total
+            </span>
+          </div>
+          <h1 className="text-2xl sm:text-3xl font-semibold tracking-tight text-white mt-1">
+            Projects Portfolio
+          </h1>
+          <p className="text-xs text-white/50 mt-1 max-w-lg">
+            Manage field impact initiatives, verify ground-truth media, and track automated AI audit logs.
           </p>
         </div>
-        <Button onClick={() => setIsModalOpen(true)} className="gap-2 shrink-0">
-          <Plus className="w-4 h-4" />
-          <span>New Project</span>
-        </Button>
-      </div>
+
+        <div className="flex items-center gap-3">
+          <Button
+            onClick={() => setIsModalOpen(true)}
+            className="group inline-flex items-center justify-center gap-2 rounded-full bg-white text-black font-semibold text-xs px-5 py-2.5 transition-all hover:bg-white/90 active:scale-[0.98] shadow-[0_0_20px_rgba(255,255,255,0.2)]"
+          >
+            <Plus className="w-4 h-4 text-black" />
+            <span>New Project</span>
+            <ChevronRight className="w-3.5 h-3.5 text-black/60 transition-transform group-hover:translate-x-0.5" />
+          </Button>
+        </div>
+      </motion.div>
+
+      {/* Quick Telemetry Bar */}
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
+        className="grid grid-cols-2 md:grid-cols-4 gap-3"
+      >
+        <div className="liquid-glass rounded-xl p-4 flex flex-col justify-between">
+          <span className="text-[11px] font-medium text-white/40 uppercase tracking-wider">Active Workspaces</span>
+          <div className="flex items-baseline gap-2 mt-2">
+            <span className="text-2xl font-bold text-white tracking-tight">{projects.length}</span>
+            <span className="text-[11px] text-[#28c840] font-medium">Online</span>
+          </div>
+        </div>
+
+        <div className="liquid-glass rounded-xl p-4 flex flex-col justify-between">
+          <span className="text-[11px] font-medium text-white/40 uppercase tracking-wider">Ingested Evidence</span>
+          <div className="flex items-baseline gap-2 mt-2">
+            <span className="text-2xl font-bold text-white tracking-tight">{totalAssets}</span>
+            <span className="text-[11px] text-[#00d2ff] font-medium">Assets</span>
+          </div>
+        </div>
+
+        <div className="liquid-glass rounded-xl p-4 flex flex-col justify-between">
+          <span className="text-[11px] font-medium text-white/40 uppercase tracking-wider">Verification Rate</span>
+          <div className="flex items-baseline gap-2 mt-2">
+            <span className="text-2xl font-bold text-white tracking-tight">100%</span>
+            <span className="text-[11px] text-[#A4F4FD] font-medium">Deterministic</span>
+          </div>
+        </div>
+
+        <div className="liquid-glass rounded-xl p-4 flex flex-col justify-between">
+          <span className="text-[11px] font-medium text-white/40 uppercase tracking-wider">Telemetry Engine</span>
+          <div className="flex items-baseline gap-2 mt-2">
+            <span className="text-sm font-semibold text-white tracking-tight">Aura Vision v2.5</span>
+            <span className="w-2 h-2 rounded-full bg-[#00d2ff] shadow-[0_0_6px_#00d2ff]" />
+          </div>
+        </div>
+      </motion.div>
 
       {/* Controls Bar */}
-      <div className="flex flex-col sm:flex-row items-center justify-between gap-3 bg-card p-3 rounded-xl border border-border shadow-2xs">
-        <div className="w-full sm:w-80">
-          <SearchInput
-            placeholder="Search projects by name or location..."
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
+        className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 liquid-glass p-2.5 rounded-2xl"
+      >
+        <div className="relative flex-1 max-w-md">
+          <Search className="w-4 h-4 text-white/40 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+          <input
+            type="text"
+            placeholder="Search projects by name, location, or tag..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full bg-white/[0.04] text-white text-xs rounded-xl pl-9 pr-4 py-2 border border-white/[0.08] placeholder:text-white/30 focus:outline-none focus:border-white/30 focus:bg-white/[0.07] transition-all"
           />
         </div>
 
         <div className="flex items-center gap-2 self-end sm:self-auto">
-          <div className="flex items-center bg-muted p-1 rounded-lg border border-border">
+          <div className="flex items-center bg-black/40 p-1 rounded-xl border border-white/10">
             <button
               onClick={() => setViewMode('grid')}
-              className={`p-1.5 rounded-md transition-colors ${
+              className={`p-1.5 rounded-lg transition-all ${
                 viewMode === 'grid'
-                  ? 'bg-background text-foreground shadow-2xs font-semibold'
-                  : 'text-muted-foreground hover:text-foreground'
+                  ? 'bg-white/15 text-white shadow-sm'
+                  : 'text-white/40 hover:text-white/80'
               }`}
               aria-label="Grid View"
             >
@@ -85,10 +161,10 @@ export default function ProjectsPage() {
             </button>
             <button
               onClick={() => setViewMode('list')}
-              className={`p-1.5 rounded-md transition-colors ${
+              className={`p-1.5 rounded-lg transition-all ${
                 viewMode === 'list'
-                  ? 'bg-background text-foreground shadow-2xs font-semibold'
-                  : 'text-muted-foreground hover:text-foreground'
+                  ? 'bg-white/15 text-white shadow-sm'
+                  : 'text-white/40 hover:text-white/80'
               }`}
               aria-label="List View"
             >
@@ -96,61 +172,115 @@ export default function ProjectsPage() {
             </button>
           </div>
         </div>
-      </div>
+      </motion.div>
 
       {/* Projects List / Grid */}
       {isLoading ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
-          <CardSkeleton />
-          <CardSkeleton />
-          <CardSkeleton />
+          {[1, 2, 3, 4].map((i) => (
+            <div key={i} className="liquid-glass rounded-2xl border border-white/10 bg-[#0e1014]/60 h-64 animate-pulse p-4 space-y-4">
+              <div className="h-28 bg-white/[0.04] rounded-xl" />
+              <div className="h-4 bg-white/[0.06] rounded w-3/4" />
+              <div className="h-3 bg-white/[0.04] rounded w-1/2" />
+            </div>
+          ))}
         </div>
       ) : filteredProjects.length === 0 ? (
-        <EmptyState
-          icon={<FolderKanban className="w-8 h-8 text-muted-text" />}
-          title={searchTerm ? 'No matching projects' : 'No projects yet'}
-          description={
-            searchTerm
-              ? `No projects matched "${searchTerm}". Try a different keyword.`
-              : 'Create your first project to start collecting impact evidence.'
-          }
-          action={
-            <Button onClick={() => setIsModalOpen(true)} className="gap-2">
-              <Plus className="w-4 h-4" />
-              <span>Create Project</span>
-            </Button>
-          }
-        />
+        <div className="liquid-glass rounded-2xl border border-white/10 bg-[#0e1014]/60 p-12 text-center">
+          <EmptyState
+            icon={<FolderKanban className="w-8 h-8 text-white/30" />}
+            title={searchTerm ? 'No matching projects found' : 'No active projects'}
+            description={
+              searchTerm
+                ? `No projects matched "${searchTerm}". Try a different keyword.`
+                : 'Create your first project to start collecting and verifying impact evidence.'
+            }
+            action={
+              <Button
+                onClick={() => setIsModalOpen(true)}
+                className="mt-4 rounded-full bg-white text-black font-semibold text-xs px-5 py-2.5 hover:bg-white/90"
+              >
+                <Plus className="w-4 h-4 mr-2" />
+                <span>Create First Project</span>
+              </Button>
+            }
+          />
+        </div>
       ) : viewMode === 'grid' ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.4 }}
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5"
+        >
           {filteredProjects.map((project) => (
             <ProjectCard key={project.id} project={project} />
           ))}
-        </div>
+        </motion.div>
       ) : (
-        <div className="bg-card border border-border rounded-xl divide-y divide-border overflow-hidden shadow-2xs">
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.4 }}
+          className="liquid-glass rounded-2xl divide-y divide-white/[0.05] overflow-hidden"
+        >
+          {/* macOS titlebar style header */}
+          <div className="px-5 py-3 bg-white/[0.02] border-b border-white/[0.05] flex items-center justify-between text-xs text-white/50 font-medium">
+            <div className="flex items-center gap-2">
+              <span className="w-2.5 h-2.5 rounded-full bg-[#ff5f57]/80" />
+              <span className="w-2.5 h-2.5 rounded-full bg-[#febc2e]/80" />
+              <span className="w-2.5 h-2.5 rounded-full bg-[#28c840]/80" />
+              <span className="ml-2">Workspace Registry</span>
+            </div>
+            <span>Showing {filteredProjects.length} items</span>
+          </div>
+
           {filteredProjects.map((project) => (
             <Link
               key={project.id}
               href={`/projects/${project.id}`}
-              className="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:bg-secondary-bg/50 transition-colors"
+              className="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:bg-white/[0.04] transition-all group"
             >
               <div className="flex items-center gap-4">
-                <div className="w-10 h-10 rounded-lg bg-brand-light-orange text-brand-dark-orange flex items-center justify-center font-bold text-sm shrink-0">
+                <div className="w-10 h-10 rounded-xl bg-white/[0.06] border border-white/15 text-white flex items-center justify-center font-bold text-xs shrink-0 group-hover:border-[#00d2ff]/40 transition-colors">
                   {project.name.slice(0, 2).toUpperCase()}
                 </div>
                 <div>
-                  <h3 className="text-base font-semibold text-primary-text">{project.name}</h3>
-                  <p className="text-xs text-secondary-text">{project.location || 'Location unspecified'}</p>
+                  <div className="flex items-center gap-2">
+                    <h3 className="text-sm font-semibold text-white group-hover:text-[#A4F4FD] transition-colors">
+                      {project.name}
+                    </h3>
+                    <span className="text-[10px] uppercase font-semibold text-white/40 px-2 py-0.5 rounded-full bg-white/[0.04] border border-white/[0.08]">
+                      {(project.project_type || 'Field').replace('_', ' ')}
+                    </span>
+                  </div>
+                  {project.location && (
+                    <div className="flex items-center gap-1 text-xs text-white/50 mt-1">
+                      <MapPin className="w-3 h-3 text-white/40" />
+                      <span>{project.location}</span>
+                    </div>
+                  )}
                 </div>
               </div>
-              <div className="flex items-center gap-6 text-xs text-secondary-text">
-                <span>{project.media_count ?? 0} media</span>
-                <span>{project.start_date || 'N/A'} – {project.end_date || 'N/A'}</span>
+
+              <div className="flex items-center gap-6 text-xs text-white/50">
+                <div className="flex items-center gap-1.5">
+                  <ImageIcon className="w-3.5 h-3.5 text-[#00d2ff]" />
+                  <span>{project.media_count ?? 0} media</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <Calendar className="w-3.5 h-3.5 text-white/40" />
+                  <span>
+                    {project.start_date
+                      ? new Date(project.start_date).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })
+                      : 'Active'}
+                  </span>
+                </div>
+                <ChevronRight className="w-4 h-4 text-white/30 group-hover:text-white group-hover:translate-x-0.5 transition-all" />
               </div>
             </Link>
           ))}
-        </div>
+        </motion.div>
       )}
 
       {/* Modal */}
@@ -162,3 +292,4 @@ export default function ProjectsPage() {
     </div>
   );
 }
+

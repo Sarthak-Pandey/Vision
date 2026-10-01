@@ -1,4 +1,5 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Instrument+Serif:ital@1&display=swap');
+@import './landing.css';
 
 @tailwind base;
 @tailwind components;
@@ -6,7 +7,6 @@
 
 @layer base {
   :root {
-    /* Shadcn Light Theme: Page off-white (#FAFAFA), Card crisp white (#FFFFFF) */
     --background: 240 4.8% 98%;
     --foreground: 240 10% 3.9%;
 
@@ -43,38 +43,38 @@
   }
 
   .dark {
-    /* Shadcn Dark Theme: Page dark black (#09090B), Card exact charcoal gray (#171717 = 0 0% 9%) */
-    --background: 0 0% 3.9%;
+    /* Pure Deep Obsidian Dark Theme */
+    --background: 240 10% 2.5%; /* #050508 */
     --foreground: 0 0% 98%;
 
-    --card: 0 0% 9%; /* #171717 exact card charcoal gray */
+    --card: 240 7% 5%; /* #0b0b0f */
     --card-foreground: 0 0% 98%;
 
-    --popover: 0 0% 9%; /* #171717 */
+    --popover: 240 7% 5%;
     --popover-foreground: 0 0% 98%;
 
     --primary: 0 0% 98%;
     --primary-foreground: 0 0% 9%;
 
-    --secondary: 0 0% 14.9%; /* #262626 */
+    --secondary: 240 6% 9%; /* #14141a */
     --secondary-foreground: 0 0% 98%;
 
-    --muted: 0 0% 14.9%; /* #262626 */
-    --muted-foreground: 0 0% 63.9%;
+    --muted: 240 6% 9%;
+    --muted-foreground: 0 0% 60%;
 
-    --accent: 0 0% 14.9%;
+    --accent: 240 6% 11%;
     --accent-foreground: 0 0% 98%;
 
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 0 0% 98%;
 
-    --border: 0 0% 14.9%; /* #262626 */
-    --input: 0 0% 14.9%;
+    --border: 240 5% 12%; /* #1d1d24 */
+    --input: 240 5% 12%;
     --ring: 0 0% 83.1%;
 
-    --brand-orange: 0 0% 98%;
-    --brand-dark-orange: 0 0% 98%;
-    --brand-light-orange: 0 0% 14.9%;
+    --brand-orange: 215 100% 60%;
+    --brand-dark-orange: 215 90% 50%;
+    --brand-light-orange: 215 100% 12%;
   }
 }
 
@@ -103,7 +103,7 @@
   animation: fadeIn 0.15s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
-/* Custom Shadcn Scrollbars */
+/* Custom Sleek Obsidian Scrollbars */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
@@ -112,9 +112,47 @@
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: hsl(var(--border));
+  background: rgba(255, 255, 255, 0.12);
   border-radius: 9999px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: hsl(var(--muted-foreground) / 0.5);
+  background: rgba(255, 255, 255, 0.25);
 }
+
+/* Flawless Obsidian Glass Card (Refined, Subtle Bordering) */
+.liquid-glass {
+  background: rgba(14, 16, 20, 0.75);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  box-shadow: 
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.05),
+    0 1px 2px 0 rgba(0, 0, 0, 0.4),
+    0 8px 24px -4px rgba(0, 0, 0, 0.5);
+  position: relative;
+  overflow: hidden;
+  transition: border-color 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.liquid-glass:hover {
+  border-color: rgba(255, 255, 255, 0.12);
+  box-shadow: 
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.08),
+    0 4px 12px 0 rgba(0, 0, 0, 0.5),
+    0 16px 36px -4px rgba(0, 0, 0, 0.65);
+}
+
+
+@keyframes shiny {
+  0% {
+    background-position: -200% center;
+  }
+  100% {
+    background-position: 200% center;
+  }
+}
+
+.animate-shiny {
+  animation: shiny 6s linear infinite;
+}
+
