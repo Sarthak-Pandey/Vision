@@ -11,65 +11,67 @@ import {
   FileText,
 } from 'lucide-react';
 import { cn } from '@/lib/utils/cn';
-import { Avatar } from '@/components/ui/Avatar';
-import { Logo } from '@/components/ui/Logo';
-import { useAuth } from '@/lib/auth/AuthContext';
 
 const mainNavItems = [
   { label: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
   { label: 'Projects', href: '/projects', icon: FolderKanban },
-  { label: 'Media', href: '/media', icon: Images },
-  { label: 'Search', href: '/search', icon: Search },
-  { label: 'Reports', href: '/reports', icon: FileText },
+  { label: 'Media Intelligence', href: '/media', icon: Images },
+  { label: 'Evidence Audit', href: '/search', icon: Search },
+  { label: 'Impact Reports', href: '/reports', icon: FileText },
 ];
 
 export const Sidebar: React.FC = () => {
   const pathname = usePathname();
-  const { user } = useAuth();
-  const userName = user?.name || 'Guest User';
 
   return (
-    <aside className="w-[240px] h-screen sticky top-0 bg-card border-r border-border flex flex-col justify-between shrink-0 select-none z-30 shadow-2xs">
+    <aside className="w-[240px] h-screen sticky top-0 bg-[#070709] border-r border-white/[0.08] flex flex-col justify-between shrink-0 select-none z-30">
       <div>
-        {/* Logo / Branding */}
-        <div className="p-5 border-b border-border flex items-center gap-3">
-          <div className="w-8 h-8 rounded-md bg-primary text-primary-foreground flex items-center justify-center shadow-2xs">
-            <Logo className="w-5 h-5 text-primary-foreground" />
+        {/* Logo / Branding with Alien Head Logo */}
+        <Link
+          href="/"
+          className="p-4 border-b border-white/[0.08] flex items-center justify-between group hover:bg-white/[0.02] transition-colors"
+          title="Return to Landing Page"
+        >
+          <div className="flex items-center gap-2.5">
+            <div className="w-8 h-8 rounded-lg bg-white/[0.06] border border-white/[0.1] flex items-center justify-center p-1.5 group-hover:border-white/25 transition-colors">
+              <img
+                src="/logo-white.png"
+                alt="Vision"
+                className="w-full h-full object-contain"
+              />
+            </div>
+            <div className="flex items-baseline gap-1">
+              <span className="text-[15px] font-semibold tracking-tight text-white leading-none">
+                Vision
+              </span>
+              <span className="text-[11px] font-mono text-white/40">.ai</span>
+            </div>
           </div>
-          <div>
-            <h1 className="text-sm font-bold tracking-tight text-foreground uppercase leading-none">
-              Impact
-            </h1>
-            <p className="text-[10px] font-semibold text-muted-foreground tracking-widest uppercase mt-1">
-              Intelligence
-            </p>
-          </div>
-        </div>
+        </Link>
 
         {/* Navigation */}
-        <nav className="p-3 space-y-1 mt-2">
+        <nav className="p-3 space-y-1 mt-1">
           {mainNavItems.map((item) => {
             const Icon = item.icon;
-            const isActive = pathname === item.href || (item.href !== '/dashboard' && pathname?.startsWith(item.href));
+            const isActive =
+              pathname === item.href ||
+              (item.href !== '/dashboard' && pathname?.startsWith(item.href));
 
             return (
               <Link
                 key={item.label}
                 href={item.href}
                 className={cn(
-                  'relative flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-all group duration-150',
+                  'flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-medium transition-all duration-150',
                   isActive
-                    ? 'bg-accent text-accent-foreground font-semibold shadow-2xs'
-                    : 'text-muted-foreground hover:text-foreground hover:bg-accent/60'
+                    ? 'bg-white/[0.08] text-white border border-white/[0.08] shadow-xs'
+                    : 'text-white/55 hover:text-white hover:bg-white/[0.04]'
                 )}
               >
-                {isActive && (
-                  <span className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-4 bg-primary rounded-r-full" />
-                )}
                 <Icon
                   className={cn(
-                    'w-4 h-4 transition-colors',
-                    isActive ? 'text-foreground' : 'text-muted-foreground group-hover:text-foreground'
+                    'w-4 h-4 shrink-0 transition-colors',
+                    isActive ? 'text-white' : 'text-white/45'
                   )}
                 />
                 <span>{item.label}</span>
@@ -79,16 +81,17 @@ export const Sidebar: React.FC = () => {
         </nav>
       </div>
 
-      {/* User Section */}
-      <div className="p-4 border-t border-border bg-card">
-        <div className="flex items-center gap-3 p-1 rounded-md">
-          <Avatar name={userName} size="sm" />
-          <div className="min-w-0 flex-1">
-            <p className="text-xs font-semibold text-foreground truncate">{userName}</p>
-            <p className="text-[11px] text-muted-foreground truncate">Guest Account</p>
+      {/* Footer Section: Clean Minimal Workspace Status */}
+      <div className="p-3 border-t border-white/[0.06]">
+        <div className="flex items-center justify-between px-2.5 py-1.5 text-[11px] text-white/40">
+          <div className="flex items-center gap-2">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#00d2ff] shadow-[0_0_6px_#00d2ff]" />
+            <span className="font-medium text-white/60">System Ready</span>
           </div>
+          <span className="font-mono text-[10px] text-white/30">v2.5</span>
         </div>
       </div>
     </aside>
   );
 };
+
