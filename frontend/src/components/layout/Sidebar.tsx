@@ -47,14 +47,14 @@ export const Sidebar: React.FC = () => {
           className="h-14 px-4 border-b border-white/[0.08] flex items-center gap-3 group hover:bg-white/[0.02] transition-colors shrink-0"
           title="Return to Landing Page"
         >
-          {/* PieBurst 3D Disc Split — Clear, Big, No Outline Border */}
-          <div className="w-9 h-9 flex items-center justify-center shrink-0">
+          {/* PieBurst 3D Disc Split — Round, Perfectly Unclipped, Floating */}
+          <div className="w-10 h-10 flex items-center justify-center shrink-0">
             <PieBurst
               background="transparent"
               baseColor="#FFFFFF"
               accentColor="#3D81E3"
               speed={45}
-              distance={3.8}
+              distance={5.8}
               style={{ width: '100%', height: '100%' }}
             />
           </div>

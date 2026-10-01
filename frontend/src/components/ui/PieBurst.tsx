@@ -402,7 +402,7 @@ function __OriginkitBase_PieBurst(props: PieBurstProps) {
         baseColor = "#FFFFFF",
         accentColor = "#FFFFFF",
         speed = 50,
-        distance = 20,
+        distance = 5.8,
         pie,
         style,
         className,

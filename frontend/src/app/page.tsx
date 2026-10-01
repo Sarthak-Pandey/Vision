@@ -132,13 +132,13 @@ export default function LandingPage() {
             style={{ '--d': '0.08s' } as React.CSSProperties}
             aria-label="Vision Platform"
           >
-            <div className="w-9 h-9 flex items-center justify-center shrink-0">
+            <div className="w-10 h-10 flex items-center justify-center shrink-0">
               <PieBurst
                 background="transparent"
                 baseColor="#FFFFFF"
                 accentColor="#3D81E3"
                 speed={45}
-                distance={3.8}
+                distance={5.8}
                 style={{ width: '100%', height: '100%' }}
               />
             </div>
