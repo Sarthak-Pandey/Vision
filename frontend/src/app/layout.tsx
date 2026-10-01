@@ -7,7 +7,14 @@ export const metadata: Metadata = {
   title: 'Vision — Multimodal Ground-Truth & Media Intelligence',
   description: 'AI platform for environmental, sustainability, and field operations verification',
   icons: {
-    icon: '/logo-white.png',
+    icon: [
+      { url: '/icon.svg', type: 'image/svg+xml' },
+      { url: '/favicon.ico', sizes: 'any' },
+      { url: '/logo-white.png', sizes: '512x512', type: 'image/png' },
+    ],
+    apple: [
+      { url: '/logo-white.png', sizes: '180x180', type: 'image/png' },
+    ],
   },
 };
 
@@ -19,6 +26,10 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning className="dark" style={{ background: '#000000', color: '#ffffff' }}>
       <head>
+        <link rel="icon" type="image/svg+xml" href="/icon.svg" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/logo-white.png" />
+        <link rel="icon" href="/favicon.ico" sizes="any" />
+        <link rel="apple-touch-icon" href="/logo-white.png" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link
